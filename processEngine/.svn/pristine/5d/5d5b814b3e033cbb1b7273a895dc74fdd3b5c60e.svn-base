@@ -1,7 +1,0 @@
-Parent project for FBK DAS Unit Process Engine
-
-To install, just run:
-
-mvn clean install
-
-see in process-engine-impl/src/test/java for tests

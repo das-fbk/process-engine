@@ -1,3 +1,0 @@
-Test of double effect for an activity. 
-
-Idea behind is that any activity can have an effect with one or more events, even on same domainProperty

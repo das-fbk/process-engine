@@ -1,2 +1,0 @@
-In this test there is only one domainObject with a process. In this process there is an eventhandler
-that catch an external issue and react changing domainProperty

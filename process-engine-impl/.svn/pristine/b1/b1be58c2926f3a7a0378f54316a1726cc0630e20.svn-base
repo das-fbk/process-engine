@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<tns:domainObject name="JourneyPlanner" xmlns:tns="http://das.fbk.eu/DomainObject" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://das.fbk.eu/DomainObject ../Schemata/DomainObject.xsd ">
-  <tns:domainKnowledge>
-    <tns:external>
-      <tns:domainProperty name="JourneyPlanner_dk" type="JourneyPlanner_dk"/>
-    </tns:external>
-  </tns:domainKnowledge>
-  <tns:process name="JourneyPlanner_core"/>
-</tns:domainObject>

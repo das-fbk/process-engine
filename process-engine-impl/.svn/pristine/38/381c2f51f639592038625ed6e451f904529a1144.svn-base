@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<tns:domainObject name="Test" xmlns:tns="http://das.fbk.eu/DomainObject" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <tns:domainKnowledge>
-    <tns:external>
-      <tns:domainProperty name="prec_TripPlanner_dp" type="prec_TripPlanner_dp"/>
-    </tns:external>
-  </tns:domainKnowledge>
-  <tns:process name="prec_Process_test1"/>
-</tns:domainObject>

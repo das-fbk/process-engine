@@ -1,9 +1,0 @@
-Basic example with two domain object
-
-DO1
-	invoke - receive
-	
-DO2
-	concrete - scope: receive - invoke
-
-Objective of this test is to check communication between two domain object inside a scope

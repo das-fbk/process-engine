@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<tns:process name="P_Do1" xmlns:tns="http://das.fbk.eu/Process"
-	xmlns:tns1="http://das.fbk.eu/Annotation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-
-	<tns:invoke name="invoke1" />
-	<tns:receive name="receive1" />
-
-</tns:process>

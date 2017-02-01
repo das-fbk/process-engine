@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<tns:scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:tns="http://das.fbk.eu/Scenario">
-	<tns:domainObject file="E_Test" >
-		<tns:domainObjectInstance id="EntityTest">
-		</tns:domainObjectInstance>
-	</tns:domainObject>
-</tns:scenario>

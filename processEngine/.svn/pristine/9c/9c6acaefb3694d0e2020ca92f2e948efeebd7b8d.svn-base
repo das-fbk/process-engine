@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<tns:process name="UMS" xmlns:tns="http://das.fbk.eu/Process"
-	xmlns:tns1="http://das.fbk.eu/Annotation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-
-	<tns:receive name="TripPlanner" />
-
-	<tns:invoke name="ReceiveAlternatives" />
-</tns:process>

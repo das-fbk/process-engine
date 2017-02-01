@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<composition xmlns="http://das.fbk.eu/Composition" xmlns:ns2="http://das.fbk.eu/Annotation" xmlns:ns3="http://das.fbk.eu/Process" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://soa.fbk.eu/Composition null\Schemata\Composition.xsd">
+    <domainProperties>
+        <domainProperty type="TrainTrip" oid="TrainTrip"/>
+        <domainProperty type="HandlePayment" oid="HandlePayment"/>
+        <domainProperty type="FlexibusTrip" oid="FlexibusTrip"/>
+        <domainProperty type="BikeSharingTrip" oid="BikeSharingTrip"/>
+        <domainProperty type="CarSharingTrip" oid="CarSharingTrip"/>
+        <domainProperty type="RoutePassengerStatus" oid="RoutePassengerStatus"/>
+        <domainProperty type="HandleSmartMobilityCard" oid="HandleSmartMobilityCard"/>
+    </domainProperties>
+    <fragments>
+        <fragment type="FC_userRegistration" sid="service4">
+            <assignment oid="FlexibusTrip" o_name="FlexibusTrip"/>
+        </fragment>
+        <fragment type="BS_userRegistration" sid="service5">
+            <assignment oid="BikeSharingTrip" o_name="BikeSharingTrip"/>
+            <assignment oid="HandleSmartMobilityCard" o_name="HandleSmartMobilityCard"/>
+        </fragment>
+        <fragment type="CS_carReservation" sid="service6">
+            <assignment oid="CarSharingTrip" o_name="CarSharingTrip"/>
+        </fragment>
+        <fragment type="TC_userRegistration" sid="service7">
+            <assignment oid="TrainTrip" o_name="TrainTrip"/>
+        </fragment>
+        <fragment type="CS_membershipDemand" sid="service8">
+            <assignment oid="CarSharingTrip" o_name="CarSharingTrip"/>
+            <assignment oid="HandleSmartMobilityCard" o_name="HandleSmartMobilityCard"/>
+        </fragment>
+        <fragment type="TC_trainBooking" sid="service9">
+            <assignment oid="TrainTrip" o_name="TrainTrip"/>
+            <assignment oid="HandlePayment" o_name="HandlePayment"/>
+        </fragment>
+        <fragment type="FC_flexibusBooking" sid="service10">
+            <assignment oid="FlexibusTrip" o_name="FlexibusTrip"/>
+            <assignment oid="RoutePassengerStatus" o_name="RoutePassengerStatus"/>
+        </fragment>
+    </fragments>
+    <synchronization>
+        <point priority="0">
+            <domainProperty oid="TrainTrip">
+                <state>TRIP_BOOKED</state>
+            </domainProperty>
+            <domainProperty oid="FlexibusTrip">
+                <state>TRIP_BOOKED</state>
+            </domainProperty>
+            <domainProperty oid="BikeSharingTrip">
+                <state>USER_REGISTERED</state>
+            </domainProperty>
+            <domainProperty oid="CarSharingTrip">
+                <state>RESERVATION_COMPLETED</state>
+            </domainProperty>
+        </point>
+    </synchronization>
+    <runtime>
+        <domainProperties>
+            <domainProperty oid="TrainTrip">INITIAL</domainProperty>
+            <domainProperty oid="HandlePayment">INITIAL</domainProperty>
+            <domainProperty oid="FlexibusTrip">INITIAL</domainProperty>
+            <domainProperty oid="BikeSharingTrip">INITIAL</domainProperty>
+            <domainProperty oid="CarSharingTrip">INITIAL</domainProperty>
+            <domainProperty oid="RoutePassengerStatus">INITIAL</domainProperty>
+            <domainProperty oid="HandleSmartMobilityCard">INITIAL</domainProperty>
+        </domainProperties>
+        <fragments>
+            <fragment sid="service4">ST0</fragment>
+            <fragment sid="service5">ST0</fragment>
+            <fragment sid="service6">ST0</fragment>
+            <fragment sid="service7">ST0</fragment>
+            <fragment sid="service8">ST0</fragment>
+            <fragment sid="service9">ST0</fragment>
+            <fragment sid="service10">ST0</fragment>
+        </fragments>
+    </runtime>
+</composition>

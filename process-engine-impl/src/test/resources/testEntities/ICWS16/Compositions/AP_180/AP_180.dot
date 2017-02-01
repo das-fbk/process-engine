@@ -1,0 +1,19 @@
+digraph plan_fsm {
+ratio="1.3";
+margin="0.2";
+size="8.0,11.4";
+"0" -> "1" [style=dotted label="dn_main.input = service347_PR_RegistrationRequest &\n"]
+"1" -> "2" [label="dn_main.output = service347_PR_concrete_1"]
+"2" -> "3" [label="dn_main.output = service347_PR_concrete_2"]
+"3" -> "4" [label="dn_main.output = service347_PR_concrete_3"]
+"4" -> "5" [label="dn_main.output = service347_PR_concrete_4"]
+"5" -> "6" [label="dn_main.output = service347_PR_RegistrationAck"]
+"6" -> "7" [style=dotted label="dn_main.input = service347_PR_bookPark &\n"]
+"7" -> "8" [style=dotted label="dn_main.input = service344_PR_FindPArkRequest &\n"]
+"8" -> "9" [label="dn_main.output = service344_PR_concrete1"]
+"9" -> "10" [label="dn_main.output = service344_PR_concrete2"]
+"10" -> "11" [label="dn_main.output = service344_PR_concrete3"]
+"11" -> "12" [style=dotted label="dn_main.input = service344_PR_PlanCarRoute &\n"]
+"12" -> "13" [label="dn_main.output = service344_PR_FindPArkAck"]
+}
+

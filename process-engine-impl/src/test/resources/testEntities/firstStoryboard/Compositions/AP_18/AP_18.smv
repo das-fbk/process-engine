@@ -1,0 +1,210 @@
+-------------------------------
+--   C O M P O S I T I O N   --
+-------------------------------
+MODULE dn_main
+
+---------------------
+--   I N P U T S   --
+---------------------
+IVAR input:
+{
+UNDEF, service30_FC_UserLoginRequest, service30_RESET, service32_RESET, service32_FC_UserRegistrationRequest, service33_FC_DriverLoginRequest, service33_RESET, service34_FC_ConfirmAndPay, service34_FC_FlexibusBookingRequest, service34_FC_PaymentReceipt, service34_FC_SetPassengerDetails, service34_RESET, service35_RESET, service35_FC_RouteAssignmentRequest, service35_FC_TakeFlexibus
+};
+
+-----------------------
+--   O U T P U T S   --
+-----------------------
+IVAR output:
+{
+UNDEF, service30_FC_UserLoginAck, service32_FC_UserRegistrationAck, service33_FC_DriverLoginAck, service34_FC_TripDetails, service34_FC_BookingResult, service35_FC_RouteAssignmentReply
+};
+
+-------------------------
+--   S E R V I C E S   --
+-------------------------
+--	 service30
+VAR service30: {ST2, ST1, ST0};
+ASSIGN
+next(service30) :=
+case
+(service30 = ST1 & output = service30_FC_UserLoginAck): ST2;
+(service30 = ST2 & input = service30_RESET): ST0;
+(service30 = ST0 & input = service30_FC_UserLoginRequest): ST1;
+(service30 = ST1 & input = service30_RESET): ST0;
+1:service30;
+esac;
+TRANS ( input = service30_FC_UserLoginRequest) -> (service30 = ST0)
+TRANS ( input = service30_RESET) -> (service30 = ST2 | service30 = ST1)
+TRANS ( output = service30_FC_UserLoginAck) -> (service30 = ST1)
+
+--	 service32
+VAR service32: {ST2, ST1, ST0};
+ASSIGN
+next(service32) :=
+case
+(service32 = ST2 & input = service32_RESET): ST0;
+(service32 = ST1 & output = service32_FC_UserRegistrationAck): ST2;
+(service32 = ST0 & input = service32_FC_UserRegistrationRequest): ST1;
+(service32 = ST1 & input = service32_RESET): ST0;
+1:service32;
+esac;
+TRANS ( output = service32_FC_UserRegistrationAck) -> (service32 = ST1)
+TRANS ( input = service32_RESET) -> (service32 = ST2 | service32 = ST1)
+TRANS ( input = service32_FC_UserRegistrationRequest) -> (service32 = ST0)
+
+--	 service33
+VAR service33: {ST2, ST1, ST0};
+ASSIGN
+next(service33) :=
+case
+(service33 = ST2 & input = service33_RESET): ST0;
+(service33 = ST1 & input = service33_RESET): ST0;
+(service33 = ST1 & output = service33_FC_DriverLoginAck): ST2;
+(service33 = ST0 & input = service33_FC_DriverLoginRequest): ST1;
+1:service33;
+esac;
+TRANS ( output = service33_FC_DriverLoginAck) -> (service33 = ST1)
+TRANS ( input = service33_FC_DriverLoginRequest) -> (service33 = ST0)
+TRANS ( input = service33_RESET) -> (service33 = ST2 | service33 = ST1)
+
+--	 service34
+VAR service34: {ST2, ST1, ST4, ST3, ST6, ST5, ST0};
+ASSIGN
+next(service34) :=
+case
+(service34 = ST0 & input = service34_FC_FlexibusBookingRequest): ST1;
+(service34 = ST3 & input = service34_RESET): ST0;
+(service34 = ST4 & input = service34_RESET): ST0;
+(service34 = ST6 & input = service34_RESET): ST0;
+(service34 = ST4 & output = service34_FC_BookingResult): ST5;
+(service34 = ST5 & input = service34_RESET): ST0;
+(service34 = ST2 & input = service34_FC_ConfirmAndPay): ST3;
+(service34 = ST5 & input = service34_FC_SetPassengerDetails): ST6;
+(service34 = ST1 & output = service34_FC_TripDetails): ST2;
+(service34 = ST1 & input = service34_RESET): ST0;
+(service34 = ST3 & input = service34_FC_PaymentReceipt): ST4;
+(service34 = ST2 & input = service34_RESET): ST0;
+1:service34;
+esac;
+TRANS ( input = service34_FC_ConfirmAndPay) -> (service34 = ST2)
+TRANS ( input = service34_FC_FlexibusBookingRequest) -> (service34 = ST0)
+TRANS ( input = service34_FC_PaymentReceipt) -> (service34 = ST3)
+TRANS ( input = service34_FC_SetPassengerDetails) -> (service34 = ST5)
+TRANS ( output = service34_FC_TripDetails) -> (service34 = ST1)
+TRANS ( output = service34_FC_BookingResult) -> (service34 = ST4)
+TRANS ( input = service34_RESET) -> (service34 = ST2 | service34 = ST1 | service34 = ST4 | service34 = ST3 | service34 = ST6 | service34 = ST5)
+
+--	 service35
+VAR service35: {ST2, ST1, ST3, ST0};
+ASSIGN
+next(service35) :=
+case
+(service35 = ST0 & input = service35_FC_RouteAssignmentRequest): ST1;
+(service35 = ST2 & input = service35_RESET): ST0;
+(service35 = ST2 & input = service35_FC_TakeFlexibus): ST3;
+(service35 = ST1 & output = service35_FC_RouteAssignmentReply): ST2;
+(service35 = ST3 & input = service35_RESET): ST0;
+(service35 = ST1 & input = service35_RESET): ST0;
+1:service35;
+esac;
+TRANS ( input = service35_RESET) -> (service35 = ST2 | service35 = ST1 | service35 = ST3)
+TRANS ( output = service35_FC_RouteAssignmentReply) -> (service35 = ST1)
+TRANS ( input = service35_FC_RouteAssignmentRequest) -> (service35 = ST0)
+TRANS ( input = service35_FC_TakeFlexibus) -> (service35 = ST2)
+
+-----------------------
+--   O B J E C T S   --
+-----------------------
+--	 HandlePayment
+VAR HandlePayment: {PAYMENT_EXECUTED, INITIAL};
+ASSIGN
+next(HandlePayment) :=
+case
+(input = service34_FC_ConfirmAndPay):{(PAYMENT_EXECUTED)};
+1:HandlePayment;
+esac;
+--	 FlexibusDriverStatus
+VAR FlexibusDriverStatus: {ROUTE_STARTED, PASSENGERS_LOADED, AT_PICKUP_POINT, ROUTE_ENDED, INITIAL, ROUTE_CLOSED, FLEXIBUS_TAKEN, TAKING_PASSENGER};
+ASSIGN
+next(FlexibusDriverStatus) :=
+case
+(input = service35_FC_TakeFlexibus):{(FLEXIBUS_TAKEN)};
+1:FlexibusDriverStatus;
+esac;
+--	 FlexibusTrip
+VAR FlexibusTrip: {USER_LOGGED_IN, DRIVER_LOGGED_IN, TRIP_BOOKED, ROUTE_COMPLETED, INITIAL, USER_REGISTERED, ROUTE_ASSIGNED};
+ASSIGN
+next(FlexibusTrip) :=
+case
+(FlexibusTrip = USER_REGISTERED & output = service30_FC_UserLoginAck): USER_LOGGED_IN;
+(FlexibusTrip = INITIAL & output = service33_FC_DriverLoginAck): DRIVER_LOGGED_IN;
+(FlexibusTrip = USER_LOGGED_IN & input = service34_FC_SetPassengerDetails): TRIP_BOOKED;
+(FlexibusTrip = INITIAL & output = service32_FC_UserRegistrationAck): USER_REGISTERED;
+(FlexibusTrip = DRIVER_LOGGED_IN & input = service35_FC_TakeFlexibus): ROUTE_ASSIGNED;
+1:FlexibusTrip;
+esac;
+--	 RoutePassengerStatus
+VAR RoutePassengerStatus: {PASSENGER_DETAILS_DEFINED, DESTINATION_REACHED, INITIAL, PICKUP_POINT_REACHED, PASSENGER_CHECKED_IN, FLEXIBUS_ARRIVED};
+ASSIGN
+next(RoutePassengerStatus) :=
+case
+(input = service34_FC_SetPassengerDetails):{(PASSENGER_DETAILS_DEFINED)};
+1:RoutePassengerStatus;
+esac;
+-----------------------------------
+--   P R E C O N D I T I O N S   --
+-----------------------------------
+TRANS (input = service30_FC_UserLoginRequest) -> ((((FlexibusTrip = USER_REGISTERED))))
+TRANS (input = service32_FC_UserRegistrationRequest) -> ((((FlexibusTrip = INITIAL))))
+TRANS (input = service33_FC_DriverLoginRequest) -> ((((FlexibusTrip = INITIAL))))
+TRANS (input = service34_FC_FlexibusBookingRequest) -> ((((FlexibusTrip = USER_LOGGED_IN))))
+TRANS (input = service35_FC_RouteAssignmentRequest) -> ((((FlexibusTrip = DRIVER_LOGGED_IN))))
+-----------------------------
+--   I N V A R I A N T S   --
+-----------------------------
+--	 Synchronicity
+TRANS (1-(input = UNDEF)) + (1-(output = UNDEF)) = 1
+
+---------------------------------------
+--   S Y N C H R O N I Z A T I O N   --
+---------------------------------------
+DEFINE SYNC0 := ((FlexibusTrip in {ROUTE_ASSIGNED}));
+--	 Synchronicity enforcement
+TRANS (service30 in {ST1}) -> (next(service30) != service30)
+TRANS (service32 in {ST1}) -> (next(service32) != service32)
+TRANS (service33 in {ST1}) -> (next(service33) != service33)
+TRANS (service34 in {ST1, ST4}) -> (next(service34) != service34)
+TRANS (service35 in {ST1}) -> (next(service35) != service35)
+-------------------------------
+--   C O N T R O L L E R S   --
+-------------------------------
+--	 Fault Controller
+VAR FAULT_CONTROLLER: { START, STOP };
+INIT FAULT_CONTROLLER = START
+
+ASSIGN
+next(FAULT_CONTROLLER) := 
+case
+(FAULT_CONTROLLER = START & FALSE): STOP;
+1: FAULT_CONTROLLER;
+esac;
+
+TRANS (output != UNDEF | input != UNDEF) -> (FAULT_CONTROLLER != STOP)
+
+-------------------------------------
+--   I N I T I A L I Z A T I O N   --
+-------------------------------------
+INIT ((HandlePayment = INITIAL) & (FlexibusDriverStatus = INITIAL) & (FlexibusTrip = INITIAL) & (RoutePassengerStatus = INITIAL))
+INIT ((service30 = ST0) & (service32 = ST0) & (service33 = ST0) & (service34 = ST0) & (service35 = ST0))
+
+-----------------
+--   G O A L   --
+-----------------
+MODULE main
+VAR dn_main : dn_main;
+
+GOAL ONEOF(
+(dn_main.SYNC0), 1;
+(dn_main.FAULT_CONTROLLER = STOP), 0
+
+)

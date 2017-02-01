@@ -1,0 +1,141 @@
+-------------------------------
+--   C O M P O S I T I O N   --
+-------------------------------
+MODULE dn_main
+
+---------------------
+--   I N P U T S   --
+---------------------
+IVAR input:
+{
+UNDEF, service309_BS_RegistrationRequest, service309_BS_UpdateSmartMobilityCard, service309_RESET, service311_BS_PlanBikeRoute, service311_BS_ExecuteRouteRequest, service311_RESET
+};
+
+-----------------------
+--   O U T P U T S   --
+-----------------------
+IVAR output:
+{
+UNDEF, service309_BS_RegistrationAck, service311_BS_ExecuteRouteAck
+};
+
+-------------------------
+--   S E R V I C E S   --
+-------------------------
+--	 service309
+VAR service309: {ST2, ST1, ST3, ST0};
+ASSIGN
+next(service309) :=
+case
+(service309 = ST1 & input = service309_RESET): ST0;
+(service309 = ST1 & input = service309_BS_UpdateSmartMobilityCard): ST2;
+(service309 = ST2 & input = service309_RESET): ST0;
+(service309 = ST0 & input = service309_BS_RegistrationRequest): ST1;
+(service309 = ST3 & input = service309_RESET): ST0;
+(service309 = ST2 & output = service309_BS_RegistrationAck): ST3;
+1:service309;
+esac;
+TRANS ( input = service309_BS_RegistrationRequest) -> (service309 = ST0)
+TRANS ( output = service309_BS_RegistrationAck) -> (service309 = ST2)
+TRANS ( input = service309_BS_UpdateSmartMobilityCard) -> (service309 = ST1)
+TRANS ( input = service309_RESET) -> (service309 = ST2 | service309 = ST1 | service309 = ST3)
+
+--	 service311
+VAR service311: {ST2, ST1, ST3, ST0};
+ASSIGN
+next(service311) :=
+case
+(service311 = ST3 & input = service311_RESET): ST0;
+(service311 = ST2 & output = service311_BS_ExecuteRouteAck): ST3;
+(service311 = ST0 & input = service311_BS_ExecuteRouteRequest): ST1;
+(service311 = ST1 & input = service311_BS_PlanBikeRoute): ST2;
+(service311 = ST1 & input = service311_RESET): ST0;
+(service311 = ST2 & input = service311_RESET): ST0;
+1:service311;
+esac;
+TRANS ( input = service311_BS_PlanBikeRoute) -> (service311 = ST1)
+TRANS ( input = service311_BS_ExecuteRouteRequest) -> (service311 = ST0)
+TRANS ( input = service311_RESET) -> (service311 = ST2 | service311 = ST1 | service311 = ST3)
+TRANS ( output = service311_BS_ExecuteRouteAck) -> (service311 = ST2)
+
+-----------------------
+--   O B J E C T S   --
+-----------------------
+--	 BikeRoutePlan
+VAR BikeRoutePlan: {ROUTE_PLANNED, INITIAL};
+ASSIGN
+next(BikeRoutePlan) :=
+case
+(input = service311_BS_PlanBikeRoute):{(ROUTE_PLANNED)};
+1:BikeRoutePlan;
+esac;
+--	 BikeSharingTrip
+VAR BikeSharingTrip: {RACK_REACHED, INITIAL, BIKE_ROUTE_PLANNED, USER_REGISTERED};
+ASSIGN
+next(BikeSharingTrip) :=
+case
+(BikeSharingTrip = INITIAL & output = service309_BS_RegistrationAck): USER_REGISTERED;
+(BikeSharingTrip = BIKE_ROUTE_PLANNED & output = service311_BS_ExecuteRouteAck): RACK_REACHED;
+(BikeSharingTrip = USER_REGISTERED & input = service311_BS_PlanBikeRoute): BIKE_ROUTE_PLANNED;
+1:BikeSharingTrip;
+esac;
+--	 HandleSmartMobilityCard
+VAR HandleSmartMobilityCard: {INITIAL, SUBSCRIPTION, CARD_RELEASED, SERVICE_ADDED};
+ASSIGN
+next(HandleSmartMobilityCard) :=
+case
+(HandleSmartMobilityCard = SERVICE_ADDED & input = service309_BS_UpdateSmartMobilityCard): CARD_RELEASED;
+(input = service309_BS_UpdateSmartMobilityCard):{(SERVICE_ADDED)};
+1:HandleSmartMobilityCard;
+esac;
+-----------------------------------
+--   P R E C O N D I T I O N S   --
+-----------------------------------
+TRANS (input = service309_BS_RegistrationRequest) -> ((((BikeSharingTrip = INITIAL))))
+TRANS (input = service311_BS_ExecuteRouteRequest) -> ((((BikeSharingTrip = USER_REGISTERED))))
+-----------------------------
+--   I N V A R I A N T S   --
+-----------------------------
+--	 Synchronicity
+TRANS (1-(input = UNDEF)) + (1-(output = UNDEF)) = 1
+
+---------------------------------------
+--   S Y N C H R O N I Z A T I O N   --
+---------------------------------------
+DEFINE SYNC0 := ((BikeSharingTrip in {USER_REGISTERED}));
+--	 Synchronicity enforcement
+TRANS (service309 in {ST2}) -> (next(service309) != service309)
+TRANS (service311 in {ST2}) -> (next(service311) != service311)
+-------------------------------
+--   C O N T R O L L E R S   --
+-------------------------------
+--	 Fault Controller
+VAR FAULT_CONTROLLER: { START, STOP };
+INIT FAULT_CONTROLLER = START
+
+ASSIGN
+next(FAULT_CONTROLLER) := 
+case
+(FAULT_CONTROLLER = START & FALSE): STOP;
+1: FAULT_CONTROLLER;
+esac;
+
+TRANS (output != UNDEF | input != UNDEF) -> (FAULT_CONTROLLER != STOP)
+
+-------------------------------------
+--   I N I T I A L I Z A T I O N   --
+-------------------------------------
+INIT ((BikeRoutePlan = INITIAL) & (BikeSharingTrip = INITIAL) & (HandleSmartMobilityCard = INITIAL))
+INIT ((service309 = ST0) & (service311 = ST0))
+
+-----------------
+--   G O A L   --
+-----------------
+MODULE main
+VAR dn_main : dn_main;
+
+GOAL ONEOF(
+(dn_main.SYNC0), 1;
+(dn_main.FAULT_CONTROLLER = STOP), 0
+
+)

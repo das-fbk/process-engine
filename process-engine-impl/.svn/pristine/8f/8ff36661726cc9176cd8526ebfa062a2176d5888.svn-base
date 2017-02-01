@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<tns:domainObject name="User" xmlns:tns="http://das.fbk.eu/DomainObject"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" >
+	<tns:domainKnowledge>
+		<tns:externalDomainProperty name="domainProperties/TripPlanner" />
+	</tns:domainKnowledge>
+	<tns:process name="processes/User_process.xml" />
+</tns:domainObject>
+

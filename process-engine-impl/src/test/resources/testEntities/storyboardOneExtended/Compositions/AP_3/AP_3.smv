@@ -1,0 +1,278 @@
+-------------------------------
+--   C O M P O S I T I O N   --
+-------------------------------
+MODULE dn_main
+
+---------------------
+--   I N P U T S   --
+---------------------
+IVAR input:
+{
+UNDEF, service4_FC_RegistrationRequest, service4_RESET, service5_BS_RegistrationRequest, service5_BS_UpdateSmartMobilityCard, service5_RESET, service6_CS_CarReservationRequest, service6_CS_DetailsAssessed, service6_RESET, service7_TC_RegistrationRequest, service7_RESET, service8_CS_UpdateSmartMobilityCard, service8_CS_MembershipRequest, service8_RESET, service9_RESET, service9_TC_TrainBookingRequest, service9_TC_PayTicket, service10_FC_ConfirmAndPay, service10_FC_FlexibusBookingRequest, service10_RESET
+};
+
+-----------------------
+--   O U T P U T S   --
+-----------------------
+IVAR output:
+{
+UNDEF, service4_FC_RegistrationAck, service5_BS_RegistrationAck, service6_CS_CarReservationReply, service6_CS_CarReservationDetails, service7_TC_RegistrationAck, service8_CS_MembershipReply, service9_TC_BookingResult, service10_FC_BookingResult
+};
+
+-------------------------
+--   S E R V I C E S   --
+-------------------------
+--	 service4
+VAR service4: {ST2, ST1, ST0};
+ASSIGN
+next(service4) :=
+case
+(service4 = ST0 & input = service4_FC_RegistrationRequest): ST1;
+(service4 = ST1 & input = service4_RESET): ST0;
+(service4 = ST1 & output = service4_FC_RegistrationAck): ST2;
+(service4 = ST2 & input = service4_RESET): ST0;
+1:service4;
+esac;
+TRANS ( input = service4_FC_RegistrationRequest) -> (service4 = ST0)
+TRANS ( input = service4_RESET) -> (service4 = ST2 | service4 = ST1)
+TRANS ( output = service4_FC_RegistrationAck) -> (service4 = ST1)
+
+--	 service5
+VAR service5: {ST2, ST1, ST3, ST0};
+ASSIGN
+next(service5) :=
+case
+(service5 = ST2 & output = service5_BS_RegistrationAck): ST3;
+(service5 = ST2 & input = service5_RESET): ST0;
+(service5 = ST1 & input = service5_RESET): ST0;
+(service5 = ST1 & input = service5_BS_UpdateSmartMobilityCard): ST2;
+(service5 = ST0 & input = service5_BS_RegistrationRequest): ST1;
+(service5 = ST3 & input = service5_RESET): ST0;
+1:service5;
+esac;
+TRANS ( input = service5_BS_RegistrationRequest) -> (service5 = ST0)
+TRANS ( output = service5_BS_RegistrationAck) -> (service5 = ST2)
+TRANS ( input = service5_BS_UpdateSmartMobilityCard) -> (service5 = ST1)
+TRANS ( input = service5_RESET) -> (service5 = ST2 | service5 = ST1 | service5 = ST3)
+
+--	 service6
+VAR service6: {ST2, ST1, ST4, ST3, ST0};
+ASSIGN
+next(service6) :=
+case
+(service6 = ST1 & input = service6_RESET): ST0;
+(service6 = ST1 & output = service6_CS_CarReservationDetails): ST2;
+(service6 = ST2 & input = service6_CS_DetailsAssessed): ST3;
+(service6 = ST3 & output = service6_CS_CarReservationReply): ST4;
+(service6 = ST2 & input = service6_RESET): ST0;
+(service6 = ST0 & input = service6_CS_CarReservationRequest): ST1;
+(service6 = ST4 & input = service6_RESET): ST0;
+(service6 = ST3 & input = service6_RESET): ST0;
+1:service6;
+esac;
+TRANS ( input = service6_CS_CarReservationRequest) -> (service6 = ST0)
+TRANS ( input = service6_CS_DetailsAssessed) -> (service6 = ST2)
+TRANS ( output = service6_CS_CarReservationReply) -> (service6 = ST3)
+TRANS ( input = service6_RESET) -> (service6 = ST2 | service6 = ST1 | service6 = ST4 | service6 = ST3)
+TRANS ( output = service6_CS_CarReservationDetails) -> (service6 = ST1)
+
+--	 service7
+VAR service7: {ST2, ST1, ST0};
+ASSIGN
+next(service7) :=
+case
+(service7 = ST1 & input = service7_RESET): ST0;
+(service7 = ST1 & output = service7_TC_RegistrationAck): ST2;
+(service7 = ST0 & input = service7_TC_RegistrationRequest): ST1;
+(service7 = ST2 & input = service7_RESET): ST0;
+1:service7;
+esac;
+TRANS ( input = service7_TC_RegistrationRequest) -> (service7 = ST0)
+TRANS ( input = service7_RESET) -> (service7 = ST2 | service7 = ST1)
+TRANS ( output = service7_TC_RegistrationAck) -> (service7 = ST1)
+
+--	 service8
+VAR service8: {ST2, ST1, ST3, ST0};
+ASSIGN
+next(service8) :=
+case
+(service8 = ST2 & output = service8_CS_MembershipReply): ST3;
+(service8 = ST1 & input = service8_CS_UpdateSmartMobilityCard): ST2;
+(service8 = ST3 & input = service8_RESET): ST0;
+(service8 = ST0 & input = service8_CS_MembershipRequest): ST1;
+(service8 = ST2 & input = service8_RESET): ST0;
+(service8 = ST1 & input = service8_RESET): ST0;
+1:service8;
+esac;
+TRANS ( output = service8_CS_MembershipReply) -> (service8 = ST2)
+TRANS ( input = service8_CS_UpdateSmartMobilityCard) -> (service8 = ST1)
+TRANS ( input = service8_CS_MembershipRequest) -> (service8 = ST0)
+TRANS ( input = service8_RESET) -> (service8 = ST2 | service8 = ST1 | service8 = ST3)
+
+--	 service9
+VAR service9: {ST2, ST1, ST3, ST0};
+ASSIGN
+next(service9) :=
+case
+(service9 = ST2 & input = service9_RESET): ST0;
+(service9 = ST2 & output = service9_TC_BookingResult): ST3;
+(service9 = ST1 & input = service9_TC_PayTicket): ST2;
+(service9 = ST0 & input = service9_TC_TrainBookingRequest): ST1;
+(service9 = ST3 & input = service9_RESET): ST0;
+(service9 = ST1 & input = service9_RESET): ST0;
+1:service9;
+esac;
+TRANS ( input = service9_RESET) -> (service9 = ST2 | service9 = ST1 | service9 = ST3)
+TRANS ( input = service9_TC_TrainBookingRequest) -> (service9 = ST0)
+TRANS ( input = service9_TC_PayTicket) -> (service9 = ST1)
+TRANS ( output = service9_TC_BookingResult) -> (service9 = ST2)
+
+--	 service10
+VAR service10: {ST2, ST1, ST3, ST0};
+ASSIGN
+next(service10) :=
+case
+(service10 = ST2 & input = service10_FC_ConfirmAndPay): ST3;
+(service10 = ST1 & input = service10_RESET): ST0;
+(service10 = ST1 & output = service10_FC_BookingResult): ST2;
+(service10 = ST0 & input = service10_FC_FlexibusBookingRequest): ST1;
+(service10 = ST3 & input = service10_RESET): ST0;
+(service10 = ST2 & input = service10_RESET): ST0;
+1:service10;
+esac;
+TRANS ( input = service10_FC_ConfirmAndPay) -> (service10 = ST2)
+TRANS ( input = service10_FC_FlexibusBookingRequest) -> (service10 = ST0)
+TRANS ( output = service10_FC_BookingResult) -> (service10 = ST1)
+TRANS ( input = service10_RESET) -> (service10 = ST2 | service10 = ST1 | service10 = ST3)
+
+-----------------------
+--   O B J E C T S   --
+-----------------------
+--	 TrainTrip
+VAR TrainTrip: {TRIP_BOOKED, TRIP_REQUESTED, INITIAL, USER_REGISTERED};
+ASSIGN
+next(TrainTrip) :=
+case
+(TrainTrip = TRIP_REQUESTED & output = service9_TC_BookingResult): TRIP_BOOKED;
+(TrainTrip = INITIAL & output = service7_TC_RegistrationAck): USER_REGISTERED;
+(TrainTrip = USER_REGISTERED & input = service9_TC_TrainBookingRequest): TRIP_REQUESTED;
+1:TrainTrip;
+esac;
+--	 HandlePayment
+VAR HandlePayment: {PAYMENT_EXECUTED, INITIAL};
+ASSIGN
+next(HandlePayment) :=
+case
+(HandlePayment = PAYMENT_EXECUTED & input = service9_TC_PayTicket): INITIAL;
+(input = service9_TC_PayTicket):{(PAYMENT_EXECUTED)};
+1:HandlePayment;
+esac;
+--	 FlexibusTrip
+VAR FlexibusTrip: {TRIP_BOOKED, TRIP_REQUESTED, INITIAL, USER_REGISTERED};
+ASSIGN
+next(FlexibusTrip) :=
+case
+(FlexibusTrip = INITIAL & output = service4_FC_RegistrationAck): USER_REGISTERED;
+(FlexibusTrip = TRIP_REQUESTED & input = service10_FC_ConfirmAndPay): TRIP_BOOKED;
+(FlexibusTrip = USER_REGISTERED & input = service10_FC_FlexibusBookingRequest): TRIP_REQUESTED;
+1:FlexibusTrip;
+esac;
+--	 BikeSharingTrip
+VAR BikeSharingTrip: {INITIAL, USER_REGISTERED};
+ASSIGN
+next(BikeSharingTrip) :=
+case
+(BikeSharingTrip = INITIAL & output = service5_BS_RegistrationAck): USER_REGISTERED;
+1:BikeSharingTrip;
+esac;
+--	 CarSharingTrip
+VAR CarSharingTrip: {RESERVATION_COMPLETED, INITIAL, MEMBERSHIP_DEFINED, RESERVATION_REQUESTED};
+ASSIGN
+next(CarSharingTrip) :=
+case
+(CarSharingTrip = MEMBERSHIP_DEFINED & output = service6_CS_CarReservationDetails): RESERVATION_REQUESTED;
+(CarSharingTrip = INITIAL & output = service8_CS_MembershipReply): MEMBERSHIP_DEFINED;
+(CarSharingTrip = RESERVATION_REQUESTED & output = service6_CS_CarReservationReply): RESERVATION_COMPLETED;
+1:CarSharingTrip;
+esac;
+--	 RoutePassengerStatus
+VAR RoutePassengerStatus: {CONFIRMATION_REQUEST_RECEIVED, INITIAL, CONFIRMATION_REQUEST_CONFIRMED};
+ASSIGN
+next(RoutePassengerStatus) :=
+case
+(input = service10_FC_ConfirmAndPay):{(CONFIRMATION_REQUEST_CONFIRMED)};
+1:RoutePassengerStatus;
+esac;
+--	 HandleSmartMobilityCard
+VAR HandleSmartMobilityCard: {AMOUNT_VERIFIED, INITIAL, CARD_RELEASED, SERVICE_ADDED};
+ASSIGN
+next(HandleSmartMobilityCard) :=
+case
+(HandleSmartMobilityCard = SERVICE_ADDED & input = service5_BS_UpdateSmartMobilityCard): CARD_RELEASED;
+(HandleSmartMobilityCard = SERVICE_ADDED & input = service8_CS_UpdateSmartMobilityCard): CARD_RELEASED;
+(input = service5_BS_UpdateSmartMobilityCard):{(SERVICE_ADDED)};
+(input = service8_CS_UpdateSmartMobilityCard):{(SERVICE_ADDED)};
+1:HandleSmartMobilityCard;
+esac;
+-----------------------------------
+--   P R E C O N D I T I O N S   --
+-----------------------------------
+TRANS (input = service4_FC_RegistrationRequest) -> ((((FlexibusTrip = INITIAL))))
+TRANS (input = service5_BS_RegistrationRequest) -> ((((BikeSharingTrip = INITIAL))))
+TRANS (input = service6_CS_CarReservationRequest) -> ((((CarSharingTrip = MEMBERSHIP_DEFINED))))
+TRANS (input = service6_CS_DetailsAssessed) -> ((((CarSharingTrip = RESERVATION_REQUESTED))))
+TRANS (input = service7_TC_RegistrationRequest) -> ((((TrainTrip = INITIAL))))
+TRANS (input = service8_CS_MembershipRequest) -> ((((CarSharingTrip = INITIAL))))
+TRANS (input = service9_TC_TrainBookingRequest) -> ((((TrainTrip = USER_REGISTERED))))
+TRANS (input = service10_FC_FlexibusBookingRequest) -> ((((FlexibusTrip = USER_REGISTERED))))
+-----------------------------
+--   I N V A R I A N T S   --
+-----------------------------
+--	 Synchronicity
+TRANS (1-(input = UNDEF)) + (1-(output = UNDEF)) = 1
+
+---------------------------------------
+--   S Y N C H R O N I Z A T I O N   --
+---------------------------------------
+DEFINE SYNC0 := ((TrainTrip in {TRIP_BOOKED}) & (FlexibusTrip in {TRIP_BOOKED}) & (BikeSharingTrip in {USER_REGISTERED}) & (CarSharingTrip in {RESERVATION_COMPLETED}));
+--	 Synchronicity enforcement
+TRANS (service4 in {ST1}) -> (next(service4) != service4)
+TRANS (service5 in {ST2}) -> (next(service5) != service5)
+TRANS (service6 in {ST1, ST3}) -> (next(service6) != service6)
+TRANS (service7 in {ST1}) -> (next(service7) != service7)
+TRANS (service8 in {ST2}) -> (next(service8) != service8)
+TRANS (service9 in {ST2}) -> (next(service9) != service9)
+TRANS (service10 in {ST1}) -> (next(service10) != service10)
+-------------------------------
+--   C O N T R O L L E R S   --
+-------------------------------
+--	 Fault Controller
+VAR FAULT_CONTROLLER: { START, STOP };
+INIT FAULT_CONTROLLER = START
+
+ASSIGN
+next(FAULT_CONTROLLER) := 
+case
+(FAULT_CONTROLLER = START & FALSE): STOP;
+1: FAULT_CONTROLLER;
+esac;
+
+TRANS (output != UNDEF | input != UNDEF) -> (FAULT_CONTROLLER != STOP)
+
+-------------------------------------
+--   I N I T I A L I Z A T I O N   --
+-------------------------------------
+INIT ((TrainTrip = INITIAL) & (HandlePayment = INITIAL) & (FlexibusTrip = INITIAL) & (BikeSharingTrip = INITIAL) & (CarSharingTrip = INITIAL) & (RoutePassengerStatus = INITIAL) & (HandleSmartMobilityCard = INITIAL))
+INIT ((service4 = ST0) & (service5 = ST0) & (service6 = ST0) & (service7 = ST0) & (service8 = ST0) & (service9 = ST0) & (service10 = ST0))
+
+-----------------
+--   G O A L   --
+-----------------
+MODULE main
+VAR dn_main : dn_main;
+
+GOAL ONEOF(
+(dn_main.SYNC0), 1;
+(dn_main.FAULT_CONTROLLER = STOP), 0
+
+)

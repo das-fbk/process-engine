@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<composition xmlns="http://das.fbk.eu/Composition" xmlns:ns2="http://das.fbk.eu/Annotation" xmlns:ns3="http://das.fbk.eu/Process" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://soa.fbk.eu/Composition null\Schemata\Composition.xsd">
+    <domainProperties>
+        <domainProperty type="FlexibusDriverStatus" oid="FlexibusDriverStatus"/>
+    </domainProperties>
+    <fragments>
+        <fragment type="FD_takeTheFlexibus" sid="service41">
+            <assignment oid="FlexibusDriverStatus" o_name="FlexibusDriverStatus"/>
+        </fragment>
+        <fragment type="FD_executeFlexibusRoute" sid="service42">
+            <assignment oid="FlexibusDriverStatus" o_name="FlexibusDriverStatus"/>
+        </fragment>
+    </fragments>
+    <synchronization>
+        <point priority="0">
+            <domainProperty oid="FlexibusDriverStatus">
+                <state>FLEXIBUS_TAKEN</state>
+            </domainProperty>
+        </point>
+    </synchronization>
+    <runtime>
+        <domainProperties>
+            <domainProperty oid="FlexibusDriverStatus">INITIAL</domainProperty>
+        </domainProperties>
+        <fragments>
+            <fragment sid="service41">ST0</fragment>
+            <fragment sid="service42">ST0</fragment>
+        </fragments>
+    </runtime>
+</composition>

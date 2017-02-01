@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:domainProperty id="TripPlanner" xmlns:tns="http://das.fbk.eu/DomainProperty" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://das.fbk.eu/DomainProperty ../Schemata/DomainProperty.xsd ">
+ <tns:states>
+    <tns:state isInitial="true">INIT</tns:state>
+    <tns:state>ORGANIZED</tns:state>
+  </tns:states>
+  <tns:events>
+    <tns:event>tripOrganized</tns:event>
+  </tns:events>
+  <tns:transitions>
+    <tns:transition isControllable="true">
+      <tns:from>INIT</tns:from>
+      <tns:to>ORGANIZED</tns:to>
+      <tns:event>tripOrganized</tns:event>
+    </tns:transition>
+  </tns:transitions>
+</tns:domainProperty>

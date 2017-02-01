@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:domainProperty id="testDp" xmlns:tns="http://das.fbk.eu/Process"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+	<tns:state isInitial="true">INITIAL</tns:state>
+	<tns:state>ENDED</tns:state>
+
+	<tns:event>endend</tns:event>
+
+	<tns:transition isControllable="true">
+		<tns:from>INITIAL</tns:from>
+		<tns:to>ENDED</tns:to>
+		<tns:event>endend</tns:event>
+	</tns:transition>
+
+</tns:domainProperty>

@@ -1,0 +1,135 @@
+-------------------------------
+--   C O M P O S I T I O N   --
+-------------------------------
+MODULE dn_main
+
+---------------------
+--   I N P U T S   --
+---------------------
+IVAR input:
+{
+UNDEF, service17_SMC_ActivateServiceRequest, service17_RESET, service18_RESET, service18_SMC_MobilityCardRequest, service19_SMC_VerifyAmountRequest, service19_RESET
+};
+
+-----------------------
+--   O U T P U T S   --
+-----------------------
+IVAR output:
+{
+UNDEF, service17_SMC_ActivateServiceReply, service18_SMC_MobilityCardReply, service19_SMC_VerifyAmountReply
+};
+
+-------------------------
+--   S E R V I C E S   --
+-------------------------
+--	 service17
+VAR service17: {ST2, ST1, ST0};
+ASSIGN
+next(service17) :=
+case
+(service17 = ST1 & output = service17_SMC_ActivateServiceReply): ST2;
+(service17 = ST2 & input = service17_RESET): ST0;
+(service17 = ST0 & input = service17_SMC_ActivateServiceRequest): ST1;
+(service17 = ST1 & input = service17_RESET): ST0;
+1:service17;
+esac;
+TRANS ( input = service17_SMC_ActivateServiceRequest) -> (service17 = ST0)
+TRANS ( input = service17_RESET) -> (service17 = ST2 | service17 = ST1)
+TRANS ( output = service17_SMC_ActivateServiceReply) -> (service17 = ST1)
+
+--	 service18
+VAR service18: {ST2, ST1, ST0};
+ASSIGN
+next(service18) :=
+case
+(service18 = ST2 & input = service18_RESET): ST0;
+(service18 = ST1 & input = service18_RESET): ST0;
+(service18 = ST0 & input = service18_SMC_MobilityCardRequest): ST1;
+(service18 = ST1 & output = service18_SMC_MobilityCardReply): ST2;
+1:service18;
+esac;
+TRANS ( output = service18_SMC_MobilityCardReply) -> (service18 = ST1)
+TRANS ( input = service18_RESET) -> (service18 = ST2 | service18 = ST1)
+TRANS ( input = service18_SMC_MobilityCardRequest) -> (service18 = ST0)
+
+--	 service19
+VAR service19: {ST2, ST1, ST0};
+ASSIGN
+next(service19) :=
+case
+(service19 = ST2 & input = service19_RESET): ST0;
+(service19 = ST1 & input = service19_RESET): ST0;
+(service19 = ST0 & input = service19_SMC_VerifyAmountRequest): ST1;
+(service19 = ST1 & output = service19_SMC_VerifyAmountReply): ST2;
+1:service19;
+esac;
+TRANS ( output = service19_SMC_VerifyAmountReply) -> (service19 = ST1)
+TRANS ( input = service19_SMC_VerifyAmountRequest) -> (service19 = ST0)
+TRANS ( input = service19_RESET) -> (service19 = ST2 | service19 = ST1)
+
+-----------------------
+--   O B J E C T S   --
+-----------------------
+--	 HandleSmartMobilityCard
+VAR HandleSmartMobilityCard: {AMOUNT_VERIFIED, INITIAL, CARD_RELEASED, SERVICE_ADDED};
+ASSIGN
+next(HandleSmartMobilityCard) :=
+case
+(HandleSmartMobilityCard = INITIAL & output = service18_SMC_MobilityCardReply): CARD_RELEASED;
+(HandleSmartMobilityCard = AMOUNT_VERIFIED & output = service17_SMC_ActivateServiceReply): SERVICE_ADDED;
+(HandleSmartMobilityCard = CARD_RELEASED & output = service19_SMC_VerifyAmountReply): AMOUNT_VERIFIED;
+1:HandleSmartMobilityCard;
+esac;
+-----------------------------------
+--   P R E C O N D I T I O N S   --
+-----------------------------------
+TRANS (input = service17_SMC_ActivateServiceRequest) -> ((((HandleSmartMobilityCard = AMOUNT_VERIFIED))))
+TRANS (input = service18_SMC_MobilityCardRequest) -> ((((HandleSmartMobilityCard = INITIAL))))
+TRANS (input = service19_SMC_VerifyAmountRequest) -> ((((HandleSmartMobilityCard = CARD_RELEASED))))
+-----------------------------
+--   I N V A R I A N T S   --
+-----------------------------
+--	 Synchronicity
+TRANS (1-(input = UNDEF)) + (1-(output = UNDEF)) = 1
+
+---------------------------------------
+--   S Y N C H R O N I Z A T I O N   --
+---------------------------------------
+DEFINE SYNC0 := ((HandleSmartMobilityCard in {SERVICE_ADDED}));
+--	 Synchronicity enforcement
+TRANS (service17 in {ST1}) -> (next(service17) != service17)
+TRANS (service18 in {ST1}) -> (next(service18) != service18)
+TRANS (service19 in {ST1}) -> (next(service19) != service19)
+-------------------------------
+--   C O N T R O L L E R S   --
+-------------------------------
+--	 Fault Controller
+VAR FAULT_CONTROLLER: { START, STOP };
+INIT FAULT_CONTROLLER = START
+
+ASSIGN
+next(FAULT_CONTROLLER) := 
+case
+(FAULT_CONTROLLER = START & FALSE): STOP;
+1: FAULT_CONTROLLER;
+esac;
+
+TRANS (output != UNDEF | input != UNDEF) -> (FAULT_CONTROLLER != STOP)
+
+-------------------------------------
+--   I N I T I A L I Z A T I O N   --
+-------------------------------------
+INIT ((HandleSmartMobilityCard = INITIAL))
+INIT ((service17 = ST0) & (service18 = ST0) & (service19 = ST0))
+
+-----------------
+--   G O A L   --
+-----------------
+MODULE main
+VAR dn_main : dn_main;
+
+GOAL ONEOF(
+(dn_main.SYNC0), 1;
+(dn_main.FAULT_CONTROLLER = STOP), 0
+
+)

@@ -1,0 +1,8 @@
+Idea of this example is to have the following scenario:
+
+- Starter: one abstract activity
+- Supporter: provide a fragment to solve abstract activity, in core call Maker
+- Maker: do the job
+
+Aim for this is to check correlation
+ 

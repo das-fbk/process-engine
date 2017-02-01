@@ -1,0 +1,132 @@
+-------------------------------
+--   C O M P O S I T I O N   --
+-------------------------------
+MODULE dn_main
+
+---------------------
+--   I N P U T S   --
+---------------------
+IVAR input:
+{
+UNDEF, service29_UMS_ManagementTrip, service29_UMS_TripManagementRequest, service29_RESET, service31_UMS_TripRequest, service31_RESET
+};
+
+-----------------------
+--   O U T P U T S   --
+-----------------------
+IVAR output:
+{
+UNDEF, service29_UMS_TripManagementReply, service31_UMS_TripAlternatives
+};
+
+-------------------------
+--   S E R V I C E S   --
+-------------------------
+--	 service29
+VAR service29: {ST2, ST1, ST3, ST0};
+ASSIGN
+next(service29) :=
+case
+(service29 = ST1 & input = service29_UMS_ManagementTrip): ST2;
+(service29 = ST3 & input = service29_RESET): ST0;
+(service29 = ST2 & input = service29_RESET): ST0;
+(service29 = ST2 & output = service29_UMS_TripManagementReply): ST3;
+(service29 = ST1 & input = service29_RESET): ST0;
+(service29 = ST0 & input = service29_UMS_TripManagementRequest): ST1;
+1:service29;
+esac;
+TRANS ( input = service29_UMS_ManagementTrip) -> (service29 = ST1)
+TRANS ( input = service29_UMS_TripManagementRequest) -> (service29 = ST0)
+TRANS ( input = service29_RESET) -> (service29 = ST2 | service29 = ST1 | service29 = ST3)
+TRANS ( output = service29_UMS_TripManagementReply) -> (service29 = ST2)
+
+--	 service31
+VAR service31: {ST2, ST1, ST0};
+ASSIGN
+next(service31) :=
+case
+(service31 = ST1 & output = service31_UMS_TripAlternatives): ST2;
+(service31 = ST0 & input = service31_UMS_TripRequest): ST1;
+(service31 = ST2 & input = service31_RESET): ST0;
+(service31 = ST1 & input = service31_RESET): ST0;
+1:service31;
+esac;
+TRANS ( input = service31_UMS_TripRequest) -> (service31 = ST0)
+TRANS ( output = service31_UMS_TripAlternatives) -> (service31 = ST1)
+TRANS ( input = service31_RESET) -> (service31 = ST2 | service31 = ST1)
+
+-----------------------
+--   O B J E C T S   --
+-----------------------
+--	 SetupTrip
+VAR SetupTrip: {ORGANIZED, INITIAL};
+ASSIGN
+next(SetupTrip) :=
+case
+(input = service29_UMS_ManagementTrip):{(ORGANIZED)};
+1:SetupTrip;
+esac;
+--	 ProvideTrip
+VAR ProvideTrip: {TRIP_REQUEST_ACCOMPLISHED, TRIP_MANAGEMENT_ACCOMPLISHED, TRIP_MANAGE_REQUEST_LOADED, TRIP_REQUEST_LOADED, INITIAL};
+ASSIGN
+next(ProvideTrip) :=
+case
+(ProvideTrip = TRIP_REQUEST_ACCOMPLISHED & input = service29_UMS_TripManagementRequest): TRIP_MANAGE_REQUEST_LOADED;
+(ProvideTrip = TRIP_MANAGE_REQUEST_LOADED & output = service29_UMS_TripManagementReply): TRIP_MANAGEMENT_ACCOMPLISHED;
+(ProvideTrip = TRIP_REQUEST_LOADED & output = service31_UMS_TripAlternatives): TRIP_REQUEST_ACCOMPLISHED;
+(ProvideTrip = INITIAL & input = service31_UMS_TripRequest): TRIP_REQUEST_LOADED;
+1:ProvideTrip;
+esac;
+-----------------------------------
+--   P R E C O N D I T I O N S   --
+-----------------------------------
+TRANS (input = service29_UMS_TripManagementRequest) -> ((((ProvideTrip = TRIP_REQUEST_ACCOMPLISHED))))
+TRANS (output = service29_UMS_TripManagementReply) -> ((((ProvideTrip = TRIP_MANAGE_REQUEST_LOADED))))
+TRANS (input = service31_UMS_TripRequest) -> ((((ProvideTrip = INITIAL))))
+TRANS (output = service31_UMS_TripAlternatives) -> ((((ProvideTrip = TRIP_REQUEST_LOADED))))
+-----------------------------
+--   I N V A R I A N T S   --
+-----------------------------
+--	 Synchronicity
+TRANS (1-(input = UNDEF)) + (1-(output = UNDEF)) = 1
+
+---------------------------------------
+--   S Y N C H R O N I Z A T I O N   --
+---------------------------------------
+DEFINE SYNC0 := ((ProvideTrip in {TRIP_REQUEST_ACCOMPLISHED}));
+--	 Synchronicity enforcement
+TRANS (service29 in {ST2}) -> (next(service29) != service29)
+TRANS (service31 in {ST1}) -> (next(service31) != service31)
+-------------------------------
+--   C O N T R O L L E R S   --
+-------------------------------
+--	 Fault Controller
+VAR FAULT_CONTROLLER: { START, STOP };
+INIT FAULT_CONTROLLER = START
+
+ASSIGN
+next(FAULT_CONTROLLER) := 
+case
+(FAULT_CONTROLLER = START & FALSE): STOP;
+1: FAULT_CONTROLLER;
+esac;
+
+TRANS (output != UNDEF | input != UNDEF) -> (FAULT_CONTROLLER != STOP)
+
+-------------------------------------
+--   I N I T I A L I Z A T I O N   --
+-------------------------------------
+INIT ((SetupTrip = INITIAL) & (ProvideTrip = INITIAL))
+INIT ((service29 = ST0) & (service31 = ST0))
+
+-----------------
+--   G O A L   --
+-----------------
+MODULE main
+VAR dn_main : dn_main;
+
+GOAL ONEOF(
+(dn_main.SYNC0), 1;
+(dn_main.FAULT_CONTROLLER = STOP), 0
+
+)

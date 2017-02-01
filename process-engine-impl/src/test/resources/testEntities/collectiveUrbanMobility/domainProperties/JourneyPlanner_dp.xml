@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:domainProperty id="JourneyPlanner_dk" xmlns:tns="http://das.fbk.eu/Process"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<tns:state isInitial="true">WAIT</tns:state>
+	<tns:state>JOURNEY_RESPONSE</tns:state>
+	<tns:event>journeyRequest</tns:event>
+	<tns:transition isControllable="true">
+		<tns:from>WAIT</tns:from>
+		<tns:to>JOURNEY_RESPONSE</tns:to>
+		<tns:event>journeyRequest</tns:event>
+	</tns:transition>
+</tns:domainProperty>

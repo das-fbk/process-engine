@@ -1,0 +1,9 @@
+Basic test with two domain object
+
+DO1
+	invoke - receive
+	
+DO2
+	concrete - while - receive - invoke
+
+Objective is to test communication between two domain object

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:process name="JourneyPlanner_core" xmlns:tns="http://das.fbk.eu/Process" xmlns:tns1="http://das.fbk.eu/Annotation"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://das.fbk.eu/Process ../Schemata/Process.xsd ">
+ 
+<tns:receive name="SendTripInfo">
+<tns:effect>
+	<tns:event dpName="JourneyPlanner_dk" eventName="journeyRequest" />	
+</tns:effect>
+</tns:receive>
+<tns:invoke name="ReceiveTripInfo">
+<tns:precondition>
+	<tns1:point>
+		<tns1:domainProperty dp_name="JourneyPlanner_dk">
+			<tns1:state>
+			JOURNEY_RESPONSE
+			</tns1:state>
+		</tns1:domainProperty>
+	</tns1:point>
+</tns:precondition>
+</tns:invoke>
+
+</tns:process>

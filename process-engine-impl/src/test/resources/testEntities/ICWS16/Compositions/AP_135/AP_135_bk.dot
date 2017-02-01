@@ -1,0 +1,11 @@
+(dn_main.service242 = ST0 & (dn_main.service244 = ST0 & (dn_main.service246 = ST0 & (dn_main.service247 = ST0 & (dn_main.service248 = ST0 & (dn_main.HandleRoute = INITIAL & dn_main.FAULT_CONTROLLER = START))))))
+2
+(dn_main.service242 = ST0 & (dn_main.service244 = ST0 & (dn_main.service246 = ST0 & (dn_main.service247 = ST2 & (dn_main.service248 = ST0 & (dn_main.HandleRoute = ROUTE_STARTED & dn_main.FAULT_CONTROLLER = START))))))
+digraph plan_fsm {
+ratio="1.3";
+margin="0.2";
+size="8.0,11.4";
+"0" -> "1" [style=dotted label="dn_main.input = service247_RM_StartRouteRequest &\n"]
+"1" -> "2" [label="dn_main.output = service247_RM_StartRouteReply"]
+}
+

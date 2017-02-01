@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:process name="User_Core" xmlns:tns="http://das.fbk.eu/Process" xmlns:tns1="http://das.fbk.eu/Annotation"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://das.fbk.eu/Process ../Schemata/Process.xsd ">
+ 
+<tns:invoke name="SendTripInfo">
+<tns:precondition>
+	<tns1:point>
+		<tns1:domainProperty dp_name="TripPlanner">
+			<tns1:state>
+			INIT
+			</tns1:state>
+		</tns1:domainProperty>
+	</tns1:point>
+</tns:precondition>
+</tns:invoke>
+<tns:receive name="ReceiveTripInfo">
+<tns:effect>
+	<tns:event dpName="TripPlanner" eventName="tripOrganized" />	
+</tns:effect>
+</tns:receive>
+<!--
+<tns:abstract name="AbstractRequestCompleted">
+	<tns:goal>
+		<tns1:point>
+			<tns1:domainProperty dp_name="TripPlanner">
+				<tns1:state>
+				TRIP_REQUESTED_COMPLETED
+				</tns1:state>
+			</tns1:domainProperty>
+		</tns1:point>
+	</tns:goal>
+	<tns:precondition>
+		<tns1:point>
+			<tns1:domainProperty dp_name="TripPlanner">
+				<tns1:state>
+				ORGANIZED
+				</tns1:state>
+			</tns1:domainProperty>
+		</tns1:point>
+	</tns:precondition>
+</tns:abstract>
+-->
+<tns:invoke name="SendTripAlternatives">
+</tns:invoke>
+
+</tns:process>

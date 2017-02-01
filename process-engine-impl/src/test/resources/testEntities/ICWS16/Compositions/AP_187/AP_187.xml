@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<composition xmlns="http://das.fbk.eu/Composition" xmlns:ns2="http://das.fbk.eu/Annotation" xmlns:ns3="http://das.fbk.eu/Process" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://soa.fbk.eu/Composition null\Schemata\Composition.xsd">
+    <domainProperties>
+        <domainProperty type="BikeRoutePlan" oid="BikeRoutePlan"/>
+        <domainProperty type="BikeSharingTrip" oid="BikeSharingTrip"/>
+        <domainProperty type="HandleSmartMobilityCard" oid="HandleSmartMobilityCard"/>
+    </domainProperties>
+    <fragments>
+        <fragment type="BS_userRegistration" sid="service377">
+            <assignment oid="BikeSharingTrip" o_name="BikeSharingTrip"/>
+            <assignment oid="HandleSmartMobilityCard" o_name="HandleSmartMobilityCard"/>
+        </fragment>
+        <fragment type="BS_executeBikeRoute" sid="service378">
+            <assignment oid="BikeRoutePlan" o_name="BikeRoutePlan"/>
+            <assignment oid="BikeSharingTrip" o_name="BikeSharingTrip"/>
+        </fragment>
+    </fragments>
+    <synchronization>
+        <point priority="0">
+            <domainProperty oid="BikeSharingTrip">
+                <state>USER_REGISTERED</state>
+            </domainProperty>
+        </point>
+    </synchronization>
+    <runtime>
+        <domainProperties>
+            <domainProperty oid="BikeRoutePlan">INITIAL</domainProperty>
+            <domainProperty oid="BikeSharingTrip">INITIAL</domainProperty>
+            <domainProperty oid="HandleSmartMobilityCard">INITIAL</domainProperty>
+        </domainProperties>
+        <fragments>
+            <fragment sid="service377">ST0</fragment>
+            <fragment sid="service378">ST0</fragment>
+        </fragments>
+    </runtime>
+</composition>

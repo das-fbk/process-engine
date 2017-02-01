@@ -1,0 +1,101 @@
+-------------------------------
+--   C O M P O S I T I O N   --
+-------------------------------
+MODULE dn_main
+
+---------------------
+--   I N P U T S   --
+---------------------
+IVAR input:
+{
+UNDEF, service43_MMP_PlanRequest, service43_RESET
+};
+
+-----------------------
+--   O U T P U T S   --
+-----------------------
+IVAR output:
+{
+UNDEF, service43_MMP_PlanResponse
+};
+
+-------------------------
+--   S E R V I C E S   --
+-------------------------
+--	 service43
+VAR service43: {ST2, ST1, ST0};
+ASSIGN
+next(service43) :=
+case
+(service43 = ST1 & input = service43_RESET): ST0;
+(service43 = ST1 & output = service43_MMP_PlanResponse): ST2;
+(service43 = ST2 & input = service43_RESET): ST0;
+(service43 = ST0 & input = service43_MMP_PlanRequest): ST1;
+1:service43;
+esac;
+TRANS ( output = service43_MMP_PlanResponse) -> (service43 = ST1)
+TRANS ( input = service43_MMP_PlanRequest) -> (service43 = ST0)
+TRANS ( input = service43_RESET) -> (service43 = ST2 | service43 = ST1)
+
+-----------------------
+--   O B J E C T S   --
+-----------------------
+--	 MultiModalPlanner
+VAR MultiModalPlanner: {REQUEST_LOADED, INITIAL, PLANNING_COMPLETED};
+ASSIGN
+next(MultiModalPlanner) :=
+case
+(MultiModalPlanner = REQUEST_LOADED & output = service43_MMP_PlanResponse): PLANNING_COMPLETED;
+(MultiModalPlanner = INITIAL & input = service43_MMP_PlanRequest): REQUEST_LOADED;
+1:MultiModalPlanner;
+esac;
+-----------------------------------
+--   P R E C O N D I T I O N S   --
+-----------------------------------
+TRANS (input = service43_MMP_PlanRequest) -> ((((MultiModalPlanner = INITIAL))))
+TRANS (output = service43_MMP_PlanResponse) -> ((((MultiModalPlanner = REQUEST_LOADED))))
+-----------------------------
+--   I N V A R I A N T S   --
+-----------------------------
+--	 Synchronicity
+TRANS (1-(input = UNDEF)) + (1-(output = UNDEF)) = 1
+
+---------------------------------------
+--   S Y N C H R O N I Z A T I O N   --
+---------------------------------------
+DEFINE SYNC0 := ((MultiModalPlanner in {PLANNING_COMPLETED}));
+--	 Synchronicity enforcement
+TRANS (service43 in {ST1}) -> (next(service43) != service43)
+-------------------------------
+--   C O N T R O L L E R S   --
+-------------------------------
+--	 Fault Controller
+VAR FAULT_CONTROLLER: { START, STOP };
+INIT FAULT_CONTROLLER = START
+
+ASSIGN
+next(FAULT_CONTROLLER) := 
+case
+(FAULT_CONTROLLER = START & FALSE): STOP;
+1: FAULT_CONTROLLER;
+esac;
+
+TRANS (output != UNDEF | input != UNDEF) -> (FAULT_CONTROLLER != STOP)
+
+-------------------------------------
+--   I N I T I A L I Z A T I O N   --
+-------------------------------------
+INIT ((MultiModalPlanner = INITIAL))
+INIT ((service43 = ST0))
+
+-----------------
+--   G O A L   --
+-----------------
+MODULE main
+VAR dn_main : dn_main;
+
+GOAL ONEOF(
+(dn_main.SYNC0), 1;
+(dn_main.FAULT_CONTROLLER = STOP), 0
+
+)

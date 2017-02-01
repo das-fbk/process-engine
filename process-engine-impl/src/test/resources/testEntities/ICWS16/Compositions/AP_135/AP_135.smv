@@ -1,0 +1,180 @@
+-------------------------------
+--   C O M P O S I T I O N   --
+-------------------------------
+MODULE dn_main
+
+---------------------
+--   I N P U T S   --
+---------------------
+IVAR input:
+{
+UNDEF, service242_RM_PickupPointRequest, service242_RESET, service244_RM_RouteCreationRequest, service244_RESET, service246_RM_PassengerCheckInRequest, service246_RESET, service247_RM_StartRouteRequest, service247_RESET, service248_RM_EndRouteRequest, service248_RESET
+};
+
+-----------------------
+--   O U T P U T S   --
+-----------------------
+IVAR output:
+{
+UNDEF, service242_RM_PickupPointReply, service244_RM_concrete1, service244_RM_concrete2, service244_RM_RouteCreationReply, service246_RM_PassengerCheckInReply, service247_RM_StartRouteReply, service248_RM_EndRouteReply
+};
+
+-------------------------
+--   S E R V I C E S   --
+-------------------------
+--	 service242
+VAR service242: {ST2, ST1, ST0};
+ASSIGN
+next(service242) :=
+case
+(service242 = ST1 & output = service242_RM_PickupPointReply): ST2;
+(service242 = ST1 & input = service242_RESET): ST0;
+(service242 = ST2 & input = service242_RESET): ST0;
+(service242 = ST0 & input = service242_RM_PickupPointRequest): ST1;
+1:service242;
+esac;
+TRANS ( input = service242_RM_PickupPointRequest) -> (service242 = ST0)
+TRANS ( input = service242_RESET) -> (service242 = ST2 | service242 = ST1)
+TRANS ( output = service242_RM_PickupPointReply) -> (service242 = ST1)
+
+--	 service244
+VAR service244: {ST2, ST1, ST4, ST3, ST0};
+ASSIGN
+next(service244) :=
+case
+(service244 = ST0 & input = service244_RM_RouteCreationRequest): ST1;
+(service244 = ST3 & output = service244_RM_RouteCreationReply): ST4;
+(service244 = ST2 & input = service244_RESET): ST0;
+(service244 = ST1 & output = service244_RM_concrete1): ST2;
+(service244 = ST4 & input = service244_RESET): ST0;
+(service244 = ST3 & input = service244_RESET): ST0;
+(service244 = ST2 & output = service244_RM_concrete2): ST3;
+(service244 = ST1 & input = service244_RESET): ST0;
+1:service244;
+esac;
+TRANS ( input = service244_RM_RouteCreationRequest) -> (service244 = ST0)
+TRANS ( output = service244_RM_concrete1) -> (service244 = ST1)
+TRANS ( output = service244_RM_concrete2) -> (service244 = ST2)
+TRANS ( input = service244_RESET) -> (service244 = ST2 | service244 = ST1 | service244 = ST4 | service244 = ST3)
+TRANS ( output = service244_RM_RouteCreationReply) -> (service244 = ST3)
+
+--	 service246
+VAR service246: {ST2, ST1, ST0};
+ASSIGN
+next(service246) :=
+case
+(service246 = ST0 & input = service246_RM_PassengerCheckInRequest): ST1;
+(service246 = ST1 & output = service246_RM_PassengerCheckInReply): ST2;
+(service246 = ST1 & input = service246_RESET): ST0;
+(service246 = ST2 & input = service246_RESET): ST0;
+1:service246;
+esac;
+TRANS ( output = service246_RM_PassengerCheckInReply) -> (service246 = ST1)
+TRANS ( input = service246_RM_PassengerCheckInRequest) -> (service246 = ST0)
+TRANS ( input = service246_RESET) -> (service246 = ST2 | service246 = ST1)
+
+--	 service247
+VAR service247: {ST2, ST1, ST0};
+ASSIGN
+next(service247) :=
+case
+(service247 = ST0 & input = service247_RM_StartRouteRequest): ST1;
+(service247 = ST1 & input = service247_RESET): ST0;
+(service247 = ST1 & output = service247_RM_StartRouteReply): ST2;
+(service247 = ST2 & input = service247_RESET): ST0;
+1:service247;
+esac;
+TRANS ( input = service247_RM_StartRouteRequest) -> (service247 = ST0)
+TRANS ( input = service247_RESET) -> (service247 = ST2 | service247 = ST1)
+TRANS ( output = service247_RM_StartRouteReply) -> (service247 = ST1)
+
+--	 service248
+VAR service248: {ST2, ST1, ST0};
+ASSIGN
+next(service248) :=
+case
+(service248 = ST2 & input = service248_RESET): ST0;
+(service248 = ST0 & input = service248_RM_EndRouteRequest): ST1;
+(service248 = ST1 & output = service248_RM_EndRouteReply): ST2;
+(service248 = ST1 & input = service248_RESET): ST0;
+1:service248;
+esac;
+TRANS ( output = service248_RM_EndRouteReply) -> (service248 = ST1)
+TRANS ( input = service248_RM_EndRouteRequest) -> (service248 = ST0)
+TRANS ( input = service248_RESET) -> (service248 = ST2 | service248 = ST1)
+
+-----------------------
+--   O B J E C T S   --
+-----------------------
+--	 HandleRoute
+VAR HandleRoute: {ROUTE_STARTED, PICKUP_POINT_ADDED, ROUTE_COMPLETED, INITIAL, ROUTE_CLOSED, PASSENGER_CHECKED_IN, CHECK_IN_CLOSED, ROUTE_CREATED};
+ASSIGN
+next(HandleRoute) :=
+case
+(HandleRoute = ROUTE_STARTED & output = service246_RM_PassengerCheckInReply): PASSENGER_CHECKED_IN;
+(HandleRoute = INITIAL & input = service246_RM_PassengerCheckInRequest): ROUTE_STARTED;
+(HandleRoute = CHECK_IN_CLOSED & output = service248_RM_EndRouteReply): ROUTE_COMPLETED;
+(HandleRoute = ROUTE_CLOSED & output = service247_RM_StartRouteReply): ROUTE_STARTED;
+(HandleRoute = INITIAL & input = service247_RM_StartRouteRequest): ROUTE_CLOSED;
+(HandleRoute = INITIAL & output = service244_RM_RouteCreationReply): ROUTE_CREATED;
+(HandleRoute = ROUTE_STARTED & input = service248_RM_EndRouteRequest): CHECK_IN_CLOSED;
+(HandleRoute = ROUTE_CREATED & output = service242_RM_PickupPointReply): PICKUP_POINT_ADDED;
+1:HandleRoute;
+esac;
+-----------------------------------
+--   P R E C O N D I T I O N S   --
+-----------------------------------
+TRANS (input = service242_RM_PickupPointRequest) -> ((((HandleRoute = ROUTE_CREATED))))
+TRANS (input = service244_RM_RouteCreationRequest) -> ((((HandleRoute = INITIAL))))
+TRANS (input = service246_RM_PassengerCheckInRequest) -> ((((HandleRoute = INITIAL))))
+TRANS (input = service247_RM_StartRouteRequest) -> ((((HandleRoute = INITIAL))))
+TRANS (input = service248_RM_EndRouteRequest) -> ((((HandleRoute = ROUTE_STARTED))))
+-----------------------------
+--   I N V A R I A N T S   --
+-----------------------------
+--	 Synchronicity
+TRANS (1-(input = UNDEF)) + (1-(output = UNDEF)) = 1
+
+---------------------------------------
+--   S Y N C H R O N I Z A T I O N   --
+---------------------------------------
+DEFINE SYNC0 := ((HandleRoute in {ROUTE_STARTED}));
+--	 Synchronicity enforcement
+TRANS (service242 in {ST1}) -> (next(service242) != service242)
+TRANS (service244 in {ST2, ST1, ST3}) -> (next(service244) != service244)
+TRANS (service246 in {ST1}) -> (next(service246) != service246)
+TRANS (service247 in {ST1}) -> (next(service247) != service247)
+TRANS (service248 in {ST1}) -> (next(service248) != service248)
+-------------------------------
+--   C O N T R O L L E R S   --
+-------------------------------
+--	 Fault Controller
+VAR FAULT_CONTROLLER: { START, STOP };
+INIT FAULT_CONTROLLER = START
+
+ASSIGN
+next(FAULT_CONTROLLER) := 
+case
+(FAULT_CONTROLLER = START & FALSE): STOP;
+1: FAULT_CONTROLLER;
+esac;
+
+TRANS (output != UNDEF | input != UNDEF) -> (FAULT_CONTROLLER != STOP)
+
+-------------------------------------
+--   I N I T I A L I Z A T I O N   --
+-------------------------------------
+INIT ((HandleRoute = INITIAL))
+INIT ((service242 = ST0) & (service244 = ST0) & (service246 = ST0) & (service247 = ST0) & (service248 = ST0))
+
+-----------------
+--   G O A L   --
+-----------------
+MODULE main
+VAR dn_main : dn_main;
+
+GOAL ONEOF(
+(dn_main.SYNC0), 1;
+(dn_main.FAULT_CONTROLLER = STOP), 0
+
+)

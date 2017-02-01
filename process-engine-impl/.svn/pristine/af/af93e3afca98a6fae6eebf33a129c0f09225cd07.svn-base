@@ -1,0 +1,32 @@
+=Scenario Loader Command line tool=
+
+Scenario Loader command line tool is a debug tool for scenario, domainObject, fragments, etc.. definitions.
+
+
+==How to build== 
+
+In order to build run over source code of process-engine-impl:
+
+	mvn package
+
+maven will create in target/ScenarioLoader.exe command-line tool
+
+
+==How to use==
+
+To get help about command-line arguments, please run ScenarioLoader.exe and see help
+
+
+==Here a simple example==
+
+Note: subject to change during development
+
+1) create a new folder <FOLDER_NAME> on your system
+2) copy ScenarioLoader.exe inside it
+3) copy src\test\resources\testEntities\collectiveUrbanMobility folder inside your new folder
+4) from command line run:
+
+	ScenarioLoader.exe -d <FOLDER_NAME> -f scenario-test-2user.xml
+	
+5) for help and syntax, type ScenarioLoader.exe without any commands
+

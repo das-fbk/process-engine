@@ -1,0 +1,11 @@
+digraph plan_fsm {
+ratio="1.3";
+margin="0.2";
+size="8.0,11.4";
+"0" -> "1" [style=dotted label="dn_main.input = service80_FC_DriverLoginRequest &\n"]
+"1" -> "2" [label="dn_main.output = service80_FC_DriverLoginAck"]
+"2" -> "3" [style=dotted label="dn_main.input = service82_FC_RouteAssignmentRequest &\n"]
+"3" -> "4" [label="dn_main.output = service82_FC_RouteAssignmentReply"]
+"4" -> "5" [style=dotted label="dn_main.input = service82_FC_TakeFlexibus &\n"]
+}
+

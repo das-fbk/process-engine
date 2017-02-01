@@ -1,0 +1,14 @@
+(dn_main.service30 = ST0 & (dn_main.service32 = ST0 & (dn_main.service33 = ST0 & (dn_main.service34 = ST0 & (dn_main.service35 = ST0 & (dn_main.HandlePayment = INITIAL & (dn_main.FlexibusDriverStatus = INITIAL & (dn_main.FlexibusTrip = INITIAL & (dn_main.RoutePassengerStatus = INITIAL & dn_main.FAULT_CONTROLLER = START)))))))))
+5
+(dn_main.service30 = ST0 & (dn_main.service32 = ST0 & (dn_main.service33 = ST2 & (dn_main.service34 = ST0 & (dn_main.service35 = ST3 & (dn_main.HandlePayment = INITIAL & (dn_main.FlexibusDriverStatus = FLEXIBUS_TAKEN & (dn_main.FlexibusTrip = ROUTE_ASSIGNED & (dn_main.RoutePassengerStatus = INITIAL & dn_main.FAULT_CONTROLLER = START)))))))))
+digraph plan_fsm {
+ratio="1.3";
+margin="0.2";
+size="8.0,11.4";
+"0" -> "1" [style=dotted label="dn_main.input = service33_FC_DriverLoginRequest &\n"]
+"1" -> "2" [label="dn_main.output = service33_FC_DriverLoginAck"]
+"2" -> "3" [style=dotted label="dn_main.input = service35_FC_RouteAssignmentRequest &\n"]
+"3" -> "4" [label="dn_main.output = service35_FC_RouteAssignmentReply"]
+"4" -> "5" [style=dotted label="dn_main.input = service35_FC_TakeFlexibus &\n"]
+}
+

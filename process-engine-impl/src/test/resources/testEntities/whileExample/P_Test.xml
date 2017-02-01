@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:process name="WhileProcessTest" xmlns:tns="http://das.fbk.eu/Process"
+	xmlns:tns1="http://das.fbk.eu/Annotation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://das.fbk.eu/Process ../../../schema/allow-ensembles/Process.xsd ">
+	
+	<tns:concrete name="testConcrete" returnsTo="ChoosedGate"></tns:concrete>
+	<tns:while name="while1">
+		<tns:varCondition>
+			<tns:name>AssignedDGate</tns:name>
+			<tns:value>G1</tns:value>
+		</tns:varCondition>
+	<tns:concrete name="testConcrete2" returnsTo="ChoosedGate2"></tns:concrete>
+	</tns:while>
+
+</tns:process>

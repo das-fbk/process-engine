@@ -1,0 +1,132 @@
+-------------------------------
+--   C O M P O S I T I O N   --
+-------------------------------
+MODULE dn_main
+
+---------------------
+--   I N P U T S   --
+---------------------
+IVAR input:
+{
+UNDEF, service45_UMS_ManagementTrip, service45_UMS_TripManagementRequest, service45_RESET, service46_UMS_TripRequest, service46_RESET
+};
+
+-----------------------
+--   O U T P U T S   --
+-----------------------
+IVAR output:
+{
+UNDEF, service45_UMS_TripManagementReply, service46_UMS_TripAlternatives
+};
+
+-------------------------
+--   S E R V I C E S   --
+-------------------------
+--	 service45
+VAR service45: {ST2, ST1, ST3, ST0};
+ASSIGN
+next(service45) :=
+case
+(service45 = ST0 & input = service45_UMS_TripManagementRequest): ST1;
+(service45 = ST1 & input = service45_RESET): ST0;
+(service45 = ST3 & input = service45_RESET): ST0;
+(service45 = ST1 & input = service45_UMS_ManagementTrip): ST2;
+(service45 = ST2 & input = service45_RESET): ST0;
+(service45 = ST2 & output = service45_UMS_TripManagementReply): ST3;
+1:service45;
+esac;
+TRANS ( input = service45_UMS_ManagementTrip) -> (service45 = ST1)
+TRANS ( input = service45_UMS_TripManagementRequest) -> (service45 = ST0)
+TRANS ( input = service45_RESET) -> (service45 = ST2 | service45 = ST1 | service45 = ST3)
+TRANS ( output = service45_UMS_TripManagementReply) -> (service45 = ST2)
+
+--	 service46
+VAR service46: {ST2, ST1, ST0};
+ASSIGN
+next(service46) :=
+case
+(service46 = ST1 & output = service46_UMS_TripAlternatives): ST2;
+(service46 = ST2 & input = service46_RESET): ST0;
+(service46 = ST0 & input = service46_UMS_TripRequest): ST1;
+(service46 = ST1 & input = service46_RESET): ST0;
+1:service46;
+esac;
+TRANS ( input = service46_UMS_TripRequest) -> (service46 = ST0)
+TRANS ( output = service46_UMS_TripAlternatives) -> (service46 = ST1)
+TRANS ( input = service46_RESET) -> (service46 = ST2 | service46 = ST1)
+
+-----------------------
+--   O B J E C T S   --
+-----------------------
+--	 SetupTrip
+VAR SetupTrip: {ORGANIZED, INITIAL};
+ASSIGN
+next(SetupTrip) :=
+case
+(input = service45_UMS_ManagementTrip):{(ORGANIZED)};
+1:SetupTrip;
+esac;
+--	 ProvideTrip
+VAR ProvideTrip: {TRIP_REQUEST_ACCOMPLISHED, TRIP_MANAGEMENT_ACCOMPLISHED, TRIP_MANAGE_REQUEST_LOADED, TRIP_REQUEST_LOADED, INITIAL};
+ASSIGN
+next(ProvideTrip) :=
+case
+(ProvideTrip = TRIP_REQUEST_LOADED & output = service46_UMS_TripAlternatives): TRIP_REQUEST_ACCOMPLISHED;
+(ProvideTrip = TRIP_MANAGE_REQUEST_LOADED & output = service45_UMS_TripManagementReply): TRIP_MANAGEMENT_ACCOMPLISHED;
+(ProvideTrip = TRIP_REQUEST_ACCOMPLISHED & input = service45_UMS_TripManagementRequest): TRIP_MANAGE_REQUEST_LOADED;
+(ProvideTrip = INITIAL & input = service46_UMS_TripRequest): TRIP_REQUEST_LOADED;
+1:ProvideTrip;
+esac;
+-----------------------------------
+--   P R E C O N D I T I O N S   --
+-----------------------------------
+TRANS (input = service45_UMS_TripManagementRequest) -> ((((ProvideTrip = TRIP_REQUEST_ACCOMPLISHED))))
+TRANS (output = service45_UMS_TripManagementReply) -> ((((ProvideTrip = TRIP_MANAGE_REQUEST_LOADED))))
+TRANS (input = service46_UMS_TripRequest) -> ((((ProvideTrip = INITIAL))))
+TRANS (output = service46_UMS_TripAlternatives) -> ((((ProvideTrip = TRIP_REQUEST_LOADED))))
+-----------------------------
+--   I N V A R I A N T S   --
+-----------------------------
+--	 Synchronicity
+TRANS (1-(input = UNDEF)) + (1-(output = UNDEF)) = 1
+
+---------------------------------------
+--   S Y N C H R O N I Z A T I O N   --
+---------------------------------------
+DEFINE SYNC0 := ((ProvideTrip in {TRIP_MANAGEMENT_ACCOMPLISHED}));
+--	 Synchronicity enforcement
+TRANS (service45 in {ST2}) -> (next(service45) != service45)
+TRANS (service46 in {ST1}) -> (next(service46) != service46)
+-------------------------------
+--   C O N T R O L L E R S   --
+-------------------------------
+--	 Fault Controller
+VAR FAULT_CONTROLLER: { START, STOP };
+INIT FAULT_CONTROLLER = START
+
+ASSIGN
+next(FAULT_CONTROLLER) := 
+case
+(FAULT_CONTROLLER = START & FALSE): STOP;
+1: FAULT_CONTROLLER;
+esac;
+
+TRANS (output != UNDEF | input != UNDEF) -> (FAULT_CONTROLLER != STOP)
+
+-------------------------------------
+--   I N I T I A L I Z A T I O N   --
+-------------------------------------
+INIT ((SetupTrip = INITIAL) & (ProvideTrip = TRIP_REQUEST_ACCOMPLISHED))
+INIT ((service45 = ST0) & (service46 = ST0))
+
+-----------------
+--   G O A L   --
+-----------------
+MODULE main
+VAR dn_main : dn_main;
+
+GOAL ONEOF(
+(dn_main.SYNC0), 1;
+(dn_main.FAULT_CONTROLLER = STOP), 0
+
+)

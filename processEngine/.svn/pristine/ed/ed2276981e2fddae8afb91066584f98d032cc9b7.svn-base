@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:tns="http://das.fbk.eu/Scenario">
+	<tns:domainObject file="domainObjects/PayPal" />
+	<tns:domainObject file="domainObjects/CreditCard" />
+	<tns:domainObject file="domainObjects/PaymentManager" />
+	<!-- <tns:domainObject file="domainObjects/BikeSharingCompany" /> -->
+	<!-- <tns:domainObject file="domainObjects/TrainCompany" /> -->
+	<!-- <tns:domainObject file="domainObjects/SmartMobilityCard" /> -->
+	<!-- <tns:domainObject file="domainObjects/CarSharingCompany" /> -->
+	<tns:domainObject file="domainObjects/RouteManagement" />
+	<tns:domainObject file="domainObjects/RoutePassenger" />
+	<tns:domainObject file="domainObjects/FlexibusCompany" />
+	<tns:domainObject file="domainObjects/MultimodalPlanner" />
+	<tns:domainObject file="domainObjects/TripOrganization" />
+	<tns:domainObject file="domainObjects/UrbanMobilitySystem" />
+	<tns:domainObject file="domainObjects/FlexibusEmployee" />
+	<tns:domainObject file="domainObjects/FlexibusDriver" />
+	<tns:domainObject file="domainObjects/User">
+		<tns:domainObjectInstance id="User_1" lat="46.10826"
+			long="11.11055" preferenceFile="preferences/User1_preference.xml" />
+		<tns:domainObjectInstance id="User_2" lat="46.10683"
+			long="11.11201" preferenceFile="preferences/User2_preference.xml"
+			onTurn="2" />
+		<tns:domainObjectInstance id="User_3" lat="46.10683"
+			long="11.11201" preferenceFile="preferences/User2_preference.xml"
+			onTurn="4" />
+<!-- 		<tns:domainObjectInstance id="User_4" lat="46.10683" -->
+<!-- 			long="11.11201" preferenceFile="preferences/User2_preference.xml" -->
+<!-- 			onTurn="6" /> -->
+<!-- 		<tns:domainObjectInstance id="User_5" lat="46.10683" -->
+<!-- 			long="11.11201" preferenceFile="preferences/User2_preference.xml" -->
+<!-- 			onTurn="8" /> -->
+<!-- 		<tns:domainObjectInstance id="User_6" lat="46.10683" -->
+<!-- 			long="11.11201" preferenceFile="preferences/User2_preference.xml" -->
+<!-- 			onTurn="10" /> -->
+<!-- 		<tns:domainObjectInstance id="User_7" lat="46.10683" -->
+<!-- 			long="11.11201" preferenceFile="preferences/User2_preference.xml" -->
+<!-- 			onTurn="12" /> -->
+<!-- 		<tns:domainObjectInstance id="User_8" lat="46.10683" -->
+<!-- 			long="11.11201" preferenceFile="preferences/User2_preference.xml" -->
+<!-- 			onTurn="14" /> -->
+<!-- 		<tns:domainObjectInstance id="User_9" lat="46.10683" -->
+<!-- 			long="11.11201" preferenceFile="preferences/User2_preference.xml" -->
+<!-- 			onTurn="16" /> -->
+<!-- 		<tns:domainObjectInstance id="User_10" lat="46.10683" -->
+<!-- 			long="11.11201" preferenceFile="preferences/User2_preference.xml" -->
+<!-- 			onTurn="18" /> -->
+<!-- 		<tns:domainObjectInstance id="User_11" lat="46.10683" -->
+<!-- 			long="11.11201" preferenceFile="preferences/User2_preference.xml" -->
+<!-- 			onTurn="20" /> -->
+<!-- 		<tns:domainObjectInstance id="User_12" lat="46.10683" -->
+<!-- 			long="11.11201" preferenceFile="preferences/User2_preference.xml" -->
+<!-- 			onTurn="22" /> -->
+<!-- 		<tns:domainObjectInstance id="User_13" lat="46.10683" -->
+<!-- 			long="11.11201" preferenceFile="preferences/User2_preference.xml" -->
+<!-- 			onTurn="24" /> -->
+<!-- 		<tns:domainObjectInstance id="User_14" lat="46.10683" -->
+<!-- 			long="11.11201" preferenceFile="preferences/User2_preference.xml" -->
+<!-- 			onTurn="26" /> -->
+<!-- 		<tns:domainObjectInstance id="User_15" lat="46.10683" -->
+<!-- 			long="11.11201" preferenceFile="preferences/User2_preference.xml" -->
+<!-- 			onTurn="28" /> -->
+<!-- 		<tns:domainObjectInstance id="User_16" lat="46.10683" -->
+<!-- 			long="11.11201" preferenceFile="preferences/User2_preference.xml" -->
+<!-- 			onTurn="30" /> -->
+<!-- 		<tns:domainObjectInstance id="User_17" lat="46.10683" -->
+<!-- 			long="11.11201" preferenceFile="preferences/User2_preference.xml" -->
+<!-- 			onTurn="32" /> -->
+<!-- 		<tns:domainObjectInstance id="User_18" lat="46.10683" -->
+<!-- 			long="11.11201" preferenceFile="preferences/User2_preference.xml" -->
+<!-- 			onTurn="34" /> -->
+<!-- 		<tns:domainObjectInstance id="User_19" lat="46.10683" -->
+<!-- 			long="11.11201" preferenceFile="preferences/User2_preference.xml" -->
+<!-- 			onTurn="36" /> -->
+<!-- 		<tns:domainObjectInstance id="User_20" lat="46.10683" -->
+<!-- 			long="11.11201" preferenceFile="preferences/User2_preference.xml" -->
+<!-- 			onTurn="38" /> -->
+
+	</tns:domainObject>
+	<tns:domainObject file="domainObjects/FlexibusEmployee">
+		<tns:domainObjectInstance id="First_Employee"
+			lat="46.07197" long="11.12004" />
+	</tns:domainObject>
+</tns:scenario>

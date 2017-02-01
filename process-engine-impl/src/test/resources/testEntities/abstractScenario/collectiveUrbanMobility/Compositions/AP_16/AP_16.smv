@@ -1,0 +1,100 @@
+-------------------------------
+--   C O M P O S I T I O N   --
+-------------------------------
+MODULE dn_main
+
+---------------------
+--   I N P U T S   --
+---------------------
+IVAR input:
+{
+UNDEF, service28_TripPlanner, service28_RESET
+};
+
+-----------------------
+--   O U T P U T S   --
+-----------------------
+IVAR output:
+{
+UNDEF, service28_ReceiveAlternatives
+};
+
+-------------------------
+--   S E R V I C E S   --
+-------------------------
+--	 service28
+VAR service28: {ST2, ST1, ST0};
+ASSIGN
+next(service28) :=
+case
+(service28 = ST1 & input = service28_RESET): ST0;
+(service28 = ST1 & output = service28_ReceiveAlternatives): ST2;
+(service28 = ST0 & input = service28_TripPlanner): ST1;
+(service28 = ST2 & input = service28_RESET): ST0;
+1:service28;
+esac;
+TRANS ( input = service28_TripPlanner) -> (service28 = ST0)
+TRANS ( input = service28_RESET) -> (service28 = ST2 | service28 = ST1)
+TRANS ( output = service28_ReceiveAlternatives) -> (service28 = ST1)
+
+-----------------------
+--   O B J E C T S   --
+-----------------------
+--	 TripPlanner
+VAR TripPlanner: {TRC, RINIT, RL};
+ASSIGN
+next(TripPlanner) :=
+case
+(TripPlanner = RINIT & input = service28_TripPlanner): RL;
+(TripPlanner = RL & output = service28_ReceiveAlternatives): TRC;
+1:TripPlanner;
+esac;
+-----------------------------------
+--   P R E C O N D I T I O N S   --
+-----------------------------------
+TRANS (input = service28_TripPlanner) -> ((((TripPlanner = RINIT))))
+-----------------------------
+--   I N V A R I A N T S   --
+-----------------------------
+--	 Synchronicity
+TRANS (1-(input = UNDEF)) + (1-(output = UNDEF)) = 1
+
+---------------------------------------
+--   S Y N C H R O N I Z A T I O N   --
+---------------------------------------
+DEFINE SYNC0 := ((TripPlanner in {TRC}));
+--	 Synchronicity enforcement
+TRANS (service28 in {ST1}) -> (next(service28) != service28)
+-------------------------------
+--   C O N T R O L L E R S   --
+-------------------------------
+--	 Fault Controller
+VAR FAULT_CONTROLLER: { START, STOP };
+INIT FAULT_CONTROLLER = START
+
+ASSIGN
+next(FAULT_CONTROLLER) := 
+case
+(FAULT_CONTROLLER = START & FALSE): STOP;
+1: FAULT_CONTROLLER;
+esac;
+
+TRANS (output != UNDEF | input != UNDEF) -> (FAULT_CONTROLLER != STOP)
+
+-------------------------------------
+--   I N I T I A L I Z A T I O N   --
+-------------------------------------
+INIT ((TripPlanner = RINIT))
+INIT ((service28 = ST0))
+
+-----------------
+--   G O A L   --
+-----------------
+MODULE main
+VAR dn_main : dn_main;
+
+GOAL ONEOF(
+(dn_main.SYNC0), 1;
+(dn_main.FAULT_CONTROLLER = STOP), 0
+
+)

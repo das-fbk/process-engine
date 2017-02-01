@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:tns="http://das.fbk.eu/Scenario">
+	<tns:domainObject file="domainObjects/FlexibusCompany" />
+	<tns:domainObject file="domainObjects/MultimodalPlanner" />
+	<tns:domainObject file="domainObjects/TripOrganizer" />
+	<tns:domainObject file="domainObjects/UrbanMobilitySystem" />
+	<tns:domainObject file="domainObjects/User">
+		<tns:domainObjectInstance id="First_User">
+		</tns:domainObjectInstance>
+	</tns:domainObject>
+</tns:scenario>

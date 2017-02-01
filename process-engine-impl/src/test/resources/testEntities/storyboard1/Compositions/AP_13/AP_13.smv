@@ -1,0 +1,101 @@
+-------------------------------
+--   C O M P O S I T I O N   --
+-------------------------------
+MODULE dn_main
+
+---------------------
+--   I N P U T S   --
+---------------------
+IVAR input:
+{
+UNDEF, service24_RESET, service24_PlanRequest
+};
+
+-----------------------
+--   O U T P U T S   --
+-----------------------
+IVAR output:
+{
+UNDEF, service24_PlanResponse
+};
+
+-------------------------
+--   S E R V I C E S   --
+-------------------------
+--	 service24
+VAR service24: {ST2, ST1, ST0};
+ASSIGN
+next(service24) :=
+case
+(service24 = ST0 & input = service24_PlanRequest): ST1;
+(service24 = ST1 & input = service24_RESET): ST0;
+(service24 = ST1 & output = service24_PlanResponse): ST2;
+(service24 = ST2 & input = service24_RESET): ST0;
+1:service24;
+esac;
+TRANS ( output = service24_PlanResponse) -> (service24 = ST1)
+TRANS ( input = service24_RESET) -> (service24 = ST2 | service24 = ST1)
+TRANS ( input = service24_PlanRequest) -> (service24 = ST0)
+
+-----------------------
+--   O B J E C T S   --
+-----------------------
+--	 MultiModalPlanner
+VAR MultiModalPlanner: {RINIT, PLANNINGCOMPLETED, REQUESTLOADED};
+ASSIGN
+next(MultiModalPlanner) :=
+case
+(MultiModalPlanner = REQUESTLOADED & output = service24_PlanResponse): PLANNINGCOMPLETED;
+(MultiModalPlanner = RINIT & input = service24_PlanRequest): REQUESTLOADED;
+1:MultiModalPlanner;
+esac;
+-----------------------------------
+--   P R E C O N D I T I O N S   --
+-----------------------------------
+TRANS (input = service24_PlanRequest) -> ((((MultiModalPlanner = RINIT))))
+TRANS (output = service24_PlanResponse) -> ((((MultiModalPlanner = REQUESTLOADED))))
+-----------------------------
+--   I N V A R I A N T S   --
+-----------------------------
+--	 Synchronicity
+TRANS (1-(input = UNDEF)) + (1-(output = UNDEF)) = 1
+
+---------------------------------------
+--   S Y N C H R O N I Z A T I O N   --
+---------------------------------------
+DEFINE SYNC0 := ((MultiModalPlanner in {PLANNINGCOMPLETED}));
+--	 Synchronicity enforcement
+TRANS (service24 in {ST1}) -> (next(service24) != service24)
+-------------------------------
+--   C O N T R O L L E R S   --
+-------------------------------
+--	 Fault Controller
+VAR FAULT_CONTROLLER: { START, STOP };
+INIT FAULT_CONTROLLER = START
+
+ASSIGN
+next(FAULT_CONTROLLER) := 
+case
+(FAULT_CONTROLLER = START & FALSE): STOP;
+1: FAULT_CONTROLLER;
+esac;
+
+TRANS (output != UNDEF | input != UNDEF) -> (FAULT_CONTROLLER != STOP)
+
+-------------------------------------
+--   I N I T I A L I Z A T I O N   --
+-------------------------------------
+INIT ((MultiModalPlanner = RINIT))
+INIT ((service24 = ST0))
+
+-----------------
+--   G O A L   --
+-----------------
+MODULE main
+VAR dn_main : dn_main;
+
+GOAL ONEOF(
+(dn_main.SYNC0), 1;
+(dn_main.FAULT_CONTROLLER = STOP), 0
+
+)

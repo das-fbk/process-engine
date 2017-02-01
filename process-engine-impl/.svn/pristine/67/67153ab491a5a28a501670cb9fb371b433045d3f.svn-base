@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:domainObject name="TrainUser" xmlns:tns="http://das.fbk.eu/DomainObject" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://das.fbk.eu/DomainObject ../../../schema/allow-ensembles/DomainObject.xsd ">
+  
+  <tns:domainKnowledge>
+    <tns:internalDomainProperty name="domainProperties/TrainUserStatus"/>
+  </tns:domainKnowledge>
+    
+  <tns:process name="processes/PROC_TrainUser"/>
+  
+  <tns:fragment name="fragments/TU_confirmBooking"/>
+  
+</tns:domainObject>

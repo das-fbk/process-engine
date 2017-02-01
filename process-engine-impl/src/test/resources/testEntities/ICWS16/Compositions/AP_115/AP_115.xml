@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<composition xmlns="http://das.fbk.eu/Composition" xmlns:ns2="http://das.fbk.eu/Annotation" xmlns:ns3="http://das.fbk.eu/Process" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://soa.fbk.eu/Composition null\Schemata\Composition.xsd">
+    <domainProperties>
+        <domainProperty type="SetupTrip" oid="SetupTrip"/>
+        <domainProperty type="ProvideTrip" oid="ProvideTrip"/>
+    </domainProperties>
+    <fragments>
+        <fragment type="UMS_manageTrip" sid="service204">
+            <assignment oid="SetupTrip" o_name="SetupTrip"/>
+            <assignment oid="ProvideTrip" o_name="ProvideTrip"/>
+        </fragment>
+        <fragment type="UMS_provideTripAlternatives" sid="service205">
+            <assignment oid="ProvideTrip" o_name="ProvideTrip"/>
+        </fragment>
+    </fragments>
+    <synchronization>
+        <point priority="0">
+            <domainProperty oid="ProvideTrip">
+                <state>TRIP_MANAGEMENT_ACCOMPLISHED</state>
+            </domainProperty>
+        </point>
+    </synchronization>
+    <runtime>
+        <domainProperties>
+            <domainProperty oid="SetupTrip">INITIAL</domainProperty>
+            <domainProperty oid="ProvideTrip">TRIP_REQUEST_ACCOMPLISHED</domainProperty>
+        </domainProperties>
+        <fragments>
+            <fragment sid="service204">ST0</fragment>
+            <fragment sid="service205">ST0</fragment>
+        </fragments>
+    </runtime>
+</composition>

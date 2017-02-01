@@ -1,0 +1,19 @@
+(dn_main.service61 = ST0 & (dn_main.service62 = ST0 & (dn_main.service63 = ST0 & (dn_main.service64 = ST0 & (dn_main.service65 = ST0 & (dn_main.HandlePayment = INITIAL & (dn_main.FlexibusDriverStatus = INITIAL & (dn_main.FlexibusTrip = INITIAL & (dn_main.RoutePassengerStatus = INITIAL & dn_main.FAULT_CONTROLLER = START)))))))))
+10
+(dn_main.service61 = ST2 & (dn_main.service62 = ST2 & (dn_main.service63 = ST0 & (dn_main.service64 = ST6 & (dn_main.service65 = ST0 & (dn_main.HandlePayment = PAYMENT_EXECUTED & (dn_main.FlexibusDriverStatus = INITIAL & (dn_main.FlexibusTrip = TRIP_BOOKED & (dn_main.RoutePassengerStatus = PASSENGER_DETAILS_DEFINED & dn_main.FAULT_CONTROLLER = START)))))))))
+digraph plan_fsm {
+ratio="1.3";
+margin="0.2";
+size="8.0,11.4";
+"0" -> "1" [style=dotted label="dn_main.input = service62_FC_UserRegistrationRequest &\n"]
+"1" -> "2" [label="dn_main.output = service62_FC_UserRegistrationAck"]
+"2" -> "3" [style=dotted label="dn_main.input = service61_FC_UserLoginRequest &\n"]
+"3" -> "4" [label="dn_main.output = service61_FC_UserLoginAck"]
+"4" -> "5" [style=dotted label="dn_main.input = service64_FC_FlexibusBookingRequest &\n"]
+"5" -> "6" [label="dn_main.output = service64_FC_TripDetails"]
+"6" -> "7" [style=dotted label="dn_main.input = service64_FC_ConfirmAndPay &\n"]
+"7" -> "8" [style=dotted label="dn_main.input = service64_FC_PaymentReceipt &\n"]
+"8" -> "9" [label="dn_main.output = service64_FC_BookingResult"]
+"9" -> "10" [style=dotted label="dn_main.input = service64_FC_SetPassengerDetails &\n"]
+}
+

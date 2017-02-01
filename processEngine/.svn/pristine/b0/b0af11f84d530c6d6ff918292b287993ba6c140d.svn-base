@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:domainProperty id="MakerDP" xmlns:tns="http://das.fbk.eu/Process"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+	<tns:state isInitial="true">INITIAL</tns:state>
+	<tns:state>MAKER_COMMITED</tns:state>
+
+	<tns:event>makercommited</tns:event>
+
+	<tns:transition isControllable="true">
+		<tns:from>INITIAL</tns:from>
+		<tns:to>MAKER_COMMITED</tns:to>
+		<tns:event>makercommited</tns:event>
+	</tns:transition>
+
+</tns:domainProperty>

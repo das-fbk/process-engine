@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:domainObject name="Do2" xmlns:tns="http://das.fbk.eu/DomainObject"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+	<tns:domainKnowledge>
+		<tns:internalDomainProperty name="MultiModalPlanner" />
+	</tns:domainKnowledge>
+
+	<tns:process name="P_Do2" />
+
+</tns:domainObject>

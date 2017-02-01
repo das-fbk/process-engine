@@ -1,0 +1,4 @@
+Idea of this example is to have the following scenario:
+
+2 instances of Starter that invoke 2 different instances of Supporter
+ 

@@ -1,0 +1,210 @@
+-------------------------------
+--   C O M P O S I T I O N   --
+-------------------------------
+MODULE dn_main
+
+---------------------
+--   I N P U T S   --
+---------------------
+IVAR input:
+{
+UNDEF, service78_FC_UserLoginRequest, service78_RESET, service79_RESET, service79_FC_UserRegistrationRequest, service80_FC_DriverLoginRequest, service80_RESET, service81_FC_ConfirmAndPay, service81_FC_FlexibusBookingRequest, service81_FC_PaymentReceipt, service81_FC_SetPassengerDetails, service81_RESET, service82_RESET, service82_FC_RouteAssignmentRequest, service82_FC_TakeFlexibus
+};
+
+-----------------------
+--   O U T P U T S   --
+-----------------------
+IVAR output:
+{
+UNDEF, service78_FC_UserLoginAck, service79_FC_UserRegistrationAck, service80_FC_DriverLoginAck, service81_FC_TripDetails, service81_FC_BookingResult, service82_FC_RouteAssignmentReply
+};
+
+-------------------------
+--   S E R V I C E S   --
+-------------------------
+--	 service78
+VAR service78: {ST2, ST1, ST0};
+ASSIGN
+next(service78) :=
+case
+(service78 = ST0 & input = service78_FC_UserLoginRequest): ST1;
+(service78 = ST2 & input = service78_RESET): ST0;
+(service78 = ST1 & output = service78_FC_UserLoginAck): ST2;
+(service78 = ST1 & input = service78_RESET): ST0;
+1:service78;
+esac;
+TRANS ( input = service78_FC_UserLoginRequest) -> (service78 = ST0)
+TRANS ( input = service78_RESET) -> (service78 = ST2 | service78 = ST1)
+TRANS ( output = service78_FC_UserLoginAck) -> (service78 = ST1)
+
+--	 service79
+VAR service79: {ST2, ST1, ST0};
+ASSIGN
+next(service79) :=
+case
+(service79 = ST1 & input = service79_RESET): ST0;
+(service79 = ST0 & input = service79_FC_UserRegistrationRequest): ST1;
+(service79 = ST2 & input = service79_RESET): ST0;
+(service79 = ST1 & output = service79_FC_UserRegistrationAck): ST2;
+1:service79;
+esac;
+TRANS ( output = service79_FC_UserRegistrationAck) -> (service79 = ST1)
+TRANS ( input = service79_RESET) -> (service79 = ST2 | service79 = ST1)
+TRANS ( input = service79_FC_UserRegistrationRequest) -> (service79 = ST0)
+
+--	 service80
+VAR service80: {ST2, ST1, ST0};
+ASSIGN
+next(service80) :=
+case
+(service80 = ST0 & input = service80_FC_DriverLoginRequest): ST1;
+(service80 = ST1 & input = service80_RESET): ST0;
+(service80 = ST1 & output = service80_FC_DriverLoginAck): ST2;
+(service80 = ST2 & input = service80_RESET): ST0;
+1:service80;
+esac;
+TRANS ( output = service80_FC_DriverLoginAck) -> (service80 = ST1)
+TRANS ( input = service80_FC_DriverLoginRequest) -> (service80 = ST0)
+TRANS ( input = service80_RESET) -> (service80 = ST2 | service80 = ST1)
+
+--	 service81
+VAR service81: {ST2, ST1, ST4, ST3, ST6, ST5, ST0};
+ASSIGN
+next(service81) :=
+case
+(service81 = ST4 & output = service81_FC_BookingResult): ST5;
+(service81 = ST1 & input = service81_RESET): ST0;
+(service81 = ST3 & input = service81_FC_PaymentReceipt): ST4;
+(service81 = ST5 & input = service81_FC_SetPassengerDetails): ST6;
+(service81 = ST6 & input = service81_RESET): ST0;
+(service81 = ST0 & input = service81_FC_FlexibusBookingRequest): ST1;
+(service81 = ST2 & input = service81_FC_ConfirmAndPay): ST3;
+(service81 = ST2 & input = service81_RESET): ST0;
+(service81 = ST1 & output = service81_FC_TripDetails): ST2;
+(service81 = ST5 & input = service81_RESET): ST0;
+(service81 = ST4 & input = service81_RESET): ST0;
+(service81 = ST3 & input = service81_RESET): ST0;
+1:service81;
+esac;
+TRANS ( input = service81_FC_ConfirmAndPay) -> (service81 = ST2)
+TRANS ( input = service81_FC_FlexibusBookingRequest) -> (service81 = ST0)
+TRANS ( input = service81_FC_PaymentReceipt) -> (service81 = ST3)
+TRANS ( input = service81_FC_SetPassengerDetails) -> (service81 = ST5)
+TRANS ( output = service81_FC_TripDetails) -> (service81 = ST1)
+TRANS ( output = service81_FC_BookingResult) -> (service81 = ST4)
+TRANS ( input = service81_RESET) -> (service81 = ST2 | service81 = ST1 | service81 = ST4 | service81 = ST3 | service81 = ST6 | service81 = ST5)
+
+--	 service82
+VAR service82: {ST2, ST1, ST3, ST0};
+ASSIGN
+next(service82) :=
+case
+(service82 = ST0 & input = service82_FC_RouteAssignmentRequest): ST1;
+(service82 = ST2 & input = service82_FC_TakeFlexibus): ST3;
+(service82 = ST1 & input = service82_RESET): ST0;
+(service82 = ST1 & output = service82_FC_RouteAssignmentReply): ST2;
+(service82 = ST3 & input = service82_RESET): ST0;
+(service82 = ST2 & input = service82_RESET): ST0;
+1:service82;
+esac;
+TRANS ( input = service82_RESET) -> (service82 = ST2 | service82 = ST1 | service82 = ST3)
+TRANS ( output = service82_FC_RouteAssignmentReply) -> (service82 = ST1)
+TRANS ( input = service82_FC_RouteAssignmentRequest) -> (service82 = ST0)
+TRANS ( input = service82_FC_TakeFlexibus) -> (service82 = ST2)
+
+-----------------------
+--   O B J E C T S   --
+-----------------------
+--	 HandlePayment
+VAR HandlePayment: {PAYMENT_EXECUTED, INITIAL};
+ASSIGN
+next(HandlePayment) :=
+case
+(input = service81_FC_ConfirmAndPay):{(PAYMENT_EXECUTED)};
+1:HandlePayment;
+esac;
+--	 FlexibusDriverStatus
+VAR FlexibusDriverStatus: {ROUTE_STARTED, PASSENGERS_LOADED, AT_PICKUP_POINT, ROUTE_ENDED, INITIAL, ROUTE_CLOSED, FLEXIBUS_TAKEN, TAKING_PASSENGER};
+ASSIGN
+next(FlexibusDriverStatus) :=
+case
+(input = service82_FC_TakeFlexibus):{(FLEXIBUS_TAKEN)};
+1:FlexibusDriverStatus;
+esac;
+--	 FlexibusTrip
+VAR FlexibusTrip: {USER_LOGGED_IN, DRIVER_LOGGED_IN, TRIP_BOOKED, ROUTE_COMPLETED, INITIAL, USER_REGISTERED, ROUTE_ASSIGNED};
+ASSIGN
+next(FlexibusTrip) :=
+case
+(FlexibusTrip = INITIAL & output = service79_FC_UserRegistrationAck): USER_REGISTERED;
+(FlexibusTrip = USER_REGISTERED & output = service78_FC_UserLoginAck): USER_LOGGED_IN;
+(FlexibusTrip = INITIAL & output = service80_FC_DriverLoginAck): DRIVER_LOGGED_IN;
+(FlexibusTrip = DRIVER_LOGGED_IN & input = service82_FC_TakeFlexibus): ROUTE_ASSIGNED;
+(FlexibusTrip = USER_LOGGED_IN & input = service81_FC_SetPassengerDetails): TRIP_BOOKED;
+1:FlexibusTrip;
+esac;
+--	 RoutePassengerStatus
+VAR RoutePassengerStatus: {PASSENGER_DETAILS_DEFINED, DESTINATION_REACHED, INITIAL, PICKUP_POINT_REACHED, PASSENGER_CHECKED_IN, FLEXIBUS_ARRIVED};
+ASSIGN
+next(RoutePassengerStatus) :=
+case
+(input = service81_FC_SetPassengerDetails):{(PASSENGER_DETAILS_DEFINED)};
+1:RoutePassengerStatus;
+esac;
+-----------------------------------
+--   P R E C O N D I T I O N S   --
+-----------------------------------
+TRANS (input = service78_FC_UserLoginRequest) -> ((((FlexibusTrip = USER_REGISTERED))))
+TRANS (input = service79_FC_UserRegistrationRequest) -> ((((FlexibusTrip = INITIAL))))
+TRANS (input = service80_FC_DriverLoginRequest) -> ((((FlexibusTrip = INITIAL))))
+TRANS (input = service81_FC_FlexibusBookingRequest) -> ((((FlexibusTrip = USER_LOGGED_IN))))
+TRANS (input = service82_FC_RouteAssignmentRequest) -> ((((FlexibusTrip = DRIVER_LOGGED_IN))))
+-----------------------------
+--   I N V A R I A N T S   --
+-----------------------------
+--	 Synchronicity
+TRANS (1-(input = UNDEF)) + (1-(output = UNDEF)) = 1
+
+---------------------------------------
+--   S Y N C H R O N I Z A T I O N   --
+---------------------------------------
+DEFINE SYNC0 := ((FlexibusTrip in {ROUTE_ASSIGNED}));
+--	 Synchronicity enforcement
+TRANS (service78 in {ST1}) -> (next(service78) != service78)
+TRANS (service79 in {ST1}) -> (next(service79) != service79)
+TRANS (service80 in {ST1}) -> (next(service80) != service80)
+TRANS (service81 in {ST1, ST4}) -> (next(service81) != service81)
+TRANS (service82 in {ST1}) -> (next(service82) != service82)
+-------------------------------
+--   C O N T R O L L E R S   --
+-------------------------------
+--	 Fault Controller
+VAR FAULT_CONTROLLER: { START, STOP };
+INIT FAULT_CONTROLLER = START
+
+ASSIGN
+next(FAULT_CONTROLLER) := 
+case
+(FAULT_CONTROLLER = START & FALSE): STOP;
+1: FAULT_CONTROLLER;
+esac;
+
+TRANS (output != UNDEF | input != UNDEF) -> (FAULT_CONTROLLER != STOP)
+
+-------------------------------------
+--   I N I T I A L I Z A T I O N   --
+-------------------------------------
+INIT ((HandlePayment = INITIAL) & (FlexibusDriverStatus = INITIAL) & (FlexibusTrip = INITIAL) & (RoutePassengerStatus = INITIAL))
+INIT ((service78 = ST0) & (service79 = ST0) & (service80 = ST0) & (service81 = ST0) & (service82 = ST0))
+
+-----------------
+--   G O A L   --
+-----------------
+MODULE main
+VAR dn_main : dn_main;
+
+GOAL ONEOF(
+(dn_main.SYNC0), 1;
+(dn_main.FAULT_CONTROLLER = STOP), 0
+
+)

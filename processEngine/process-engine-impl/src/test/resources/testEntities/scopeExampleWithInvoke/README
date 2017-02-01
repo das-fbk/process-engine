@@ -1,0 +1,9 @@
+Basic example with two domain object
+
+DO1
+	invoke - receive
+	
+DO2
+	concrete - scope: receive - invoke
+
+Objective of this example is to test a receive inside a scope

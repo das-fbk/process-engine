@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:process name="WhileProcessTest" xmlns:tns="http://das.fbk.eu/Process"
+	xmlns:tns1="http://das.fbk.eu/Annotation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://das.fbk.eu/Process ../../../schema/allow-ensembles/Process.xsd ">
+
+	<tns:concrete name="primaConcrete" returnsTo="ChoosedGate">
+		<tns:effect>
+			<tns1:event dpName="DPTEST" eventName="first"></tns1:event>
+		</tns:effect>
+	</tns:concrete>
+	<tns:while name="while1">
+		<tns:contextCondition>
+			<tns1:point>
+				<tns1:domainProperty dp_name="DPTEST">
+					<tns1:state>CARDRELEASED</tns1:state>
+				</tns1:domainProperty>
+			</tns1:point>
+		</tns:contextCondition>
+		<tns:concrete name="secondaConcrete" returnsTo="ChoosedGate2">
+			<tns:effect>
+				<tns1:event dpName="DPTEST" eventName="second"></tns1:event>
+			</tns:effect>
+		</tns:concrete>
+		<tns:concrete name="terzaConcrete" returnsTo="ChoosedGate2">
+		<!-- scommentare qui per verificare il fatto che il  while procede all'infinito-->
+<!-- 			<tns:effect> -->
+<!-- 				<tns1:event dpName="DPTEST" eventName="back"></tns1:event> -->
+<!-- 			</tns:effect> -->
+		</tns:concrete>
+	</tns:while>
+
+</tns:process>

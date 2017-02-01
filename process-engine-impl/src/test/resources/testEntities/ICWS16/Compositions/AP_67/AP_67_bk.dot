@@ -1,0 +1,13 @@
+(dn_main.service139 = ST0 & (dn_main.service141 = ST0 & (dn_main.SetupTrip = INITIAL & (dn_main.ProvideTrip = INITIAL & dn_main.FAULT_CONTROLLER = START))))
+4
+(dn_main.service139 = ST0 & (dn_main.service141 = ST4 & (dn_main.SetupTrip = INITIAL & (dn_main.ProvideTrip = TRIP_REQUEST_ACCOMPLISHED & dn_main.FAULT_CONTROLLER = START))))
+digraph plan_fsm {
+ratio="1.3";
+margin="0.2";
+size="8.0,11.4";
+"0" -> "1" [style=dotted label="dn_main.input = service141_UMS_TripRequest &\n"]
+"1" -> "2" [label="dn_main.output = service141_UMS_concrete1"]
+"2" -> "3" [label="dn_main.output = service141_UMS_concrete2"]
+"3" -> "4" [label="dn_main.output = service141_UMS_TripAlternatives"]
+}
+

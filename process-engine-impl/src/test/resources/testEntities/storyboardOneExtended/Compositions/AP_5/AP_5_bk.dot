@@ -1,0 +1,12 @@
+(dn_main.service12 = ST0 & (dn_main.HandlePayment = INITIAL & (dn_main.RoutePassengerStatus = INITIAL & dn_main.FAULT_CONTROLLER = START)))
+3
+(dn_main.service12 = ST3 & (dn_main.HandlePayment = PAYMENT_EXECUTED & (dn_main.RoutePassengerStatus = CONFIRMATION_REQUEST_CONFIRMED & dn_main.FAULT_CONTROLLER = START)))
+digraph plan_fsm {
+ratio="1.3";
+margin="0.2";
+size="8.0,11.4";
+"0" -> "1" [style=dotted label="dn_main.input = service12_RP_ConfirmationRequest &\n"]
+"1" -> "2" [style=dotted label="dn_main.input = service12_RP_PayTicket &\n"]
+"2" -> "3" [label="dn_main.output = service12_RP_ConfirmationStatus"]
+}
+

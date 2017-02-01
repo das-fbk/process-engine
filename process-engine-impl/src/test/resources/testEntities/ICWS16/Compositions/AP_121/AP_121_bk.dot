@@ -1,0 +1,17 @@
+(dn_main.service216 = ST0 & (dn_main.service217 = ST0 & (dn_main.SetupTrip = INITIAL & (dn_main.ProvideTrip = TRIP_REQUEST_ACCOMPLISHED & dn_main.FAULT_CONTROLLER = START))))
+8
+(dn_main.service216 = ST8 & (dn_main.service217 = ST0 & (dn_main.SetupTrip = ORGANIZED & (dn_main.ProvideTrip = TRIP_MANAGEMENT_ACCOMPLISHED & dn_main.FAULT_CONTROLLER = START))))
+digraph plan_fsm {
+ratio="1.3";
+margin="0.2";
+size="8.0,11.4";
+"0" -> "1" [style=dotted label="dn_main.input = service216_UMS_TripManagementRequest &\n"]
+"1" -> "2" [label="dn_main.output = service216_UMS_concrete1"]
+"2" -> "3" [label="dn_main.output = service216_UMS_concrete2"]
+"3" -> "4" [label="dn_main.output = service216_UMS_concrete3"]
+"4" -> "5" [label="dn_main.output = service216_UMS_concrete4"]
+"5" -> "6" [label="dn_main.output = service216_UMS_concrete5"]
+"6" -> "7" [style=dotted label="dn_main.input = service216_UMS_ManagementTrip &\n"]
+"7" -> "8" [label="dn_main.output = service216_UMS_TripManagementReply"]
+}
+

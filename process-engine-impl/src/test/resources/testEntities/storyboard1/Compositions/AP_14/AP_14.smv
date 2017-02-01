@@ -1,0 +1,110 @@
+-------------------------------
+--   C O M P O S I T I O N   --
+-------------------------------
+MODULE dn_main
+
+---------------------
+--   I N P U T S   --
+---------------------
+IVAR input:
+{
+UNDEF, service25_HOAAorganizeTrip, service25_ChosenTrip, service25_RESET
+};
+
+-----------------------
+--   O U T P U T S   --
+-----------------------
+IVAR output:
+{
+UNDEF, service25_DefineGoal
+};
+
+-------------------------
+--   S E R V I C E S   --
+-------------------------
+--	 service25
+VAR service25: {ST2, ST1, ST3, ST0};
+ASSIGN
+next(service25) :=
+case
+(service25 = ST1 & output = service25_DefineGoal): ST2;
+(service25 = ST1 & input = service25_RESET): ST0;
+(service25 = ST3 & input = service25_RESET): ST0;
+(service25 = ST0 & input = service25_ChosenTrip): ST1;
+(service25 = ST2 & input = service25_RESET): ST0;
+(service25 = ST2 & input = service25_HOAAorganizeTrip): ST3;
+1:service25;
+esac;
+TRANS ( input = service25_HOAAorganizeTrip) -> (service25 = ST2)
+TRANS ( output = service25_DefineGoal) -> (service25 = ST1)
+TRANS ( input = service25_ChosenTrip) -> (service25 = ST0)
+TRANS ( input = service25_RESET) -> (service25 = ST2 | service25 = ST1 | service25 = ST3)
+
+-----------------------
+--   O B J E C T S   --
+-----------------------
+--	 FlexibusTrip
+VAR FlexibusTrip: {TRIPBOOKED, RINIT, USERREGISTERED, TRIPREQUESTED};
+ASSIGN
+next(FlexibusTrip) :=
+case
+(input = service25_HOAAorganizeTrip):{(TRIPBOOKED)};
+1:FlexibusTrip;
+esac;
+--	 TripOrganizer
+VAR TripOrganizer: {ORGANIZED, RINIT};
+ASSIGN
+next(TripOrganizer) :=
+case
+(TripOrganizer = RINIT & input = service25_HOAAorganizeTrip): ORGANIZED;
+1:TripOrganizer;
+esac;
+-----------------------------------
+--   P R E C O N D I T I O N S   --
+-----------------------------------
+TRANS (input = service25_ChosenTrip) -> ((((TripOrganizer = RINIT))))
+-----------------------------
+--   I N V A R I A N T S   --
+-----------------------------
+--	 Synchronicity
+TRANS (1-(input = UNDEF)) + (1-(output = UNDEF)) = 1
+
+---------------------------------------
+--   S Y N C H R O N I Z A T I O N   --
+---------------------------------------
+DEFINE SYNC0 := ((TripOrganizer in {ORGANIZED}));
+--	 Synchronicity enforcement
+TRANS (service25 in {ST1}) -> (next(service25) != service25)
+-------------------------------
+--   C O N T R O L L E R S   --
+-------------------------------
+--	 Fault Controller
+VAR FAULT_CONTROLLER: { START, STOP };
+INIT FAULT_CONTROLLER = START
+
+ASSIGN
+next(FAULT_CONTROLLER) := 
+case
+(FAULT_CONTROLLER = START & FALSE): STOP;
+1: FAULT_CONTROLLER;
+esac;
+
+TRANS (output != UNDEF | input != UNDEF) -> (FAULT_CONTROLLER != STOP)
+
+-------------------------------------
+--   I N I T I A L I Z A T I O N   --
+-------------------------------------
+INIT ((FlexibusTrip = RINIT) & (TripOrganizer = RINIT))
+INIT ((service25 = ST0))
+
+-----------------
+--   G O A L   --
+-----------------
+MODULE main
+VAR dn_main : dn_main;
+
+GOAL ONEOF(
+(dn_main.SYNC0), 1;
+(dn_main.FAULT_CONTROLLER = STOP), 0
+
+)

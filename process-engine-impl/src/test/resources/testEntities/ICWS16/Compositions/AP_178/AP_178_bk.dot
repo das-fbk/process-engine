@@ -1,0 +1,25 @@
+(dn_main.service330 = ST0 & (dn_main.service331 = ST0 & (dn_main.service332 = ST0 & (dn_main.service333 = ST0 & (dn_main.service334 = ST0 & (dn_main.service335 = ST0 & (dn_main.service336 = ST0 & (dn_main.BikeRoutePlan = INITIAL & (dn_main.ParkAndRideTrip = INITIAL & (dn_main.CarRoutePlan = INITIAL & (dn_main.HandlePayment = INITIAL & (dn_main.BikeSharingTrip = INITIAL & (dn_main.ParkingManager = INITIAL & (dn_main.HandleSmartMobilityCard = INITIAL & dn_main.FAULT_CONTROLLER = START))))))))))))))
+16
+(dn_main.service330 = ST6 & (dn_main.service331 = ST3 & (dn_main.service332 = ST0 & (dn_main.service333 = ST7 & (dn_main.service334 = ST0 & (dn_main.service335 = ST0 & (dn_main.service336 = ST0 & (dn_main.BikeRoutePlan = INITIAL & (dn_main.ParkAndRideTrip = CAR_ROUTE_PLANNED & (dn_main.CarRoutePlan = CAR_ROUTE_PLANNED & (dn_main.HandlePayment = INITIAL & (dn_main.BikeSharingTrip = USER_REGISTERED & (dn_main.ParkingManager = PARK_BOOKED & (dn_main.HandleSmartMobilityCard = SERVICE_ADDED & dn_main.FAULT_CONTROLLER = START))))))))))))))
+digraph plan_fsm {
+ratio="1.3";
+margin="0.2";
+size="8.0,11.4";
+"0" -> "1" [style=dotted label="dn_main.input = service333_PR_RegistrationRequest &\n"]
+"1" -> "2" [label="dn_main.output = service333_PR_concrete_1"]
+"2" -> "3" [label="dn_main.output = service333_PR_concrete_2"]
+"3" -> "4" [label="dn_main.output = service333_PR_concrete_3"]
+"4" -> "5" [label="dn_main.output = service333_PR_concrete_4"]
+"5" -> "6" [label="dn_main.output = service333_PR_RegistrationAck"]
+"6" -> "7" [style=dotted label="dn_main.input = service333_PR_bookPark &\n"]
+"7" -> "8" [style=dotted label="dn_main.input = service330_PR_FindPArkRequest &\n"]
+"8" -> "9" [label="dn_main.output = service330_PR_concrete1"]
+"9" -> "10" [label="dn_main.output = service330_PR_concrete2"]
+"10" -> "11" [label="dn_main.output = service330_PR_concrete3"]
+"11" -> "12" [style=dotted label="dn_main.input = service330_PR_PlanCarRoute &\n"]
+"12" -> "13" [label="dn_main.output = service330_PR_FindPArkAck"]
+"13" -> "14" [style=dotted label="dn_main.input = service331_BS_RegistrationRequest &\n"]
+"14" -> "15" [style=dotted label="dn_main.input = service331_BS_UpdateSmartMobilityCard &\n"]
+"15" -> "16" [label="dn_main.output = service331_BS_RegistrationAck"]
+}
+

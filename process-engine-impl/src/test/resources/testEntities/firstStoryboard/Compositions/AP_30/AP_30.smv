@@ -1,0 +1,174 @@
+-------------------------------
+--   C O M P O S I T I O N   --
+-------------------------------
+MODULE dn_main
+
+---------------------
+--   I N P U T S   --
+---------------------
+IVAR input:
+{
+UNDEF, service54_RM_PickupPointRequest, service54_RESET, service55_RM_RouteCreationRequest, service55_RESET, service56_RM_PassengerCheckInRequest, service56_RESET, service57_RM_StartRouteRequest, service57_RESET, service58_RM_EndRouteRequest, service58_RESET
+};
+
+-----------------------
+--   O U T P U T S   --
+-----------------------
+IVAR output:
+{
+UNDEF, service54_RM_PickupPointReply, service55_RM_RouteCreationReply, service56_RM_PassengerCheckInReply, service57_RM_StartRouteReply, service58_RM_EndRouteReply
+};
+
+-------------------------
+--   S E R V I C E S   --
+-------------------------
+--	 service54
+VAR service54: {ST2, ST1, ST0};
+ASSIGN
+next(service54) :=
+case
+(service54 = ST0 & input = service54_RM_PickupPointRequest): ST1;
+(service54 = ST1 & output = service54_RM_PickupPointReply): ST2;
+(service54 = ST2 & input = service54_RESET): ST0;
+(service54 = ST1 & input = service54_RESET): ST0;
+1:service54;
+esac;
+TRANS ( input = service54_RM_PickupPointRequest) -> (service54 = ST0)
+TRANS ( input = service54_RESET) -> (service54 = ST2 | service54 = ST1)
+TRANS ( output = service54_RM_PickupPointReply) -> (service54 = ST1)
+
+--	 service55
+VAR service55: {ST2, ST1, ST0};
+ASSIGN
+next(service55) :=
+case
+(service55 = ST1 & output = service55_RM_RouteCreationReply): ST2;
+(service55 = ST1 & input = service55_RESET): ST0;
+(service55 = ST0 & input = service55_RM_RouteCreationRequest): ST1;
+(service55 = ST2 & input = service55_RESET): ST0;
+1:service55;
+esac;
+TRANS ( input = service55_RM_RouteCreationRequest) -> (service55 = ST0)
+TRANS ( input = service55_RESET) -> (service55 = ST2 | service55 = ST1)
+TRANS ( output = service55_RM_RouteCreationReply) -> (service55 = ST1)
+
+--	 service56
+VAR service56: {ST2, ST1, ST0};
+ASSIGN
+next(service56) :=
+case
+(service56 = ST1 & output = service56_RM_PassengerCheckInReply): ST2;
+(service56 = ST2 & input = service56_RESET): ST0;
+(service56 = ST1 & input = service56_RESET): ST0;
+(service56 = ST0 & input = service56_RM_PassengerCheckInRequest): ST1;
+1:service56;
+esac;
+TRANS ( output = service56_RM_PassengerCheckInReply) -> (service56 = ST1)
+TRANS ( input = service56_RM_PassengerCheckInRequest) -> (service56 = ST0)
+TRANS ( input = service56_RESET) -> (service56 = ST2 | service56 = ST1)
+
+--	 service57
+VAR service57: {ST2, ST1, ST0};
+ASSIGN
+next(service57) :=
+case
+(service57 = ST1 & input = service57_RESET): ST0;
+(service57 = ST0 & input = service57_RM_StartRouteRequest): ST1;
+(service57 = ST2 & input = service57_RESET): ST0;
+(service57 = ST1 & output = service57_RM_StartRouteReply): ST2;
+1:service57;
+esac;
+TRANS ( input = service57_RM_StartRouteRequest) -> (service57 = ST0)
+TRANS ( input = service57_RESET) -> (service57 = ST2 | service57 = ST1)
+TRANS ( output = service57_RM_StartRouteReply) -> (service57 = ST1)
+
+--	 service58
+VAR service58: {ST2, ST1, ST0};
+ASSIGN
+next(service58) :=
+case
+(service58 = ST2 & input = service58_RESET): ST0;
+(service58 = ST1 & input = service58_RESET): ST0;
+(service58 = ST1 & output = service58_RM_EndRouteReply): ST2;
+(service58 = ST0 & input = service58_RM_EndRouteRequest): ST1;
+1:service58;
+esac;
+TRANS ( output = service58_RM_EndRouteReply) -> (service58 = ST1)
+TRANS ( input = service58_RM_EndRouteRequest) -> (service58 = ST0)
+TRANS ( input = service58_RESET) -> (service58 = ST2 | service58 = ST1)
+
+-----------------------
+--   O B J E C T S   --
+-----------------------
+--	 HandleRoute
+VAR HandleRoute: {ROUTE_STARTED, PICKUP_POINT_ADDED, ROUTE_COMPLETED, INITIAL, ROUTE_CLOSED, PASSENGER_CHECKED_IN, CHECK_IN_CLOSED, ROUTE_CREATED};
+ASSIGN
+next(HandleRoute) :=
+case
+(HandleRoute = ROUTE_STARTED & output = service56_RM_PassengerCheckInReply): PASSENGER_CHECKED_IN;
+(HandleRoute = INITIAL & input = service57_RM_StartRouteRequest): ROUTE_CLOSED;
+(HandleRoute = CHECK_IN_CLOSED & output = service58_RM_EndRouteReply): ROUTE_COMPLETED;
+(HandleRoute = ROUTE_STARTED & input = service58_RM_EndRouteRequest): CHECK_IN_CLOSED;
+(HandleRoute = ROUTE_CREATED & output = service54_RM_PickupPointReply): PICKUP_POINT_ADDED;
+(HandleRoute = INITIAL & output = service55_RM_RouteCreationReply): ROUTE_CREATED;
+(HandleRoute = ROUTE_CLOSED & output = service57_RM_StartRouteReply): ROUTE_STARTED;
+(HandleRoute = INITIAL & input = service56_RM_PassengerCheckInRequest): ROUTE_STARTED;
+1:HandleRoute;
+esac;
+-----------------------------------
+--   P R E C O N D I T I O N S   --
+-----------------------------------
+TRANS (input = service54_RM_PickupPointRequest) -> ((((HandleRoute = ROUTE_CREATED))))
+TRANS (input = service55_RM_RouteCreationRequest) -> ((((HandleRoute = INITIAL))))
+TRANS (input = service56_RM_PassengerCheckInRequest) -> ((((HandleRoute = INITIAL))))
+TRANS (input = service57_RM_StartRouteRequest) -> ((((HandleRoute = INITIAL))))
+TRANS (input = service58_RM_EndRouteRequest) -> ((((HandleRoute = ROUTE_STARTED))))
+-----------------------------
+--   I N V A R I A N T S   --
+-----------------------------
+--	 Synchronicity
+TRANS (1-(input = UNDEF)) + (1-(output = UNDEF)) = 1
+
+---------------------------------------
+--   S Y N C H R O N I Z A T I O N   --
+---------------------------------------
+DEFINE SYNC0 := ((HandleRoute in {ROUTE_STARTED}));
+--	 Synchronicity enforcement
+TRANS (service54 in {ST1}) -> (next(service54) != service54)
+TRANS (service55 in {ST1}) -> (next(service55) != service55)
+TRANS (service56 in {ST1}) -> (next(service56) != service56)
+TRANS (service57 in {ST1}) -> (next(service57) != service57)
+TRANS (service58 in {ST1}) -> (next(service58) != service58)
+-------------------------------
+--   C O N T R O L L E R S   --
+-------------------------------
+--	 Fault Controller
+VAR FAULT_CONTROLLER: { START, STOP };
+INIT FAULT_CONTROLLER = START
+
+ASSIGN
+next(FAULT_CONTROLLER) := 
+case
+(FAULT_CONTROLLER = START & FALSE): STOP;
+1: FAULT_CONTROLLER;
+esac;
+
+TRANS (output != UNDEF | input != UNDEF) -> (FAULT_CONTROLLER != STOP)
+
+-------------------------------------
+--   I N I T I A L I Z A T I O N   --
+-------------------------------------
+INIT ((HandleRoute = INITIAL))
+INIT ((service54 = ST0) & (service55 = ST0) & (service56 = ST0) & (service57 = ST0) & (service58 = ST0))
+
+-----------------
+--   G O A L   --
+-----------------
+MODULE main
+VAR dn_main : dn_main;
+
+GOAL ONEOF(
+(dn_main.SYNC0), 1;
+(dn_main.FAULT_CONTROLLER = STOP), 0
+
+)

@@ -1,0 +1,13 @@
+(dn_main.service20 = ST0 & (dn_main.service21 = ST0 & (dn_main.service22 = ST0 & (dn_main.HandleSmartMobilityCard = CARD_RELEASED & dn_main.FAULT_CONTROLLER = START))))
+4
+(dn_main.service20 = ST2 & (dn_main.service21 = ST0 & (dn_main.service22 = ST2 & (dn_main.HandleSmartMobilityCard = SERVICE_ADDED & dn_main.FAULT_CONTROLLER = START))))
+digraph plan_fsm {
+ratio="1.3";
+margin="0.2";
+size="8.0,11.4";
+"0" -> "1" [style=dotted label="dn_main.input = service22_SMC_VerifyAmountRequest &\n"]
+"1" -> "2" [label="dn_main.output = service22_SMC_VerifyAmountReply"]
+"2" -> "3" [style=dotted label="dn_main.input = service20_SMC_ActivateServiceRequest &\n"]
+"3" -> "4" [label="dn_main.output = service20_SMC_ActivateServiceReply"]
+}
+

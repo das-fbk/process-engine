@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:process name="User_Core" xmlns:tns="http://das.fbk.eu/Process"
+	xmlns:tns1="http://das.fbk.eu/Annotation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<tns:scope name="scope1">
+		<tns:concrete name="testConcrete" returnsTo="ChoosedGate" />
+		<tns:eventHandler>
+			<tns:onExternalEvent onEventName="externaEventName" />
+			<tns:dpChange dpName="TripPlanner" eventName="tripOrganized" />			
+		</tns:eventHandler>
+	</tns:scope>
+</tns:process>

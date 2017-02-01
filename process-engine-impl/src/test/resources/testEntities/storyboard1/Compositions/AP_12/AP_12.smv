@@ -1,0 +1,101 @@
+-------------------------------
+--   C O M P O S I T I O N   --
+-------------------------------
+MODULE dn_main
+
+---------------------
+--   I N P U T S   --
+---------------------
+IVAR input:
+{
+UNDEF, service23_TripRequest, service23_RESET
+};
+
+-----------------------
+--   O U T P U T S   --
+-----------------------
+IVAR output:
+{
+UNDEF, service23_TripAlternatives
+};
+
+-------------------------
+--   S E R V I C E S   --
+-------------------------
+--	 service23
+VAR service23: {ST2, ST1, ST0};
+ASSIGN
+next(service23) :=
+case
+(service23 = ST2 & input = service23_RESET): ST0;
+(service23 = ST0 & input = service23_TripRequest): ST1;
+(service23 = ST1 & output = service23_TripAlternatives): ST2;
+(service23 = ST1 & input = service23_RESET): ST0;
+1:service23;
+esac;
+TRANS ( input = service23_TripRequest) -> (service23 = ST0)
+TRANS ( input = service23_RESET) -> (service23 = ST2 | service23 = ST1)
+TRANS ( output = service23_TripAlternatives) -> (service23 = ST1)
+
+-----------------------
+--   O B J E C T S   --
+-----------------------
+--	 TripProvider
+VAR TripProvider: {RINIT, ALTERNATIVESSENT, REQUESTLOADED};
+ASSIGN
+next(TripProvider) :=
+case
+(TripProvider = RINIT & input = service23_TripRequest): REQUESTLOADED;
+(TripProvider = REQUESTLOADED & output = service23_TripAlternatives): ALTERNATIVESSENT;
+1:TripProvider;
+esac;
+-----------------------------------
+--   P R E C O N D I T I O N S   --
+-----------------------------------
+TRANS (input = service23_TripRequest) -> ((((TripProvider = RINIT))))
+TRANS (output = service23_TripAlternatives) -> ((((TripProvider = REQUESTLOADED))))
+-----------------------------
+--   I N V A R I A N T S   --
+-----------------------------
+--	 Synchronicity
+TRANS (1-(input = UNDEF)) + (1-(output = UNDEF)) = 1
+
+---------------------------------------
+--   S Y N C H R O N I Z A T I O N   --
+---------------------------------------
+DEFINE SYNC0 := ((TripProvider in {ALTERNATIVESSENT}));
+--	 Synchronicity enforcement
+TRANS (service23 in {ST1}) -> (next(service23) != service23)
+-------------------------------
+--   C O N T R O L L E R S   --
+-------------------------------
+--	 Fault Controller
+VAR FAULT_CONTROLLER: { START, STOP };
+INIT FAULT_CONTROLLER = START
+
+ASSIGN
+next(FAULT_CONTROLLER) := 
+case
+(FAULT_CONTROLLER = START & FALSE): STOP;
+1: FAULT_CONTROLLER;
+esac;
+
+TRANS (output != UNDEF | input != UNDEF) -> (FAULT_CONTROLLER != STOP)
+
+-------------------------------------
+--   I N I T I A L I Z A T I O N   --
+-------------------------------------
+INIT ((TripProvider = RINIT))
+INIT ((service23 = ST0))
+
+-----------------
+--   G O A L   --
+-----------------
+MODULE main
+VAR dn_main : dn_main;
+
+GOAL ONEOF(
+(dn_main.SYNC0), 1;
+(dn_main.FAULT_CONTROLLER = STOP), 0
+
+)

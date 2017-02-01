@@ -1,0 +1,111 @@
+-------------------------------
+--   C O M P O S I T I O N   --
+-------------------------------
+MODULE dn_main
+
+---------------------
+--   I N P U T S   --
+---------------------
+IVAR input:
+{
+UNDEF, service13_PM_PaymentRequest, service13_PM_ExecutePayment, service13_RESET
+};
+
+-----------------------
+--   O U T P U T S   --
+-----------------------
+IVAR output:
+{
+UNDEF, service13_PM_PaymentReply
+};
+
+-------------------------
+--   S E R V I C E S   --
+-------------------------
+--	 service13
+VAR service13: {ST2, ST1, ST3, ST0};
+ASSIGN
+next(service13) :=
+case
+(service13 = ST1 & input = service13_PM_ExecutePayment): ST2;
+(service13 = ST2 & output = service13_PM_PaymentReply): ST3;
+(service13 = ST1 & input = service13_RESET): ST0;
+(service13 = ST3 & input = service13_RESET): ST0;
+(service13 = ST0 & input = service13_PM_PaymentRequest): ST1;
+(service13 = ST2 & input = service13_RESET): ST0;
+1:service13;
+esac;
+TRANS ( output = service13_PM_PaymentReply) -> (service13 = ST2)
+TRANS ( input = service13_PM_PaymentRequest) -> (service13 = ST0)
+TRANS ( input = service13_PM_ExecutePayment) -> (service13 = ST1)
+TRANS ( input = service13_RESET) -> (service13 = ST2 | service13 = ST1 | service13 = ST3)
+
+-----------------------
+--   O B J E C T S   --
+-----------------------
+--	 HandlePayment
+VAR HandlePayment: {PAYMENT_EXECUTED, INITIAL};
+ASSIGN
+next(HandlePayment) :=
+case
+(HandlePayment = INITIAL & output = service13_PM_PaymentReply): PAYMENT_EXECUTED;
+1:HandlePayment;
+esac;
+--	 PayPalPayment
+VAR PayPalPayment: {INITIAL, PP_PAYMENT_EXECUTED};
+ASSIGN
+next(PayPalPayment) :=
+case
+(PayPalPayment = PP_PAYMENT_EXECUTED & input = service13_PM_ExecutePayment): INITIAL;
+(input = service13_PM_ExecutePayment):{(PP_PAYMENT_EXECUTED)};
+1:PayPalPayment;
+esac;
+-----------------------------------
+--   P R E C O N D I T I O N S   --
+-----------------------------------
+TRANS (input = service13_PM_PaymentRequest) -> ((((HandlePayment = INITIAL))))
+-----------------------------
+--   I N V A R I A N T S   --
+-----------------------------
+--	 Synchronicity
+TRANS (1-(input = UNDEF)) + (1-(output = UNDEF)) = 1
+
+---------------------------------------
+--   S Y N C H R O N I Z A T I O N   --
+---------------------------------------
+DEFINE SYNC0 := ((HandlePayment in {PAYMENT_EXECUTED}));
+--	 Synchronicity enforcement
+TRANS (service13 in {ST2}) -> (next(service13) != service13)
+-------------------------------
+--   C O N T R O L L E R S   --
+-------------------------------
+--	 Fault Controller
+VAR FAULT_CONTROLLER: { START, STOP };
+INIT FAULT_CONTROLLER = START
+
+ASSIGN
+next(FAULT_CONTROLLER) := 
+case
+(FAULT_CONTROLLER = START & FALSE): STOP;
+1: FAULT_CONTROLLER;
+esac;
+
+TRANS (output != UNDEF | input != UNDEF) -> (FAULT_CONTROLLER != STOP)
+
+-------------------------------------
+--   I N I T I A L I Z A T I O N   --
+-------------------------------------
+INIT ((HandlePayment = INITIAL) & (PayPalPayment = INITIAL))
+INIT ((service13 = ST0))
+
+-----------------
+--   G O A L   --
+-----------------
+MODULE main
+VAR dn_main : dn_main;
+
+GOAL ONEOF(
+(dn_main.SYNC0), 1;
+(dn_main.FAULT_CONTROLLER = STOP), 0
+
+)

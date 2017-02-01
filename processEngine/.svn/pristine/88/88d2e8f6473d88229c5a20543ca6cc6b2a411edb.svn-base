@@ -1,0 +1,13 @@
+Test collegati all'analisi delle performance e risultati della process engine,
+ vedi progetto
+ 
+ C:\Users\soa\workspace\demo-controller-offline
+ 
+ della vecchia demo
+ 
+ 
+ Per il file di analisi vedi 
+ 
+ /process-engine-impl/src/test/java/eu/fbk/das/analyzer/Analysis.java
+ 
+ NOTA: non compila perche' ha dipendenze e relazioni con il composer versione vecchia demo

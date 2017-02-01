@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:process name="Train_User_Core" xmlns:tns="http://das.fbk.eu/Process" xmlns:tns1="http://das.fbk.eu/Annotation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://das.fbk.eu/Process Process.xsd ">
+
+<tns:receive name="TU_ConfirmationRequest">
+</tns:receive>
+
+<tns:invoke name="TU_ConfirmationStatus">
+</tns:invoke>
+
+</tns:process>

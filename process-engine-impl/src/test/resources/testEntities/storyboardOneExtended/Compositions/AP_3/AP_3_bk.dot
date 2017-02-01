@@ -1,0 +1,29 @@
+(dn_main.service4 = ST0 & (dn_main.service5 = ST0 & (dn_main.service6 = ST0 & (dn_main.service7 = ST0 & (dn_main.service8 = ST0 & (dn_main.service9 = ST0 & (dn_main.service10 = ST0 & (dn_main.TrainTrip = INITIAL & (dn_main.HandlePayment = INITIAL & (dn_main.FlexibusTrip = INITIAL & (dn_main.BikeSharingTrip = INITIAL & (dn_main.CarSharingTrip = INITIAL & (dn_main.RoutePassengerStatus = INITIAL & (dn_main.HandleSmartMobilityCard = INITIAL & dn_main.FAULT_CONTROLLER = START))))))))))))))
+20
+(dn_main.service4 = ST2 & (dn_main.service5 = ST3 & (dn_main.service6 = ST4 & (dn_main.service7 = ST2 & (dn_main.service8 = ST3 & (dn_main.service9 = ST3 & (dn_main.service10 = ST3 & (dn_main.TrainTrip = TRIP_BOOKED & (dn_main.HandlePayment = PAYMENT_EXECUTED & (dn_main.FlexibusTrip = TRIP_BOOKED & (dn_main.BikeSharingTrip = USER_REGISTERED & (dn_main.CarSharingTrip = RESERVATION_COMPLETED & (dn_main.RoutePassengerStatus = CONFIRMATION_REQUEST_CONFIRMED & (dn_main.HandleSmartMobilityCard = CARD_RELEASED & dn_main.FAULT_CONTROLLER = START))))))))))))))
+digraph plan_fsm {
+ratio="1.3";
+margin="0.2";
+size="8.0,11.4";
+"0" -> "1" [style=dotted label="dn_main.input = service5_BS_RegistrationRequest &\n"]
+"1" -> "2" [style=dotted label="dn_main.input = service4_FC_RegistrationRequest &\n"]
+"2" -> "3" [label="dn_main.output = service4_FC_RegistrationAck"]
+"3" -> "4" [style=dotted label="dn_main.input = service7_TC_RegistrationRequest &\n"]
+"4" -> "5" [label="dn_main.output = service7_TC_RegistrationAck"]
+"5" -> "6" [style=dotted label="dn_main.input = service9_TC_TrainBookingRequest &\n"]
+"6" -> "7" [style=dotted label="dn_main.input = service10_FC_FlexibusBookingRequest &\n"]
+"7" -> "8" [label="dn_main.output = service10_FC_BookingResult"]
+"8" -> "9" [style=dotted label="dn_main.input = service10_FC_ConfirmAndPay &\n"]
+"9" -> "10" [style=dotted label="dn_main.input = service9_TC_PayTicket &\n"]
+"10" -> "11" [label="dn_main.output = service9_TC_BookingResult"]
+"11" -> "12" [style=dotted label="dn_main.input = service8_CS_MembershipRequest &\n"]
+"12" -> "13" [style=dotted label="dn_main.input = service8_CS_UpdateSmartMobilityCard &\n"]
+"13" -> "14" [label="dn_main.output = service8_CS_MembershipReply"]
+"14" -> "15" [style=dotted label="dn_main.input = service6_CS_CarReservationRequest &\n"]
+"15" -> "16" [label="dn_main.output = service6_CS_CarReservationDetails"]
+"16" -> "17" [style=dotted label="dn_main.input = service6_CS_DetailsAssessed &\n"]
+"17" -> "18" [label="dn_main.output = service6_CS_CarReservationReply"]
+"18" -> "19" [style=dotted label="dn_main.input = service5_BS_UpdateSmartMobilityCard &\n"]
+"19" -> "20" [label="dn_main.output = service5_BS_RegistrationAck"]
+}
+

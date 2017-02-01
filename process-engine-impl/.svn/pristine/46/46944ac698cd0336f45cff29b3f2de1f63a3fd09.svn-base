@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:domainProperty id="TestDP" xmlns:tns="http://das.fbk.eu/Process"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+	<tns:state isInitial="true">INITIAL</tns:state>
+	<tns:state>USER_REGISTERED</tns:state>
+	<tns:state>USER_COMPLETED</tns:state>
+<!-- 	<tns:state>SECOND_INITIAL</tns:state> -->
+<!-- 	<tns:state>SECOND_COMPLETED</tns:state> -->
+
+	<tns:event>userRegistration</tns:event>
+	<tns:event>userCompleted</tns:event>
+<!-- 	<tns:event>secondInitial</tns:event> -->
+<!-- 	<tns:event>secondCompleted</tns:event> -->
+
+
+	<tns:transition isControllable="true">
+		<tns:from>INITIAL</tns:from>
+		<tns:to>USER_REGISTERED</tns:to>
+		<tns:event>userRegistration</tns:event>
+	</tns:transition>
+
+	<tns:transition isControllable="true">
+		<tns:from>USER_REGISTERED</tns:from>
+		<tns:to>USER_COMPLETED</tns:to>
+		<tns:event>userCompleted</tns:event>
+	</tns:transition>
+
+<!-- 	<tns:transition isControllable="true"> -->
+<!-- 		<tns:from>USER_COMPLETED</tns:from> -->
+<!-- 		<tns:to>SECOND_INITIAL</tns:to> -->
+<!-- 		<tns:event>secondInitial</tns:event> -->
+<!-- 	</tns:transition> -->
+	
+<!-- 	<tns:transition isControllable="true"> -->
+<!-- 		<tns:from>SECOND_INITIAL</tns:from> -->
+<!-- 		<tns:to>SECOND_COMPLETED</tns:to> -->
+<!-- 		<tns:event>secondCompleted</tns:event> -->
+<!-- 	</tns:transition> -->
+	
+
+</tns:domainProperty>

@@ -14,12 +14,12 @@ public class ScenarioLoader {
 
     public Scenario load(String ref) throws NullPointerException {
 	if (ref == null) {
-	    throw new NullPointerException("Scenario file is null");
+	    throw new NullPointerException("The scenario file is null");
 	}
 	File dir = new File(mainDir);
 	if (!dir.isDirectory()) {
 	    throw new NullPointerException(
-		    "Impossibile to load scenario, mainDir not found " + dir);
+		    "Impossibile to load the scenario; mainDir not found " + dir);
 	}
 	File f = new File(mainDir + File.separator + ref);
 	Parser parser = new Parser();

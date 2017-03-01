@@ -1,19 +1,8 @@
 package eu.fbk.das.analyzer;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.xml.bind.JAXBException;
 
 import eu.fbk.das.composer.api.CompositionProblem;
 import eu.fbk.das.composer.api.Parser;
@@ -23,15 +12,6 @@ import eu.fbk.das.composer.api.exceptions.InvalidServiceObjectAssignmentExceptio
 import eu.fbk.das.composer.impl.Composer;
 import eu.fbk.das.process.engine.api.domain.ObjectDiagram;
 import eu.fbk.das.process.engine.api.domain.ServiceDiagram;
-import eu.fbk.das.process.engine.api.composition.element.ServiceTransitionGlobal;
-import eu.fbk.das.process.engine.api.composition.element.exceptions.CompositionDuplicateSidException;
-import eu.fbk.das.process.engine.api.composition.element.exceptions.InvalidCompositionPreconditionException;
-import eu.fbk.das.process.engine.api.composition.element.exceptions.InvalidObjectCurrentStateException;
-import eu.fbk.das.process.engine.api.composition.element.exceptions.InvalidObjectEventException;
-import eu.fbk.das.process.engine.api.composition.element.exceptions.InvalidObjectInitialStateException;
-import eu.fbk.das.process.engine.api.composition.element.exceptions.InvalidObjectTransitionException;
-import eu.fbk.das.process.engine.api.composition.element.exceptions.InvalidServiceCurrentStateException;
-import eu.fbk.das.process.engine.api.composition.element.exceptions.ServiceGroundingTypeMismatchException;
 
 //import eu.fbk.soa.composition.Composer;
 //

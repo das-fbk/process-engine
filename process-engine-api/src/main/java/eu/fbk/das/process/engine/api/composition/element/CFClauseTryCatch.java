@@ -1,6 +1,5 @@
 package eu.fbk.das.process.engine.api.composition.element;
 
-import java.util.List;
 import java.util.Map;
 
 

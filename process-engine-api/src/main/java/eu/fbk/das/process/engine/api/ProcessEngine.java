@@ -14,6 +14,7 @@ import eu.fbk.das.process.engine.api.domain.exceptions.InvalidFlowInitialStateEx
 import eu.fbk.das.process.engine.api.exceptions.ProcessEngineRuntimeException;
 import eu.fbk.das.process.engine.api.jaxb.ClauseType;
 import eu.fbk.das.process.engine.api.jaxb.EffectType;
+import eu.fbk.das.process.engine.api.jaxb.VariableType;
 
 /**
  * General Interface for ProcessEngine that handle processes lifecycle (start,
@@ -21,174 +22,209 @@ import eu.fbk.das.process.engine.api.jaxb.EffectType;
  */
 public interface ProcessEngine {
 
-    /**
-     * Default initial pid for a new process (not running)
-     */
-    public static final int DEFAULT_PID = 1;
+	/**
+	 * Default initial pid for a new process (not running)
+	 */
+	public static final int DEFAULT_PID = 1;
 
-    /**
-     * Remove process from {@link ProcessEngine}
-     * 
-     * @param pid
-     *            - processId
-     */
-    public void remove(ProcessDiagram process);
+	/**
+	 * Remove process from {@link ProcessEngine}
+	 * 
+	 * @param pid
+	 *            - processId
+	 */
+	public void remove(ProcessDiagram process);
 
-    /**
-     * Remove all processes from {@link ProcessEngine}
-     */
-    public void removeAll();
+	/**
+	 * Remove all processes from {@link ProcessEngine}
+	 */
+	public void removeAll();
 
-    /**
-     * Start process
-     * 
-     * @param pid
-     *            - processId
-     * @throws ProcessEngineRuntimeException
-     */
-    public int start(DomainObjectInstance doi)
-	    throws ProcessEngineRuntimeException,
-	    InvalidFlowInitialStateException, InvalidFlowActivityException,
-	    FlowDuplicateActivityException;
+	/**
+	 * Start process
+	 * 
+	 * @param pid
+	 *            - processId
+	 * @throws ProcessEngineRuntimeException
+	 */
+	public int start(DomainObjectInstance doi)
+			throws ProcessEngineRuntimeException,
+			InvalidFlowInitialStateException, InvalidFlowActivityException,
+			FlowDuplicateActivityException;
 
-    /**
-     * End process
-     * 
-     * @param pid
-     *            , processId
-     */
-    public void end(int pid);
+	/**
+	 * End process
+	 * 
+	 * @param pid
+	 *            , processId
+	 */
+	public void end(int pid);
 
-    /**
-     * Update with one step a process with given pid
-     * 
-     * @param pid
-     */
-    public void step(int pid);
+	/**
+	 * Update with one step a process with given pid
+	 * 
+	 * @param pid
+	 */
+	public void step(int pid);
 
-    /**
-     * Update with one step all processes currenctly registered into
-     * {@link ProcessEngine}
-     */
-    public void stepAll();
+	/**
+	 * Update with one step all processes currenctly registered into
+	 * {@link ProcessEngine}
+	 */
+	public void stepAll();
 
-    /**
-     * @param processDiagram
-     * @return corresponding domainObjectDefinition (using as link
-     *         DomainObjectInstance)
-     */
-    public DomainObjectDefinition getDomainObjectDefinition(
-	    ProcessDiagram processDiagram);
+	/**
+	 * @param processDiagram
+	 * @return corresponding domainObjectDefinition (using as link
+	 *         DomainObjectInstance)
+	 */
+	public DomainObjectDefinition getDomainObjectDefinition(
+			ProcessDiagram processDiagram);
 
-    public boolean checkPrecondition(ProcessDiagram proc,
-	    ProcessActivity current);
+	// public DomainObject getDomainObject(
+	// ProcessDiagram processDiagram);
 
-    public void applyEffect(ProcessDiagram proc, EffectType effect);
+	public boolean checkPrecondition(ProcessDiagram proc,
+			ProcessActivity current);
 
-    public DomainObjectInstance getDomainObjectInstance(ProcessDiagram proc);
+	public void applyEffect(ProcessDiagram proc, EffectType effect);
 
-    public List<DomainObjectDefinition> getDomainObjectDefinitionWithInternalKnowledge(
-	    String dpName);
+	public DomainObjectInstance getDomainObjectInstance(ProcessDiagram proc);
 
-    public List<DomainObjectInstance> getDomainObjectInstances();
+	public List<DomainObjectDefinition> getDomainObjectDefinitionWithInternalKnowledge(
+			String dpName);
 
-    public void addRequest(ProcessRequest pr);
+	public List<DomainObjectInstance> getDomainObjectInstances();
 
-    public void addProcVar(ProcessDiagram proc, String varName, String varValue);
+	public void addRequest(ProcessRequest pr);
 
-    public boolean isWaiting(Integer pid, String id);
+	public void addProcVar(ProcessDiagram proc, String varName, String varValue);
 
-    public void setWaiting(Integer pid, String id);
+	public boolean isWaiting(Integer pid, String id);
 
-    public void removeWaiting(Integer pid, String id);
+	public void setWaiting(Integer pid, String id);
 
-    public String submitProblem(AdaptationProblem problem);
+	public void removeWaiting(Integer pid, String id);
 
-    public AdaptationResult getAdaptationResult(ProcessDiagram proc, String id);
+	public String submitProblem(AdaptationProblem problem);
 
-    public void addRunningRefinements(ProcessDiagram proc,
-	    ProcessDiagram refinement);
+	public AdaptationResult getAdaptationResult(ProcessDiagram proc, String id);
 
-    public boolean checkVarCondition(String name, String value,
-	    ProcessDiagram father);
+	public void addRunningRefinements(ProcessDiagram proc,
+			ProcessDiagram refinement);
 
-    public int getPid();
+	public boolean checkVarCondition(String name, String value,
+			ProcessDiagram father);
 
-    public void addRunningBranch(int getpid, ProcessDiagram branch);
+	public int getPid();
 
-    public List<String> getMsg(DomainObjectInstance doi);
+	public void addRunningBranch(int getpid, ProcessDiagram branch);
 
-    public List<DomainObjectInstance> getDomainObjectInstance(
-	    DomainObjectDefinition dos);
+	// public List<String> getMsg(DomainObjectInstance doi);
 
-    public Map<String, List<String>> buildRelevantServices(ProcessDiagram proc,
-	    AbstractActivity currentAbstract);
+	public List<DomainObjectInstance> getDomainObjectInstance(
+			DomainObjectDefinition dos);
 
-    public void registerProcess(ProcessDiagram refinement, ProcessDiagram proc);
+	public Map<String, List<String>> buildRelevantServices(ProcessDiagram proc,
+			AbstractActivity currentAbstract);
 
-    public void extendKwnoledge(Map<String, List<String>> relevantServices,
-	    ProcessDiagram proc);
+	public void registerProcess(ProcessDiagram refinement, ProcessDiagram proc);
 
-    public void changeProcVar(ProcessDiagram proc, String name, String value);
+	public void extendKwnoledge(Map<String, List<String>> relevantServices,
+			ProcessDiagram proc);
 
-    public boolean checkContext(ProcessDiagram proc, ClauseType varCon);
+	public void changeProcVar(ProcessDiagram proc, String name, String value);
 
-    public void createCorrelation(DomainObjectInstance first,
-	    DomainObjectInstance second);
+	public boolean checkContext(ProcessDiagram proc, ClauseType varCon);
 
-    public void removeMessage(DomainObjectInstance doi, String msg);
+	public void createCorrelation(DomainObjectInstance first,
+			DomainObjectInstance second);
 
-    public ProcessDiagram find(int i);
+	// public void removeMessage(DomainObjectInstance doi, String msg);
 
-    public int size();
+	public ProcessDiagram find(int i);
 
-    public boolean isEmpty();
+	public int size();
 
-    public void addExecutableHandler(String activityName,
-	    AbstractExecutableActivityInterface handler);
+	public boolean isEmpty();
 
-    public ExecutableActivityInterface getExecutableHandler(String name, int pid);
+	public void addExecutableHandler(String activityName,
+			AbstractExecutableActivityInterface handler);
 
-    public Map<String, List<ObjectDiagram>> getExternaKnowledge(
-	    Map<String, List<String>> relevantServices);
+	public ExecutableActivityInterface getExecutableHandler(String name, int pid);
 
-    public List<DomainObjectInstance> getCorrelated(DomainObjectInstance doi);
+	public Map<String, List<ObjectDiagram>> getExternaKnowledge(
+			Map<String, List<String>> relevantServices);
 
-    public ProcVar getVariablesFor(ProcessDiagram proc, String name);
+	public List<DomainObjectInstance> getCorrelated(DomainObjectInstance doi);
 
-    public void createMessage(String name, DomainObjectInstance doi);
+	public ProcVar getVariablesFor(ProcessDiagram proc, String name);
 
-    public void applyEffectForAbstractActivity(ProcessDiagram father);
+	// public void createMessage(String name, DomainObjectInstance doi);
 
-    public void executeActivity(ProcessDiagram refinement);
+	public void applyEffectForAbstractActivity(ProcessDiagram father);
 
-    public boolean hasRefinements(int getpid);
+	public void executeActivity(ProcessDiagram refinement);
 
-    public ProcessDiagram getRefinement(int pid);
+	public boolean hasRefinements(int getpid);
 
-    public boolean isRefinement(Integer pid);
+	public ProcessDiagram getRefinement(int pid);
 
-    public DomainObjectInstance getRefinementOrigin(Integer pid);
+	public boolean isRefinement(Integer pid);
 
-    public void setScopeManager(ScopeManager scopeManager);
+	public DomainObjectInstance getRefinementOrigin(Integer pid);
 
-    public DomainObjectInstance findDomainObjectByType(String type);
+	public void setScopeManager(ScopeManager scopeManager);
 
-    public List<DomainObjectInstance> findAllDomainObjectByType(String type);
+	public DomainObjectInstance findDomainObjectByType(String type);
 
-    public boolean hasRunningBranch(int fatherId);
+	public List<DomainObjectInstance> findAllDomainObjectByType(String type);
 
-    public ProcessDiagram getRunningBranch(ProcessDiagram pd);
+	public boolean hasRunningBranch(int fatherId);
 
-    public void removeRunningBranch(ProcessDiagram branch);
+	public ProcessDiagram getRunningBranch(ProcessDiagram pd);
 
-    public void addExternalKnowledge(DomainObjectInstance doi, String dpName,
-	    String initialState);
+	public void removeRunningBranch(ProcessDiagram branch);
 
-    public void assignVariableFromIstance(
-	    eu.fbk.das.process.engine.api.jaxb.scenario.Scenario.DomainObject.DomainObjectInstance d,
-	    int pid);
+	public void addExternalKnowledge(DomainObjectInstance doi, String dpName,
+			String initialState);
 
-    public void removeRefinement(ProcessDiagram ref);
+	public void assignVariableFromIstance(
+			eu.fbk.das.process.engine.api.jaxb.scenario.Scenario.DomainObject.DomainObjectInstance d,
+			int pid);
+
+	public void removeRefinement(ProcessDiagram ref);
+
+	public DomainObjectDefinition getDefinitionByFragment(String serviceType);
+
+	/**
+	 * @param doi
+	 * @param msgAndVariables
+	 * 
+	 *            This method allows for the creation of a message for the
+	 *            message queue
+	 */
+	public void createMessage(DomainObjectInstance doi,
+			Map<String, List<VariableType>> msgAndVariables);
+
+	/**
+	 * @param doi
+	 * @return
+	 * 
+	 *         This method allows for the extraction of a message from the
+	 *         message queue
+	 */
+	public List<Map<String, List<VariableType>>> getMsgAndVariables(
+			DomainObjectInstance doi);
+
+	/**
+	 * @param doi
+	 * @param msgAndVariables
+	 * 
+	 *            This method allows for the remotion of a message from the
+	 *            message queue
+	 */
+	public void removeMessageAndVariables(DomainObjectInstance doi,
+			Map<String, List<VariableType>> msgAndVariables);
 
 }

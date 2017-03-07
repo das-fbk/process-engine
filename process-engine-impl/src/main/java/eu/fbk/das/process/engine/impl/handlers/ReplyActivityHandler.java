@@ -119,6 +119,21 @@ public class ReplyActivityHandler extends AbstractHandler {
 	 */
 	private void writeTheDomainObjectState(DomainObjectInstance doi,
 			ProcessActivity current) {
+		/**********************************************************************/
+		// stampa lo stato prima dell'esecuzione del processo,
+		// subito prima di fare start
+		List<VariableType> state = doi.getState().getStateVariable();
+		logger.warn("PRE EXECUTION STATE OF THE DO: " + doi.getType() + " = ");
+		for (VariableType var : state) {
+			Element e = (Element) (var.getContent());
+			if (e.getFirstChild() != null) {
+				String value = e.getFirstChild().getNodeValue();
+				logger.warn("Variable: " + var.getName() + " = " + value);
+			} else {
+				logger.warn("Variable: " + var.getName() + " = " + "");
+			}
+		}
+		/**********************************************************************/
 		List<VariableType> activityVariables;
 		if (doi.getState() != null) {
 			if (!doi.getState().getStateVariable().isEmpty()) {

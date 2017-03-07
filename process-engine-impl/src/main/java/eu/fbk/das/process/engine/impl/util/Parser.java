@@ -785,6 +785,12 @@ public class Parser {
 		return response;
 	}
 
+	// private ProcessDiagram convertToProcessDiagram(ServiceDiagram
+	// seviceDiagram) {
+	// ProcessDiagram procDiag = new ProcessDiagram();
+	// return procDiag;
+	// }
+
 	private ServiceDiagramActionType getServiceDiagramActionType(String name,
 			List<Action> action) {
 		for (Action act : action) {

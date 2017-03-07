@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.w3c.dom.Element;
 
 import com.google.common.collect.ArrayListMultimap;
 
@@ -134,6 +135,24 @@ public class ProcessEngineImpl implements ProcessEngine {
 	@Override
 	public void remove(ProcessDiagram process) {
 		if (process != null && processes.containsKey(process.getpid())) {
+
+			// stampa lo stato dopo l'esecuzione del processo, subito prima di
+			// rimuoverlo
+			DomainObjectInstance curentDoi = this
+					.getDomainObjectInstance(process);
+			List<VariableType> state = curentDoi.getState().getStateVariable();
+			logger.warn("AFTER EXECUTION STATE OF THE DO: "
+					+ curentDoi.getType() + " = ");
+			for (VariableType var : state) {
+				Element e = (Element) (var.getContent());
+				if (e.getFirstChild() != null) {
+					String value = e.getFirstChild().getNodeValue();
+					logger.warn("Variable: " + var.getName() + " = " + value);
+				} else {
+					logger.warn("Variable: " + var.getName() + " = " + "");
+				}
+			}
+
 			processes.remove(process.getpid());
 			dom.remove(process);
 			logger.debug("Process with pid " + process.getpid() + " removed");
@@ -168,6 +187,7 @@ public class ProcessEngineImpl implements ProcessEngine {
 			return -1;
 		}
 		logger.info("Starting process");
+
 		ProcessDiagram process = doi.getProcess();
 		process.setPid(getPid());
 		process.setRunning(true);

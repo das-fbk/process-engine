@@ -1,5 +1,6 @@
 package eu.fbk.das.process.engine.impl.handlers;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -40,7 +41,7 @@ public class InvokeActivityHandler extends AbstractHandler {
 			return;
 		}
 
-		this.currentActivityVariables = null;
+		this.currentActivityVariables = new ArrayList<VariableType>();
 
 		// management of the variables in the activities of type Invoke
 		manageVariablesForInvokeActivity(pe, proc, current);
@@ -77,52 +78,92 @@ public class InvokeActivityHandler extends AbstractHandler {
 	 */
 	private void manageVariablesForInvokeActivity(ProcessEngine pe,
 			ProcessDiagram proc, ProcessActivity current) {
-		String isServiceActivity = "false";
+		boolean isServiceActivity = false;
 		DomainObjectInstance currentDoi = pe.getDomainObjectInstance(proc);
+
+		// copy service action variable from the DO's state
+		checkVariablesOfAnInvokeActivity(pe, current, currentDoi);
+
 		if (current.getServiceType() != null) {
-			isServiceActivity = "true";
+			isServiceActivity = true;
 		}
-		switch (isServiceActivity) {
-		case ("true"):
-			// the invoke activity belongs to a fragment
+		if (isServiceActivity) {
+			// the invoke activity belongs to a fragment.
 			this.currentActivityVariables = current.getServiceActionVariables();
-			break;
-
-		case ("false"):
-			// the invoke activity belongs to a process
-			checkVariablesOfAnInvokeProcessActivity(pe, current, currentDoi);
+		} else {
+			// the invoke activity belongs to a core process.
 			this.currentActivityVariables = current.getActionVariables();
-			break;
 		}
-
 	}
 
-	private void checkVariablesOfAnInvokeProcessActivity(ProcessEngine pe,
+	// private void checkVariablesOfAnInvokeServiceActivity(ProcessEngine pe,
+	// ProcessActivity current, DomainObjectInstance doi) {
+	//
+	// // the invoke activity updates its variables with the values of the
+	// // corresponding
+	// // variables in the domain object state (Some
+	// // previous executed activity has written these variables probably.)
+	// if (doi.getState() != null) {
+	// if (!doi.getState().getStateVariable().isEmpty()) {
+	// if (doi.hasSameVariablesOfCurrentActivity(current)) {
+	// copyVariablesFromAdomainObjectState(current, doi);
+	// } else {
+	// // find the domain object father of the fragment under
+	// // execution
+	// DomainObjectInstance fatherDoi = new DomainObjectInstance();
+	// DomainObjectDefinition fatherDod = pe
+	// .getDefinitionByFragment(current.getServiceType());
+	// List<DomainObjectInstance> listDoi = pe.getCorrelated(doi);
+	// for (DomainObjectInstance tempDoi : pe
+	// .getDomainObjectInstance(fatherDod)) {
+	// if (listDoi.contains(tempDoi)) {
+	// fatherDoi = tempDoi;
+	// }
+	// }
+	// if (fatherDoi != null) {
+	// copyVariablesFromAdomainObjectState(current, fatherDoi);
+	// }
+	//
+	// }
+	// }
+	// }
+	// }
+
+	private void checkVariablesOfAnInvokeActivity(ProcessEngine pe,
 			ProcessActivity current, DomainObjectInstance doi) {
 
 		// the invoke activity updates its variables with the values of the
 		// corresponding
-		// variables in the domain object state (Some
-		// previous executed activity has written these variables probably.)
+		// variables in the domain object state that is executing it.
 		if (doi.getState() != null) {
 			if (!doi.getState().getStateVariable().isEmpty()) {
-				for (VariableType actionVar : current.getActionVariables()) {
-					if (doi.hasVariableWithName(actionVar.getName())) {
-						int index = doi.getIndexOfVariableWithName(actionVar
-								.getName());
-						Element eleNsImplObject = (Element) doi.getState()
-								.getStateVariable().get(index).getContent();
-						// To get the string content of the Element use the
-						// following:
-						// eleNsImplObject.getFirstChild().getNodeValue();
-						actionVar.setContent(eleNsImplObject);
-						Element e = (Element) (current.getActionVariables()
-								.get(0).getContent());
-						logger.debug(e.getFirstChild().getNodeValue());
-					}
-				}
+				copyVariablesFromTheDomainObjectState(current, doi);
 			}
 		}
 	}
 
+	private void copyVariablesFromTheDomainObjectState(ProcessActivity current,
+			DomainObjectInstance doi) {
+		List<VariableType> var;
+		if (current.getServiceType() != null) {
+			var = current.getServiceActionVariables();
+		} else {
+			var = current.getActionVariables();
+		}
+
+		for (VariableType actionVar : var) {
+			if (doi.hasVariableWithName(actionVar.getName())) {
+				int index = doi.getIndexOfVariableWithName(actionVar.getName());
+				Element eleNsImplObject = (Element) doi.getState()
+						.getStateVariable().get(index).getContent();
+				// To get the string content of the Element use the
+				// following:
+				// eleNsImplObject.getFirstChild().getNodeValue();
+				actionVar.setContent(eleNsImplObject);
+
+				Element e = (Element) (actionVar.getContent());
+				logger.debug(e.getFirstChild().getNodeValue());
+			}
+		}
+	}
 }

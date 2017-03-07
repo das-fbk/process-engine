@@ -42,6 +42,7 @@ public class AbstractActivityHandler extends AbstractHandler {
 
 		if (currentAbstract.getAbstractType() != null
 				&& currentAbstract.getAbstractType().equals(HOAA)) {
+			// if (currentAbstract.isAbstract()) {
 			logger.debug("Abstract Activity - HOAA with receiveVar "
 					+ currentAbstract.getReceiveVar());
 			ExecutableActivityInterface handler = pe.getExecutableHandler(

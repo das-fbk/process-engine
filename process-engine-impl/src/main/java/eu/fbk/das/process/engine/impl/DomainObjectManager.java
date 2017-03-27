@@ -35,6 +35,7 @@ import eu.fbk.das.process.engine.api.jaxb.DomainProperty;
 import eu.fbk.das.process.engine.api.jaxb.Fragment;
 import eu.fbk.das.process.engine.api.jaxb.Fragment.Action;
 import eu.fbk.das.process.engine.api.jaxb.Process;
+import eu.fbk.das.process.engine.api.jaxb.VariableType;
 import eu.fbk.das.process.engine.impl.util.FileUtil;
 import eu.fbk.das.process.engine.impl.util.Parser;
 
@@ -567,4 +568,37 @@ public class DomainObjectManager implements DomainObjectManagerInterface {
 		return result;
 	}
 
+	@Override
+	public void extendDoiState(DomainObjectInstance doi,
+			DomainObjectInstance otherDoi, String key) {
+		// partendo da otherDoi, vado a cercare il frammento con nome key,
+		// scorro il frammento e cerco le variabili sulle sue attività.
+		List<VariableType> extendedState = new ArrayList<VariableType>();
+		DomainObjectDefinition dod = findDefinition(otherDoi);
+		if (dod == null) {
+			logger.warn("DomainObjectDefinition not found");
+		}
+		// look for fragments involved in the refinement
+		for (Fragment f : dod.getFragments()) {
+			if (f.getId().equals(key)) {
+				// for each actions we take action variables, if any
+				for (Action a : f.getAction()) {
+					if (a.getActionVariable() != null
+							&& !a.getActionVariable().isEmpty()) {
+						// VariableType newVar = new VariableType();
+						// for (VariableType v : a.getActionVariable()) {
+						// newVar.setName(v.getName());
+						// // Element content = (Element) v.getContent();
+						// newVar.setContent(v.getContent());
+						// extendedState.add(newVar);
+						// }
+						extendedState.addAll(a.getActionVariable());
+					}
+				}
+			}
+		}
+		// for each collected variables, we check if it must be added to the DO
+		// state or not
+		doi.extendInternalState(extendedState);
+	}
 }

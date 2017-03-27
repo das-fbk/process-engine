@@ -89,6 +89,9 @@ public class AbstractActivityHandler extends AbstractHandler {
 				logger.debug("Relevant Services = "
 						+ relevantServices.toString());
 				pe.extendKwnoledge(relevantServices, proc);
+				// DO's state extension with the variables of the fragments
+				// received for the abstract activity refinement
+				pe.extendState(relevantServices, proc);
 				AdaptationProblem problem = new AdaptationProblem(
 						currentAbstract, pe.getDomainObjectInstance(proc),
 						pe.getDomainObjectInstances(),

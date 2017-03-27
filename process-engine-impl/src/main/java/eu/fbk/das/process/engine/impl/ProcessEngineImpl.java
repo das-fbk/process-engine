@@ -1052,6 +1052,7 @@ public class ProcessEngineImpl implements ProcessEngine {
 			logger.error("Impossible to extend knowledge with a null or empy list");
 			return;
 		}
+		// DO instance whose knowledge must be extended
 		DomainObjectInstance doi = findDoi(proc);
 		if (doi == null) {
 			logger.warn("Impossible find a domainObjectInstance for process with id"
@@ -1060,7 +1061,9 @@ public class ProcessEngineImpl implements ProcessEngine {
 		}
 		Iterator<String> iter = relevantServices.keySet().iterator();
 		while (iter.hasNext()) {
+			// key corresponds to the fragment's name
 			String key = iter.next();
+			// values are the names of the DOs connected by the fragment (Key)
 			List<String> values = relevantServices.get(key);
 			for (String value : values) {
 				if (!value.equals(doi.getId())) {
@@ -1070,6 +1073,41 @@ public class ProcessEngineImpl implements ProcessEngine {
 								+ value);
 					} else {
 						dom.copyDomainPropertyInstanceToDoi(doi, otherDoi);
+					}
+				}
+			}
+		}
+	}
+
+	@Override
+	public void extendState(Map<String, List<String>> relevantServices,
+			ProcessDiagram proc) {
+		if (relevantServices == null
+				|| (relevantServices != null && relevantServices.isEmpty())) {
+			logger.error("Impossible to extend the state with a null or empy list");
+			return;
+		}
+		// DO instance whose knowledge must be extended
+		DomainObjectInstance doi = findDoi(proc);
+		if (doi == null) {
+			logger.warn("Impossible find a domainObjectInstance for process with id"
+					+ proc.getpid());
+			return;
+		}
+		Iterator<String> iter = relevantServices.keySet().iterator();
+		while (iter.hasNext()) {
+			// key corresponds to the fragment's name
+			String key = iter.next();
+			// values are the names of the DOs connected by the fragment (Key)
+			List<String> values = relevantServices.get(key);
+			for (String value : values) {
+				if (!value.equals(doi.getId())) {
+					DomainObjectInstance otherDoi = dom.findInstanceById(value);
+					if (otherDoi == null) {
+						logger.warn("Not found domainObjectInstance with id "
+								+ value);
+					} else {
+						dom.extendDoiState(doi, otherDoi, key);
 					}
 				}
 			}

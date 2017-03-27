@@ -51,7 +51,6 @@ public class DomainObjectDefinition {
 		this.properties = properties;
 	}
 
-	// //martina
 	public void setState(State state) {
 		this.state = state;
 	}

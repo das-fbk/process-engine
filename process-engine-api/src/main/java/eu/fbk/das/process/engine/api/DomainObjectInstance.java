@@ -3,7 +3,10 @@ package eu.fbk.das.process.engine.api;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.w3c.dom.Element;
+
 import eu.fbk.das.process.engine.api.domain.ObjectDiagram;
+import eu.fbk.das.process.engine.api.domain.ProcessActivity;
 import eu.fbk.das.process.engine.api.domain.ProcessDiagram;
 import eu.fbk.das.process.engine.api.domain.ServiceDiagram;
 import eu.fbk.das.process.engine.api.domain.exceptions.InvalidObjectCurrentStateException;
@@ -213,9 +216,11 @@ public class DomainObjectInstance {
 
 	public boolean hasVariableWithName(String name) {
 		boolean response = false;
-		for (VariableType stateVar : this.getState().getStateVariable()) {
-			if (stateVar.getName().equalsIgnoreCase(name)) {
-				return response = true;
+		if (this.getState() != null) {
+			for (VariableType stateVar : this.getState().getStateVariable()) {
+				if (stateVar.getName().equalsIgnoreCase(name)) {
+					return response = true;
+				}
 			}
 		}
 		return response;
@@ -223,10 +228,12 @@ public class DomainObjectInstance {
 
 	public int getIndexOfVariableWithName(String name) {
 		int index = -1;
-		for (VariableType stateVar : this.getState().getStateVariable()) {
-			if (stateVar.getName().equalsIgnoreCase(name)) {
-				return index = this.getState().getStateVariable()
-						.indexOf(stateVar);
+		if (this.getState() != null) {
+			for (VariableType stateVar : this.getState().getStateVariable()) {
+				if (stateVar.getName().equalsIgnoreCase(name)) {
+					return index = this.getState().getStateVariable()
+							.indexOf(stateVar);
+				}
 			}
 		}
 		return index;
@@ -240,5 +247,35 @@ public class DomainObjectInstance {
 			}
 		}
 		return response;
+	}
+
+	public boolean hasSameVariablesOfCurrentActivity(ProcessActivity current) {
+		boolean response = true;
+		if (current.getServiceActionVariables() != null) {
+			for (VariableType actionVar : current.getServiceActionVariables()) {
+				if (!this.hasVariableWithName(actionVar.getName())) {
+					return false;
+				}
+			}
+		}
+		return response;
+	}
+
+	public Element getStateVariableContentByName(String varName) {
+		Element stateVarContent = null;
+		int index = this.getIndexOfVariableWithName(varName);
+		if (index != -1) {
+			stateVarContent = (Element) this.getState().getStateVariable()
+					.get(index).getContent();
+		}
+		return stateVarContent;
+	}
+
+	public void setStateVariableContentByVarName(String varName, Element varContent) {
+		int index = this.getIndexOfVariableWithName(varName);
+		if (index != -1) {
+			this.getState().getStateVariable().get(index)
+					.setContent(varContent);
+		}
 	}
 }

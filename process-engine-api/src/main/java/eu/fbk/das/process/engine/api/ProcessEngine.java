@@ -227,4 +227,7 @@ public interface ProcessEngine {
 	public void removeMessageAndVariables(DomainObjectInstance doi,
 			Map<String, List<VariableType>> msgAndVariables);
 
+	public void extendState(Map<String, List<String>> relevantServices,
+			ProcessDiagram proc);
+
 }

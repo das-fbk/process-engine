@@ -1,5 +1,6 @@
 package eu.fbk.das.process.engine.impl.handlers;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -83,7 +84,6 @@ public class ReplyActivityHandler extends AbstractHandler {
 				Map<String, List<VariableType>> map = it.next();
 				String[] keys = (map.keySet()).toArray(new String[0]);
 				if (contains(keys, msg)) {
-					/************************************************************/
 					// check also for variables and distinguish between a
 					// process reply and a fragment reply
 					if (current.getServiceType() != null) {
@@ -94,13 +94,11 @@ public class ReplyActivityHandler extends AbstractHandler {
 					}
 					// write the variables in the domain object state
 					writeTheDomainObjectState(doi, current);
-					/****************************************************************/
 					pe.removeMessageAndVariables(doi, map);
 					// removeMessage(doi, msg);
 					return true;
 				}
 			}
-
 		}
 		return false;
 	}
@@ -122,21 +120,26 @@ public class ReplyActivityHandler extends AbstractHandler {
 		/**********************************************************************/
 		// stampa lo stato prima dell'esecuzione del processo,
 		// subito prima di fare start
-		List<VariableType> state = doi.getState().getStateVariable();
-		logger.warn("PRE EXECUTION STATE OF THE DO: " + doi.getType() + " = ");
-		for (VariableType var : state) {
-			Element e = (Element) (var.getContent());
-			if (e.getFirstChild() != null) {
-				String value = e.getFirstChild().getNodeValue();
-				logger.warn("Variable: " + var.getName() + " = " + value);
-			} else {
-				logger.warn("Variable: " + var.getName() + " = " + "");
+		List<VariableType> state = new ArrayList<VariableType>();
+		if (doi.getState() != null) {
+			state = doi.getState().getStateVariable();
+			logger.warn("PRE EXECUTION STATE OF THE DO: " + doi.getType()
+					+ " = ");
+			for (VariableType var : state) {
+				Element e = (Element) (var.getContent());
+				if (e.getFirstChild() != null) {
+					String value = e.getFirstChild().getNodeValue();
+					logger.warn("Variable: " + var.getName() + " = " + value);
+				} else {
+					logger.warn("Variable: " + var.getName() + " = " + "");
+				}
 			}
 		}
 		/**********************************************************************/
 		List<VariableType> activityVariables;
 		if (doi.getState() != null) {
-			if (!doi.getState().getStateVariable().isEmpty()) {
+			if (!doi.getState().getStateVariable().isEmpty()
+					&& doi.getState().getStateVariable() != null) {
 				if (current.getServiceType() != null) {
 					activityVariables = current.getServiceActionVariables();
 				} else {
@@ -144,15 +147,9 @@ public class ReplyActivityHandler extends AbstractHandler {
 				}
 				for (VariableType actionVar : activityVariables) {
 					if (doi.hasVariableWithName(actionVar.getName())) {
-						int index = doi.getIndexOfVariableWithName(actionVar
-								.getName());
-						Element eleNsImplObject = (Element) actionVar
-								.getContent();
-						doi.getState().getStateVariable().get(index)
-								.setContent(eleNsImplObject);
-						Element e = (Element) (doi.getState()
-								.getStateVariable().get(index).getContent());
-						logger.debug(e.getFirstChild().getNodeValue());
+						Element varContent = (Element) actionVar.getContent();
+						doi.setStateVariableContentByVarName(
+								actionVar.getName(), varContent);
 					}
 					// int i = DatatypeConverter.parseInt(content);
 				}

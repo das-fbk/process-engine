@@ -12,110 +12,80 @@ import eu.fbk.das.process.engine.api.jaxb.SwitchType;
 
 public class SwitchActivityHandler extends AbstractHandler {
 
-    private static final Logger logger = LogManager
-	    .getLogger(SwitchActivityHandler.class);
+	private static final Logger logger = LogManager
+			.getLogger(SwitchActivityHandler.class);
 
-    // private Map<ProcessDiagram, List<ProcVar>> processVarMap = new
-    // HashMap<ProcessDiagram, List<ProcVar>>();
+	// private Map<ProcessDiagram, List<ProcVar>> processVarMap = new
+	// HashMap<ProcessDiagram, List<ProcVar>>();
 
-    @Override
-    public void handle(ProcessEngine pe, ProcessDiagram proc,
-	    ProcessActivity current) {
-	logger.debug("[" + proc.getpid() + "] Esecuzione Switch");
-	boolean foundIf = false;
-	ProcessDiagram father = proc;
-	for (IFActivity ifact : ((SwitchActivity) current).getIFs()) {
+	@Override
+	public void handle(ProcessEngine pe, ProcessDiagram proc,
+			ProcessActivity current) {
+		logger.debug("[" + proc.getpid() + "] Esecuzione Switch");
+		boolean foundIf = false;
+		ProcessDiagram father = proc;
+		ProcessDiagram branch = null;
+//		// Martina
+//		pe.addProcVar(proc, "planner", "local");
+		for (IFActivity ifact : ((SwitchActivity) current).getIFs()) {
 
-	    boolean VarConditionEval = true;
-	    boolean ContextConditionEval = true;
+			boolean VarConditionEval = true;
+			boolean ContextConditionEval = true;
 
-	    if (ifact.getVarConditions().size() > 0) {
-		for (SwitchType.If.VarCondition varCond : ifact
-			.getVarConditions()) {
+			if (ifact.getVarConditions().size() > 0) {
+				for (SwitchType.If.VarCondition varCond : ifact
+						.getVarConditions()) {
 
-		    if (!pe.checkVarCondition(varCond.getName(),
-			    varCond.getValue(), father)) {
-			VarConditionEval = false;
-		    }
+					if (!pe.checkVarCondition(varCond.getName(),
+							varCond.getValue(), father)) {
+						VarConditionEval = false;
+					}
+
+				}
+			}
+
+			if (ContextConditionEval && VarConditionEval) {
+				branch = ifact.getBranch();
+				int pid = pe.getPid();
+				branch.setPid(pid);
+				branch.setCurrentActivity(branch.getFirstActivity());
+				pe.addRunningBranch(pid, branch);
+
+				branch.setFather(proc);
+				proc.setRunning(false);
+				branch.setRunning(true);
+				current.setRunning(false);
+				foundIf = true;
+				// break;
+			}
 
 		}
-	    }
+		// if not executed if, execute def
+		if (!foundIf) {
+			branch = ((SwitchActivity) current).getDEF().getDefaultBranch();
+			int pid = pe.getPid();
+			branch.setPid(pid);
+			branch.setCurrentActivity(branch.getFirstActivity());
+			pe.addRunningBranch(pid, branch);
+			branch.setFather(proc);
+			proc.setRunning(false);
+			branch.setRunning(true);
+			current.setRunning(false);
+		}
 
-	    // if (ifact.getConditions().size() > 0) {
-	    // // create the list of relevant object instances for the
-	    // // process
-	    // List<ObjectDiagram> relatedObjects = new
-	    // ArrayList<ObjectDiagram>();
-	    // if (Orchestrator.processesToEntity.containsKey(father)) {
-	    // if (Orchestrator.processesToEntity.get(father).getObjects() !=
-	    // null) {
-	    // for (ObjectDiagram enObj : Orchestrator.processesToEntity
-	    // .get(father).getObjects()) {
-	    // relatedObjects.add(enObj);
-	    // }
-	    // }
-	    // }
-	    // for (ProcessDiagram partner : simulator.correlation.get(father))
-	    // {
-	    // if (Orchestrator.processesToEntity.containsKey(partner)) {
-	    // if (Orchestrator.processesToEntity.get(partner)
-	    // .getObjects() != null) {
-	    // for (ObjectDiagram partnerObj : Orchestrator.processesToEntity
-	    // .get(partner).getObjects()) {
-	    // relatedObjects.add(partnerObj);
-	    // }
-	    // }
-	    // }
-	    // }
-	    //
-	    // for (PreconditionType contextCond : ifact.getConditions()) {
-	    // for (PreconditionType.Point pt : contextCond.getPoint()) {
-	    // for (Object obj : pt.getObject()) {
-	    // for (ObjectDiagram CurrentObj : relatedObjects) {
-	    // if (CurrentObj.getOid()
-	    // .contains(obj.getOName())) {
-	    // ContextConditionEval = ContextConditionEval
-	    // && CurrentObj.getCurrentState()
-	    // .equals(obj.getState().get(
-	    // 0));
-	    //
-	    // }
-	    // }
-	    //
-	    // }
-	    // }
-	    // }
-	    //
-	    // }
-
-	    if (ContextConditionEval && VarConditionEval) {
-		ProcessDiagram branch = ifact.getBranch();
-		int pid = pe.getPid();
-		branch.setPid(pid);
-		branch.setCurrentActivity(branch.getFirstActivity());
-		pe.addRunningBranch(pid, branch);
-
-		branch.setFather(proc);
-		proc.setRunning(false);
-		branch.setRunning(true);
-
-		current.setRunning(false);
-		foundIf = true;
-		// break;
-	    }
-
+		// add correlation between branch and father
+		// pe.createCorrelation(branch.getpid(), proc.getpid());
+		// craere la correlazione tra il branch e chi e' in
+		// correlazione col padre che crea questo branch
+		// TODO: non serve piu' ?
+		// DomainObjectInstance fatherDoi = pe.getDomainObjectInstance(father);
+		// List<DomainObjectInstance> fatherCorrelated =
+		// pe.getCorrelated(fatherDoi);
+		// if (fatherCorrelated != null &&
+		// !fatherCorrelated.isEmpty()) {
+		// for (DomainObjectInstance fc : fatherCorrelated) {
+		// pe.createCorrelation(branch.getpid(), fc);
+		// }
+		// }
 	}
-	// if not executed if, execute def
-	if (!foundIf) {
-	    ProcessDiagram branch = ((SwitchActivity) current).getDEF()
-		    .getDefaultBranch();
-	    branch.setCurrentActivity(branch.getFirstActivity());
-	    pe.addRunningBranch(proc.getpid(), branch);
-	    branch.setFather(proc);
-	    proc.setRunning(false);
-	    branch.setRunning(true);
-	    current.setRunning(false);
-	}
-    }
-
 }

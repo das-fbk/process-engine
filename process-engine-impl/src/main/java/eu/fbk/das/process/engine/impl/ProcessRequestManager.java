@@ -214,6 +214,28 @@ public class ProcessRequestManager {
 						return true;
 					}
 				}
+			} else {
+				// non e' detto che il refinement sia direttamente del processo,
+				// ma
+				// anche nei rami dello switch
+				ProcessActivity actSwitch = processWithSwitch(process);
+				if (actSwitch != null) {
+					SwitchActivity sa = (SwitchActivity) actSwitch;
+					for (IFActivity sact : sa.getIFs()) {
+						// ref = pe.getRefinement(on.getBranch().getpid());
+						if (checkRecursiveOnRefinement(processRequest,
+								sact.getBranch())) {
+							return true;
+						}
+					}
+					if (sa.getDEF() != null) {
+						DefaultActivity da = sa.getDEF();
+						if (checkRecursiveOnRefinement(processRequest,
+								da.getDefaultBranch())) {
+							return true;
+						}
+					}
+				}
 			}
 		}
 		return false;
@@ -225,6 +247,17 @@ public class ProcessRequestManager {
 				return act;
 			}
 			// TODO: limite, non valuta all'interno della pick while, ecc..
+		}
+		return null;
+	}
+
+	private ProcessActivity processWithSwitch(ProcessDiagram process) {
+		for (ProcessActivity act : process.getActivities()) {
+			if (act.isSwitch()) {
+				return act;
+			}
+			// TODO: limite, non valuta all'interno dello switch se c'è per
+			// esempio un while
 		}
 		return null;
 	}

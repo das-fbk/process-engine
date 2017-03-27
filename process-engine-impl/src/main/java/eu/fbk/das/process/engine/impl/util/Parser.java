@@ -379,69 +379,69 @@ public class Parser {
 
 		// IFs management
 
-		for (int j = 0; j < ((SwitchType) object).getIf().size(); j++) {
-			List<SwitchType.If> ListofIFs = ((SwitchType) object).getIf();
+		// for (int j = 0; j < ((SwitchType) object).getIf().size(); j++) {
+		List<SwitchType.If> ListofIFs = ((SwitchType) object).getIf();
 
-			for (SwitchType.If currentIF : ListofIFs) {
-				// inside the IF
+		for (SwitchType.If currentIF : ListofIFs) {
+			// inside the IF
 
-				int sourceif = 0;
-				int IFInitialState = sourceif;
-				Set<Integer> ifStates = new HashSet<Integer>();
-				ifStates.add(IFInitialState);
-				IFActivity ifAct = new IFActivity();
+			int sourceif = 0;
+			int IFInitialState = sourceif;
+			Set<Integer> ifStates = new HashSet<Integer>();
+			ifStates.add(IFInitialState);
+			IFActivity ifAct = new IFActivity();
 
-				SwitchType.If.Branch branch = currentIF.getBranch();
+			SwitchType.If.Branch branch = currentIF.getBranch();
 
-				List<PreconditionType> conditions = new ArrayList<PreconditionType>();
-				List<SwitchType.If.VarCondition> varConditions = new ArrayList<SwitchType.If.VarCondition>();
-				for (java.lang.Object cond : currentIF
-						.getContextConditionOrVarCondition()) {
-					if (cond.getClass()
-							.getName()
-							.equals("eu.fbk.das.process.engine.api.composition.jaxb.PreconditionType")) {
-						conditions.add((PreconditionType) cond);
-					} else if (cond
-							.getClass()
-							.getName()
-							.startsWith(
-									"eu.fbk.das.process.engine.api.jaxb.SwitchType")) {
-						varConditions.add((SwitchType.If.VarCondition) cond);
-					}
+			List<PreconditionType> conditions = new ArrayList<PreconditionType>();
+			List<SwitchType.If.VarCondition> varConditions = new ArrayList<SwitchType.If.VarCondition>();
+			for (java.lang.Object cond : currentIF
+					.getContextConditionOrVarCondition()) {
+				if (cond.getClass()
+						.getName()
+						.equals("eu.fbk.das.process.engine.api.composition.jaxb.PreconditionType")) {
+					conditions.add((PreconditionType) cond);
+				} else if (cond
+						.getClass()
+						.getName()
+						.startsWith(
+								"eu.fbk.das.process.engine.api.jaxb.SwitchType")) {
+					varConditions.add((SwitchType.If.VarCondition) cond);
 				}
-
-				// .equals("eu.fbk.das.process.engine.api.jaxb.SwitchType.If.VarCondition"))
-				// {
-
-				List<ProcessActivity> IfBranchActivities = new ArrayList<ProcessActivity>();
-				List<ActivityType> activs = branch.getActivity();
-				// inside to a single branch
-				for (java.lang.Object act : activs) {
-					if (act.getClass()
-							.getName()
-							.equals("eu.fbk.das.process.engine.api.jaxb.SwitchType")) {
-						ProcessActivity a = this.parseSwitchActivity(act,
-								sourceif, ifStates, ProcessID);
-						IfBranchActivities.add(a);
-
-					} else {
-						ProcessActivity a = this.parseSimpleActivity(act,
-								sourceif, ifStates);
-						IfBranchActivities.add(a);
-					}
-					sourceif++;
-					ifStates.add(sourceif);
-				}
-
-				ProcessDiagram branchAct = new ProcessDiagram(ProcessID,
-						ifStates, IFInitialState, IfBranchActivities);
-				ifAct.setBranch(branchAct);
-				ifAct.setConditions(conditions);
-				ifAct.setVarConditions(varConditions);
-				IFs.add(ifAct);
 			}
 
+			// .equals("eu.fbk.das.process.engine.api.jaxb.SwitchType.If.VarCondition"))
+			// {
+
+			List<ProcessActivity> IfBranchActivities = new ArrayList<ProcessActivity>();
+			List<ActivityType> activs = branch.getActivity();
+			// inside to a single branch
+			for (java.lang.Object act : activs) {
+				if (act.getClass()
+						.getName()
+						.equals("eu.fbk.das.process.engine.api.jaxb.SwitchType")) {
+					ProcessActivity a = this.parseSwitchActivity(act, sourceif,
+							ifStates, ProcessID);
+					IfBranchActivities.add(a);
+
+				} else {
+					ProcessActivity a = this.parseSimpleActivity(act, sourceif,
+							ifStates);
+					IfBranchActivities.add(a);
+				}
+				sourceif++;
+				ifStates.add(sourceif);
+			}
+
+			ProcessDiagram branchAct = new ProcessDiagram(ProcessID, ifStates,
+					IFInitialState, IfBranchActivities);
+			ifAct.setBranch(branchAct);
+			ifAct.setConditions(conditions);
+			ifAct.setVarConditions(varConditions);
+			IFs.add(ifAct);
 		}
+
+		// }
 		SwitchActivity sw = new SwitchActivity(sourcest, sourcest + 1,
 				"SWITCH", IFs, def);
 		states.add(sourcest + 1);
@@ -761,6 +761,7 @@ public class Parser {
 					abstracts.add(act.getName());
 					inputs.add(act.getName());
 				}
+
 			}
 			Set<ServiceTransition> transitions = new HashSet<ServiceTransition>();
 			for (Transition t : f.getTransition()) {

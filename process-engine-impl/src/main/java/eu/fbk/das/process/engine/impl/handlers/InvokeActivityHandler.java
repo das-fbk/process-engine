@@ -153,16 +153,15 @@ public class InvokeActivityHandler extends AbstractHandler {
 
 		for (VariableType actionVar : var) {
 			if (doi.hasVariableWithName(actionVar.getName())) {
-				int index = doi.getIndexOfVariableWithName(actionVar.getName());
-				Element eleNsImplObject = (Element) doi.getState()
-						.getStateVariable().get(index).getContent();
+				Element eleNsImplObject = doi
+						.getStateVariableContentByName(actionVar.getName());
+
 				// To get the string content of the Element use the
 				// following:
 				// eleNsImplObject.getFirstChild().getNodeValue();
 				actionVar.setContent(eleNsImplObject);
-
-				Element e = (Element) (actionVar.getContent());
-				logger.debug(e.getFirstChild().getNodeValue());
+				// Element e = (Element) (actionVar.getContent());
+				// logger.debug(e.getFirstChild().getNodeValue());
 			}
 		}
 	}

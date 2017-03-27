@@ -315,9 +315,9 @@ public class DomainObjectManager implements DomainObjectManagerInterface {
 		}
 		doi.setRole(ed.isRole());
 		doi.setSingleton(ed.getDomainObject().isSingleton());
-		if (d.getPickupPoint() != null) {
-			doi.setPickupPoint(d.getPickupPoint());
-		}
+		// if (d.getPickupPoint() != null) {
+		// doi.setPickupPoint(d.getPickupPoint());
+		// }
 		register(ed, doi);
 		return doi;
 	}

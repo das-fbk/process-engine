@@ -140,19 +140,22 @@ public class ProcessEngineImpl implements ProcessEngine {
 			// rimuoverlo
 			DomainObjectInstance curentDoi = this
 					.getDomainObjectInstance(process);
-			List<VariableType> state = curentDoi.getState().getStateVariable();
-			logger.warn("AFTER EXECUTION STATE OF THE DO: "
-					+ curentDoi.getType() + " = ");
-			for (VariableType var : state) {
-				Element e = (Element) (var.getContent());
-				if (e.getFirstChild() != null) {
-					String value = e.getFirstChild().getNodeValue();
-					logger.warn("Variable: " + var.getName() + " = " + value);
-				} else {
-					logger.warn("Variable: " + var.getName() + " = " + "");
+			List<VariableType> state;
+			if (curentDoi.getState() != null) {
+				state = curentDoi.getState().getStateVariable();
+				logger.warn("AFTER EXECUTION STATE OF THE DO: "
+						+ curentDoi.getType() + " = ");
+				for (VariableType var : state) {
+					Element e = (Element) (var.getContent());
+					if (e.getFirstChild() != null) {
+						String value = e.getFirstChild().getNodeValue();
+						logger.warn("Variable: " + var.getName() + " = "
+								+ value);
+					} else {
+						logger.warn("Variable: " + var.getName() + " = " + "");
+					}
 				}
 			}
-
 			processes.remove(process.getpid());
 			dom.remove(process);
 			logger.debug("Process with pid " + process.getpid() + " removed");
@@ -292,6 +295,25 @@ public class ProcessEngineImpl implements ProcessEngine {
 						a.setExecuted(false);
 					}
 					branch.setCurrentActivity(branch.getFirstActivity());
+				}
+				if (father.getCurrentActivity().isSwitch()) {
+					branch.setEnded(true);
+					branch.setTerminated(true);
+					branch.setRunning(false);
+					if (father.getNextActivity().isEmpty()) {
+						father.getCurrentActivity().setExecuted(true);
+						father.setEnded(true);
+						father.setTerminated(true);
+						father.setRunning(false);
+					} else {
+						father.getCurrentActivity().setExecuted(true);
+						father.setEnded(false);
+						father.setTerminated(false);
+						father.setRunning(true);
+						father.setCurrentActivity(father.getNextActivity().get(
+								0));
+						this.executeActivity(father);
+					}
 				} else {
 					father.getCurrentActivity().setExecuted(true);
 

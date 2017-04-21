@@ -12,7 +12,7 @@ public class AbstractActivity extends ProcessActivity {
     private AdaptationProblem problem;
     private String receiveGoal;
     private String abstractType;
-    private String setReceiveVar;
+    private String receiveVar;
 
     public List<ProcessActivity> getChildren() {
 	return children;
@@ -85,7 +85,7 @@ public class AbstractActivity extends ProcessActivity {
     }
 
     public void setReceiveVar(String receiveVar) {
-	this.setReceiveVar = receiveVar;
+	this.receiveVar = receiveVar;
 
     }
 
@@ -94,7 +94,7 @@ public class AbstractActivity extends ProcessActivity {
     }
 
     public String getReceiveVar() {
-	return setReceiveVar;
+	return receiveVar;
     }
 
 }

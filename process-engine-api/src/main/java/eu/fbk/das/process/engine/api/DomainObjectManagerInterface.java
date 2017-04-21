@@ -68,7 +68,7 @@ public interface DomainObjectManagerInterface {
 	public void addExternalKnowledge(DomainObjectInstance doi, String dpName,
 			String initialState, String workingFolder);
 
-	public void extendDoiState(DomainObjectInstance doi,
+	public void extendDoiState(String scopeId, DomainObjectInstance doi,
 			DomainObjectInstance otherDoi, String key);
 
 }

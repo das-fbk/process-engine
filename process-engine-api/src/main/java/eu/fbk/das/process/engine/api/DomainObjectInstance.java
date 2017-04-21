@@ -280,27 +280,91 @@ public class DomainObjectInstance {
 		}
 	}
 
-	public void extendInternalState(List<VariableType> extendedState) {
+	// public void extendInternalState(String scopeId,
+	// List<VariableType> extendedState) {
+	// if (extendedState != null) {
+	// if (this.getState() != null) {
+	// for (VariableType var : extendedState) {
+	// boolean found = false;
+	// for (VariableType stateVar : this.getState()
+	// .getStateVariable()) {
+	// if (stateVar.getName().equalsIgnoreCase(var.getName())) {
+	// found = true;
+	// break;
+	// }
+	// }
+	// if (!found) {
+	// this.getState().getStateVariable().add(var);
+	// }
+	// }
+	// } else {
+	// State s = new State();
+	// s.getStateVariable().addAll(extendedState);
+	// this.setState(s);
+	// }
+	// }
+	// }
+
+	public void extendInternalState(String scopeId,
+			List<VariableType> extendedState) {
 		if (extendedState != null) {
 			if (this.getState() != null) {
 				for (VariableType var : extendedState) {
 					boolean found = false;
 					for (VariableType stateVar : this.getState()
 							.getStateVariable()) {
-						if (stateVar.getName().equalsIgnoreCase(var.getName())) {
+						if (scopeId.concat(stateVar.getName()).contains(
+								var.getName())) {
 							found = true;
 							break;
 						}
 					}
 					if (!found) {
+						var.setName(scopeId.concat(var.getName()));
 						this.getState().getStateVariable().add(var);
 					}
 				}
 			} else {
 				State s = new State();
+				for (VariableType var : extendedState) {
+					var.setName(scopeId.concat(var.getName()));
+				}
 				s.getStateVariable().addAll(extendedState);
 				this.setState(s);
 			}
+		}
+	}
+
+	public boolean hasVariableWithNameAndScope(String varName, String varPrefix) {
+		boolean response = false;
+		if (this.getState() != null) {
+			for (VariableType stateVar : this.getState().getStateVariable()) {
+				if (stateVar.getName().equalsIgnoreCase(
+						varPrefix + "." + varName)) {
+					return response = true;
+				}
+			}
+		}
+		return response;
+	}
+
+	public Element getStateVariableContentByNameInScope(String varName,
+			String varPrefix) {
+		Element stateVarContent = null;
+		int index = this.getIndexOfVariableWithName(varPrefix + "." + varName);
+		if (index != -1) {
+			stateVarContent = (Element) this.getState().getStateVariable()
+					.get(index).getContent();
+		}
+		return stateVarContent;
+	}
+
+	public void setStateVariableContentByVarNameInScope(String varName,
+			Element varContent, String varPrefix) {
+		int index = this.getIndexOfVariableWithName(varPrefix + "." + varName);
+		if (index != -1) {
+			this.getState().getStateVariable().get(index)
+					.setContent(varContent);
 		}
 	}
 }

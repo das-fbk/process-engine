@@ -541,6 +541,13 @@ public class DomainObjectManager implements DomainObjectManagerInterface {
 			for (ObjectDiagram ek : doi.getExternalKnowledge()) {
 				if (ek.getOid().equals(dpName)) {
 					found = true;
+					// if the doi already has the external property, it must be
+					// reset to the initial state
+					// doi.getExternalKnowledge().remove(ek); // butta la
+					// vecchia
+					// doi.getExternalKnowledge().add(objectDiagram); // prendi
+					// la
+					// nuova
 				}
 			}
 			if (!found) {
@@ -549,7 +556,6 @@ public class DomainObjectManager implements DomainObjectManagerInterface {
 		} catch (InvalidObjectCurrentStateException e) {
 			logger.error(e.getMessage(), e);
 		}
-
 	}
 
 	@Override
@@ -569,7 +575,7 @@ public class DomainObjectManager implements DomainObjectManagerInterface {
 	}
 
 	@Override
-	public void extendDoiState(DomainObjectInstance doi,
+	public void extendDoiState(String scopeId, DomainObjectInstance doi,
 			DomainObjectInstance otherDoi, String key) {
 		// partendo da otherDoi, vado a cercare il frammento con nome key,
 		// scorro il frammento e cerco le variabili sulle sue attività.
@@ -599,6 +605,6 @@ public class DomainObjectManager implements DomainObjectManagerInterface {
 		}
 		// for each collected variables, we check if it must be added to the DO
 		// state or not
-		doi.extendInternalState(extendedState);
+		doi.extendInternalState(scopeId, extendedState);
 	}
 }

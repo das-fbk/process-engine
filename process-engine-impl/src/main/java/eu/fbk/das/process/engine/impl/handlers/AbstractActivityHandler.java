@@ -9,6 +9,7 @@ import org.apache.logging.log4j.Logger;
 import eu.fbk.das.process.engine.api.AdaptationProblem;
 import eu.fbk.das.process.engine.api.AdaptationResult;
 import eu.fbk.das.process.engine.api.AdaptationTrigger;
+import eu.fbk.das.process.engine.api.DomainObjectInstance;
 import eu.fbk.das.process.engine.api.ExecutableActivityInterface;
 import eu.fbk.das.process.engine.api.ProcVar;
 import eu.fbk.das.process.engine.api.ProcessEngine;
@@ -23,6 +24,7 @@ import eu.fbk.das.process.engine.api.jaxb.GoalType;
 public class AbstractActivityHandler extends AbstractHandler {
 
 	private static final String HOAA = "HOAA";
+	private static final String GENERATED_ABSTRACT = "GeneratedAbstract";
 	private static final Logger logger = LogManager
 			.getLogger(AbstractActivityHandler.class);
 
@@ -74,7 +76,7 @@ public class AbstractActivityHandler extends AbstractHandler {
 						currentAbstract.setGoal(goal);
 					}
 				}
-
+				DomainObjectInstance doi = pe.getDomainObjectInstance(proc);
 				Map<String, List<String>> relevantServices = pe
 						.buildRelevantServices(proc, currentAbstract);
 
@@ -91,7 +93,16 @@ public class AbstractActivityHandler extends AbstractHandler {
 				pe.extendKwnoledge(relevantServices, proc);
 				// DO's state extension with the variables of the fragments
 				// received for the abstract activity refinement
-				pe.extendState(relevantServices, proc);
+				String scopeId = "";
+				if (currentAbstract.getAbstractType() != null
+						&& currentAbstract.getAbstractType().equals(
+								GENERATED_ABSTRACT)) {
+					scopeId = currentAbstract.getName();
+					pe.extendState(scopeId, relevantServices, proc);
+				} else {
+					pe.extendState(scopeId, relevantServices, proc);
+				}
+
 				AdaptationProblem problem = new AdaptationProblem(
 						currentAbstract, pe.getDomainObjectInstance(proc),
 						pe.getDomainObjectInstances(),
@@ -145,6 +156,8 @@ public class AbstractActivityHandler extends AbstractHandler {
 				currentAbstract.setExecuted(true);
 			}
 		}
+		pe.applyEffectForAbstractActivity(proc);
+		// handleEffect(pe, proc, current);
 	}
 
 	private GoalType buildGoal(ProcessEngine pe, ProcessDiagram proc,

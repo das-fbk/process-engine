@@ -97,8 +97,8 @@ public class Parser {
 			Set<Integer> states = new HashSet<Integer>();
 			Integer initialState = 0;
 			states.add(initialState);
-			// action variables are here considered only for the ReceiveType and
-			// the InvokeType activities
+			// action variables are here considered only for the ReceiveType,
+			// the InvokeType and the abstractTpe activities
 			if (isReceiveType(processActivity)) {
 				eu.fbk.das.process.engine.api.domain.ReplyActivity act = new eu.fbk.das.process.engine.api.domain.ReplyActivity(
 						a, a + 1, processActivity.getName());
@@ -141,6 +141,7 @@ public class Parser {
 				AbstractActivity absact = (AbstractActivity) act;
 				absact.setEffect(processActivity.getEffect());
 				absact.setPrecondition(processActivity.getPrecondition());
+				act.setActionVariables(processActivity.getActionVariable());
 				result.add(act);
 			}
 			if (isWhileType(processActivity)) {

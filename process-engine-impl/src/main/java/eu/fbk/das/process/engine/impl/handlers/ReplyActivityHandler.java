@@ -11,6 +11,7 @@ import org.w3c.dom.Element;
 
 import eu.fbk.das.process.engine.api.DomainObjectInstance;
 import eu.fbk.das.process.engine.api.ProcessEngine;
+import eu.fbk.das.process.engine.api.domain.AbstractActivity;
 import eu.fbk.das.process.engine.api.domain.ProcessActivity;
 import eu.fbk.das.process.engine.api.domain.ProcessDiagram;
 import eu.fbk.das.process.engine.api.domain.ReplyActivity;
@@ -20,10 +21,7 @@ import eu.fbk.das.process.engine.api.jaxb.VariableType;
  * @author Martina
  *
  */
-/**
- * @author Martina
- *
- */
+
 public class ReplyActivityHandler extends AbstractHandler {
 
 	private static final Logger logger = LogManager
@@ -32,6 +30,10 @@ public class ReplyActivityHandler extends AbstractHandler {
 	@Override
 	public void handle(ProcessEngine pe, ProcessDiagram proc,
 			ProcessActivity current) {
+
+		if (current.getName().equals("TA_ProvideInstructions")) {
+			System.out.println();
+		}
 
 		logger.debug("[" + proc.getpid() + "] receive for " + current.getName());
 		ReplyActivity receive = (ReplyActivity) current;
@@ -93,7 +95,7 @@ public class ReplyActivityHandler extends AbstractHandler {
 						current.setActionVariables(map.get(msg));
 					}
 					// write the variables in the domain object state
-					writeTheDomainObjectState(doi, current);
+					writeTheDomainObjectState(doi, proc, current);
 					pe.removeMessageAndVariables(doi, map);
 					// removeMessage(doi, msg);
 					return true;
@@ -116,15 +118,14 @@ public class ReplyActivityHandler extends AbstractHandler {
 	 * 
 	 */
 	private void writeTheDomainObjectState(DomainObjectInstance doi,
-			ProcessActivity current) {
+			ProcessDiagram proc, ProcessActivity current) {
 		/**********************************************************************/
 		// stampa lo stato prima dell'esecuzione del processo,
 		// subito prima di fare start
 		List<VariableType> state = new ArrayList<VariableType>();
 		if (doi.getState() != null) {
 			state = doi.getState().getStateVariable();
-			logger.warn("PRE EXECUTION STATE OF THE DO: " + doi.getType()
-					+ " = ");
+			logger.warn("PRE EXECUTION STATE OF THE DO: " + doi.getId() + " = ");
 			for (VariableType var : state) {
 				Element e = (Element) (var.getContent());
 				if (e.getFirstChild() != null) {
@@ -136,22 +137,69 @@ public class ReplyActivityHandler extends AbstractHandler {
 			}
 		}
 		/**********************************************************************/
-		List<VariableType> activityVariables;
-		if (doi.getState() != null) {
-			if (!doi.getState().getStateVariable().isEmpty()
-					&& doi.getState().getStateVariable() != null) {
-				if (current.getServiceType() != null) {
-					activityVariables = current.getServiceActionVariables();
-				} else {
-					activityVariables = current.getActionVariables();
-				}
-				for (VariableType actionVar : activityVariables) {
-					if (doi.hasVariableWithName(actionVar.getName())) {
-						Element varContent = (Element) actionVar.getContent();
-						doi.setStateVariableContentByVarName(
-								actionVar.getName(), varContent);
+		boolean actInAInnerScope = false;
+		AbstractActivity abstractAct = null;
+		ProcessActivity fatherAct = null;
+		if (proc.getFather() != null) {
+			fatherAct = proc.getFather().getCurrentActivity();
+		}
+		if (current.getServiceType() != null && fatherAct != null) {
+			if (fatherAct.isAbstract()) {
+				abstractAct = (AbstractActivity) fatherAct;
+				if (abstractAct.getAbstractType() != null) {
+					if (abstractAct.getAbstractType().equalsIgnoreCase(
+							"GeneratedAbstract")) {
+						// we are in a generated abstract activity scope (for
+						// variables)
+						actInAInnerScope = true;
 					}
-					// int i = DatatypeConverter.parseInt(content);
+				}
+			}
+		}
+
+		if (actInAInnerScope) {
+			String varPrefix = abstractAct.getName();
+			List<VariableType> activityVariables;
+			if (doi.getState() != null) {
+				if (!doi.getState().getStateVariable().isEmpty()
+						&& doi.getState().getStateVariable() != null) {
+					activityVariables = current.getServiceActionVariables();
+					if (activityVariables != null
+							&& !activityVariables.isEmpty()) {
+						for (VariableType actionVar : activityVariables) {
+							if (doi.hasVariableWithNameAndScope(
+									actionVar.getName(), varPrefix)) {
+								Element varContent = (Element) actionVar
+										.getContent();
+								doi.setStateVariableContentByVarNameInScope(
+										actionVar.getName(), varContent,
+										varPrefix);
+							}
+						}
+					}
+				}
+			}
+		} else {
+			List<VariableType> activityVariables;
+			if (doi.getState() != null) {
+				if (!doi.getState().getStateVariable().isEmpty()
+						&& doi.getState().getStateVariable() != null) {
+					if (current.getServiceType() != null) {
+						activityVariables = current.getServiceActionVariables();
+					} else {
+						activityVariables = current.getActionVariables();
+					}
+					if (activityVariables != null
+							&& !activityVariables.isEmpty()) {
+						for (VariableType actionVar : activityVariables) {
+							if (doi.hasVariableWithName(actionVar.getName())) {
+								Element varContent = (Element) actionVar
+										.getContent();
+								doi.setStateVariableContentByVarName(
+										actionVar.getName(), varContent);
+							}
+						}
+					}
 				}
 			}
 		}

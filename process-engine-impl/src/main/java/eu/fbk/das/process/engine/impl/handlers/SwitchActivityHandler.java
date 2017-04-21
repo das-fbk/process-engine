@@ -24,9 +24,23 @@ public class SwitchActivityHandler extends AbstractHandler {
 		logger.debug("[" + proc.getpid() + "] Esecuzione Switch");
 		boolean foundIf = false;
 		ProcessDiagram father = proc;
-		ProcessDiagram branch = null;
-//		// Martina
-//		pe.addProcVar(proc, "planner", "local");
+		ProcessDiagram branch = new ProcessDiagram();
+		// // Martina
+		// pe.addProcVar(proc, "planner", "global");
+
+		// boolean branchExecuted = false;
+		//
+		// if (pe.getRunningBranch(father) != null) {
+		// branch = pe.getRunningBranch(father);
+		// if (branch.getFather().getCurrentActivity().getName()
+		// .equals(current.getName())
+		// && branch.isEnded()) {
+		// branchExecuted = true;
+		// }
+		// }
+
+		// if (!branchExecuted) {
+
 		for (IFActivity ifact : ((SwitchActivity) current).getIFs()) {
 
 			boolean VarConditionEval = true;
@@ -40,7 +54,6 @@ public class SwitchActivityHandler extends AbstractHandler {
 							varCond.getValue(), father)) {
 						VarConditionEval = false;
 					}
-
 				}
 			}
 
@@ -78,13 +91,30 @@ public class SwitchActivityHandler extends AbstractHandler {
 		// craere la correlazione tra il branch e chi e' in
 		// correlazione col padre che crea questo branch
 		// TODO: non serve piu' ?
-		// DomainObjectInstance fatherDoi = pe.getDomainObjectInstance(father);
+		// DomainObjectInstance fatherDoi =
+		// pe.getDomainObjectInstance(father);
 		// List<DomainObjectInstance> fatherCorrelated =
 		// pe.getCorrelated(fatherDoi);
 		// if (fatherCorrelated != null &&
 		// !fatherCorrelated.isEmpty()) {
 		// for (DomainObjectInstance fc : fatherCorrelated) {
 		// pe.createCorrelation(branch.getpid(), fc);
+		// }
+		// }
+
+		// } else {
+		// logger.debug("[" + proc.getpid()
+		// + "] Execution of the selected switch branch terminated");
+		// current.setExecuted(true);
+		// // add the completed activity to the execution history
+		// proc.addExecuteActivity(current);
+		// // handle effects
+		// handleEffect(pe, proc, current);
+		//
+		// // terminate branch
+		// if (branch != null && branch.isRunning()) {
+		// branch.setRunning(false);
+		// pe.removeRunningBranch(branch);
 		// }
 		// }
 	}

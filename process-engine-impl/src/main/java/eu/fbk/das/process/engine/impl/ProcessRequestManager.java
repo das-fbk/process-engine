@@ -67,9 +67,6 @@ public class ProcessRequestManager {
 		List<ProcessRequest> toRemove = new ArrayList<ProcessRequest>();
 		DomainObjectInstance result = null;
 		for (ProcessRequest processRequest : processRequests) {
-			if (processRequest.getName().equals("FC_BookingResult")) {
-				System.out.println();
-			}
 			// get domainObjectInstance of request
 			DomainObjectInstance doi = processRequest.getDomainObjectInstance();
 			// get correlated to doi

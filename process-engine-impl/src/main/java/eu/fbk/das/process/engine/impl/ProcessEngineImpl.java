@@ -37,6 +37,7 @@ import eu.fbk.das.process.engine.api.domain.ProcessActivity;
 import eu.fbk.das.process.engine.api.domain.ProcessActivityType;
 import eu.fbk.das.process.engine.api.domain.ProcessDiagram;
 import eu.fbk.das.process.engine.api.domain.ServiceDiagram;
+import eu.fbk.das.process.engine.api.domain.WhileActivity;
 import eu.fbk.das.process.engine.api.domain.exceptions.FlowDuplicateActivityException;
 import eu.fbk.das.process.engine.api.domain.exceptions.InvalidFlowActivityException;
 import eu.fbk.das.process.engine.api.domain.exceptions.InvalidFlowInitialStateException;
@@ -144,7 +145,7 @@ public class ProcessEngineImpl implements ProcessEngine {
 			if (curentDoi.getState() != null) {
 				state = curentDoi.getState().getStateVariable();
 				logger.warn("AFTER EXECUTION STATE OF THE DO: "
-						+ curentDoi.getType() + " = ");
+						+ curentDoi.getId() + " = ");
 				for (VariableType var : state) {
 					Element e = (Element) (var.getContent());
 					if (e.getFirstChild() != null) {
@@ -156,8 +157,101 @@ public class ProcessEngineImpl implements ProcessEngine {
 					}
 				}
 			}
+			// clean the DO state before removing its process
+			// DomainObjectInstance doi = this.getDomainObjectInstance(process);
+			// DomainObjectDefinition dod = this
+			// .getDomainObjectDefinition(process);
+			// State s = dod.getState();
+			// List<VariableType> modelVar = new ArrayList<VariableType>();
+			// if (s != null) {
+			// modelVar = s.getStateVariable();
+			// }
+			// for (int i = 0; i < modelVar.size(); i++) {
+			// Element var = DocumentVariableUtils.newElement(modelVar.get(i)
+			// .getName(), "");
+			// modelVar.get(i).setContent(var);
+			// }
+			// State cleanedState = new State();
+			// cleanedState.getStateVariable().addAll(modelVar);
+			// doi.setState(cleanedState);
+			//
+			// // RESET INTERNAL KNOWLEDGE
+			// ObjectDiagram internalKnowledge =
+			// doi.getInternalKnowledge().get(0);
+			// try {
+			// internalKnowledge.setCurrentState("INITIAL");
+			// } catch (InvalidObjectCurrentStateException e) {
+			// e.printStackTrace();
+			// }
+			// // RESET EXTERNAL KNOWLEDGE
+			// ListIterator<ObjectDiagram> it = doi.getExternalKnowledge()
+			// .listIterator();
+			// while (it.hasNext()) {
+			// ObjectDiagram od = it.next();
+			// try {
+			// od.setCurrentState("INITIAL");
+			// } catch (InvalidObjectCurrentStateException e) {
+			// e.printStackTrace();
+			// }
+			// }
+
+			// DomainObjectInstance doi = this.getDomainObjectInstance(process);
 			processes.remove(process.getpid());
 			dom.remove(process);
+			/*************************************************/
+			// deleting corelates reises synchronization exception
+			// if (process.getName().contains("PROC_")) {
+			// if (cm.hasCorrelation(doi)) {
+			// List<DomainObjectInstance> correlates = Collections
+			// .synchronizedList(cm.get(doi));
+			// // correlates = cm.get(doi);
+			// for (DomainObjectInstance c : correlates) {
+			// cm.remove(doi, c);
+			// }
+			// }
+			// // dom.getInstances().remove(doi);
+			// }
+			/*************************************************/
+
+			// TEST
+			// if (doi.getId().contains("ViaggiaTrento")) {
+			// // this gives the corelates of the DO doi
+			// List<DomainObjectInstance> correlates = cm.get(doi);
+			// // ListIterator<DomainObjectInstance> it = correlates
+			// // .listIterator();
+			// // while (it.hasNext()) {
+			// for (int i = 0; i < correlates.size(); i++) {
+			// // ripulire la proprietà esterna che mi lega al co-relato
+			// // che
+			// // sto per eliminare
+			// // DomainObjectInstance corr = it.next();
+			// DomainObjectInstance corr = correlates.get(i);
+			// if (corr != null) {
+			// ListIterator<ObjectDiagram> iter = corr
+			// .getExternalKnowledge().listIterator();
+			// boolean found = false;
+			// while (iter.hasNext() && !found) {
+			// ObjectDiagram od = iter.next();
+			// int index = corr.getExternalKnowledge().indexOf(od);
+			// if (od.getOid().equals(
+			// doi.getInternalKnowledge().get(0).getOid())) {
+			// // try {
+			// // corr.getExternalKnowledge().get(index)
+			// // .setCurrentState("INITIAL");
+			// // } catch (InvalidObjectCurrentStateException
+			// // e) {
+			// // e.printStackTrace();
+			// // }
+			// // corr.getExternalKnowledge().remove(index);
+			// // cm.remove(doi, corr);
+			// // cm.remove(corr, doi);
+			// // found = true;
+			// }
+			// }
+			// }
+			// }
+			// }
+
 			logger.debug("Process with pid " + process.getpid() + " removed");
 		} else {
 			logger.warn("Process null cannot be removed");
@@ -276,6 +370,7 @@ public class ProcessEngineImpl implements ProcessEngine {
 				executeActivity(branch);
 			}
 			if (branch.getEnded()) {
+				// setProcessAsExecuted(branch);
 				runninBranchesToRemove.add(branch.getpid());
 				ProcessDiagram father = branch.getFather();
 				father.setRunning(true);
@@ -288,32 +383,43 @@ public class ProcessEngineImpl implements ProcessEngine {
 					}
 				}
 				if (father.getCurrentActivity().isWhile()) {
-					branch.setEnded(false);
-					branch.setTerminated(false);
-					// reset del branch
-					for (ProcessActivity a : branch.getActivities()) {
-						a.setExecuted(false);
+					WhileActivity act = (WhileActivity) father
+							.getCurrentActivity();
+					boolean ContextEval = true;
+					ClauseType varCon = act.getContextCondition();
+					if (varCon != null && !checkContext(father, varCon)) {
+						ContextEval = false;
 					}
-					branch.setCurrentActivity(branch.getFirstActivity());
+					if (ContextEval) {
+						branch.setEnded(false);
+						branch.setTerminated(false);
+						// reset del branch
+						for (ProcessActivity a : branch.getActivities()) {
+							a.setExecuted(false);
+						}
+						branch.setCurrentActivity(branch.getFirstActivity());
+					} else {
+						branch.setRunning(false);
+						branch.setEnded(true);
+						branch.setTerminated(true);
+						// father.getCurrentActivity().setExecuted(true);
+					}
+					return;
 				}
 				if (father.getCurrentActivity().isSwitch()) {
 					branch.setEnded(true);
 					branch.setTerminated(true);
-					branch.setRunning(false);
-					if (father.getNextActivity().isEmpty()) {
-						father.getCurrentActivity().setExecuted(true);
-						father.setEnded(true);
-						father.setTerminated(true);
-						father.setRunning(false);
-					} else {
+					// branch.setRunning(false);
+					if (!father.getNextActivity().isEmpty()) {
 						father.getCurrentActivity().setExecuted(true);
 						father.setEnded(false);
 						father.setTerminated(false);
 						father.setRunning(true);
 						father.setCurrentActivity(father.getNextActivity().get(
 								0));
-						this.executeActivity(father);
+						// this.executeActivity(father);
 					}
+					return;
 				} else {
 					father.getCurrentActivity().setExecuted(true);
 
@@ -357,7 +463,10 @@ public class ProcessEngineImpl implements ProcessEngine {
 		}
 		for (Integer key : toRemove) {
 			if (runningBranches.containsKey(key)) {
-				runningBranches.remove(key);
+				for (ProcessDiagram p : runningBranches.get(key)) {
+					// setProcessAsExecuted(p);
+					runningBranches.remove(key);
+				}
 			}
 		}
 	}
@@ -374,6 +483,7 @@ public class ProcessEngineImpl implements ProcessEngine {
 	public void end(int pid) {
 		ProcessDiagram p = find(pid);
 		if (p != null) {
+			// setProcessAsExecuted(p);
 			p.setEnded(true);
 			logger.debug("Process ended");
 		} else {
@@ -381,6 +491,12 @@ public class ProcessEngineImpl implements ProcessEngine {
 					+ ", pid not found");
 		}
 	}
+
+	// private void setProcessAsExecuted(ProcessDiagram p) {
+	// for (ProcessActivity a : p.getActivities()) {
+	// a.setExecuted(true);
+	// }
+	// } prova Martins per rimuovere attività che resta bianca
 
 	// @Override
 	// public void createMessage(String requestName, DomainObjectInstance doi) {
@@ -864,10 +980,6 @@ public class ProcessEngineImpl implements ProcessEngine {
 			List<DomainObjectDefinition> defs = findDomainObjectDefinitionWithGoalRelation(current
 					.getGoal());
 
-			if (current.getName().equals("FC_ManageRoute")) {
-				System.out.println();
-			}
-
 			Map<String, List<String>> response = new HashMap<String, List<String>>();
 			for (DomainObjectDefinition dos : defs) {
 				List<DomainObjectInstance> ins = getDomainObjectInstance(dos);
@@ -876,6 +988,24 @@ public class ProcessEngineImpl implements ProcessEngine {
 					DomainObjectInstance in = createDoi(doi, dos);
 					cm.create(doi, in);
 					response.putAll(correlate(doi, in));
+					/*******
+					 * INIZIO ATTENZIONE: CODICE AGGIUNTO PER RAFFINARE PIU
+					 * VOLTE SEPARATAMENTE SULLA STESSA PROP. ESTERNA
+					 ********/
+					List<ObjectDiagram> external = doi.getExternalKnowledge();
+					for (int i = 0; i < external.size(); i++) {
+						if (external
+								.get(i)
+								.getOid()
+								.equals(in.getInternalKnowledge().get(0)
+										.getOid())) {
+							external.get(i).setCurrentState("INITIAL");
+						}
+					}
+					/*******
+					 * FINE ATTENZIONE: CODICE AGGIUNTO PER RAFFINARE PIU VOLTE
+					 * SEPARATAMENTE SULLA STESSA PROP. ESTERNA
+					 ********/
 				} else {
 					if (dos.getDomainObject().isSingleton()) {
 						List<String> correlations = getCorrelationsForType(doi,
@@ -981,9 +1111,6 @@ public class ProcessEngineImpl implements ProcessEngine {
 			DomainObjectDefinition dos) {
 		// logica creazione doi
 		try {
-			if (dos.getDomainObject().getName().equals("FlexibusCompany")) {
-				System.out.println();
-			}
 			DomainObjectInstance in;
 			// avoid new instance creation of singleton
 			// DomainObject
@@ -1002,13 +1129,6 @@ public class ProcessEngineImpl implements ProcessEngine {
 				// for non singleton domain objects, always
 				// create
 				// one
-				if (dos.getDomainObject().getName().equals("RoutePassenger")) {
-					System.out.println();
-				}
-				if (dos.getDomainObject().getName().equals("FlexibusCompany")) {
-					System.out.println();
-				}
-
 				in = dom.buildInstance(dos);
 				start(in);
 			}
@@ -1080,17 +1200,17 @@ public class ProcessEngineImpl implements ProcessEngine {
 	}
 
 	@Override
-	public void extendState(Map<String, List<String>> relevantServices,
-			ProcessDiagram proc) {
+	public void extendState(String scopeId,
+			Map<String, List<String>> relevantServices, ProcessDiagram proc) {
 		if (relevantServices == null
 				|| (relevantServices != null && relevantServices.isEmpty())) {
-			logger.error("Impossible to extend the state with a null or empy list");
+			logger.error("Impossible to extend the state with a null or empty list");
 			return;
 		}
 		// DO instance whose knowledge must be extended
 		DomainObjectInstance doi = findDoi(proc);
 		if (doi == null) {
-			logger.warn("Impossible find a domainObjectInstance for process with id"
+			logger.warn("Impossible find a domainObjectInstance for the process with id "
 					+ proc.getpid());
 			return;
 		}
@@ -1107,7 +1227,7 @@ public class ProcessEngineImpl implements ProcessEngine {
 						logger.warn("Not found domainObjectInstance with id "
 								+ value);
 					} else {
-						dom.extendDoiState(doi, otherDoi, key);
+						dom.extendDoiState(scopeId, doi, otherDoi, key);
 					}
 				}
 			}
@@ -1280,6 +1400,7 @@ public class ProcessEngineImpl implements ProcessEngine {
 
 	@Override
 	public void removeRunningBranch(ProcessDiagram branch) {
+		// setProcessAsExecuted(branch);
 		runninBranchesToRemove.add(branch.getpid());
 	}
 
@@ -1302,12 +1423,17 @@ public class ProcessEngineImpl implements ProcessEngine {
 
 	@Override
 	public void removeRefinement(ProcessDiagram ref) {
+		// setProcessAsExecuted(ref);
 		rm.remove(ref);
 	}
 
 	@Override
 	public DomainObjectDefinition getDefinitionByFragment(String serviceType) {
 		return dom.findDefinitionByFragment(serviceType);
+	}
+
+	public Map<Integer, ProcessDiagram> getProcesses() {
+		return processes;
 	}
 
 }

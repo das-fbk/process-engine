@@ -10,6 +10,7 @@ import org.w3c.dom.Element;
 import eu.fbk.das.process.engine.api.DomainObjectInstance;
 import eu.fbk.das.process.engine.api.ProcessEngine;
 import eu.fbk.das.process.engine.api.ProcessRequest;
+import eu.fbk.das.process.engine.api.domain.AbstractActivity;
 import eu.fbk.das.process.engine.api.domain.InvokeActivty;
 import eu.fbk.das.process.engine.api.domain.ProcessActivity;
 import eu.fbk.das.process.engine.api.domain.ProcessActivityType;
@@ -31,6 +32,10 @@ public class InvokeActivityHandler extends AbstractHandler {
 	@Override
 	public void handle(ProcessEngine pe, ProcessDiagram proc,
 			ProcessActivity current) {
+
+		if (current.getName().equals("TA_GatherLegDetails")) {
+			System.out.println();
+		}
 
 		logger.debug("[" + proc.getpid()
 				+ "] invoke for a process with name : " + current.getName());
@@ -55,10 +60,23 @@ public class InvokeActivityHandler extends AbstractHandler {
 		pr.setVariables(currentActivityVariables);
 		pe.addRequest(pr);
 
+		/************************* HANDLERS IN INVOKE!!! *******************************/
+		// InvokeActivty invokeAct = (InvokeActivty) current;
+		// if (pe.getExecutableHandler(invokeAct.getName(), proc.getpid()) !=
+		// null) {
+		// logger.debug("Using executable handler for invoke activity: "
+		// + invokeAct.getName());
+		// pe.getExecutableHandler(invokeAct.getName(), proc.getpid())
+		// .execute(proc, invokeAct);
+		// if (invokeAct.isExecuted()) {
+		// proc.addExecuteActivity(current);
+		// handleEffect(pe, proc, current);
+		// }
+		// }
+		/**************************************************************************/
 		current.setExecuted(true);
 		// add the completed activity to the execution history
 		proc.addExecuteActivity(current);
-
 		// handle effects
 		handleEffect(pe, proc, current);
 	}
@@ -82,7 +100,7 @@ public class InvokeActivityHandler extends AbstractHandler {
 		DomainObjectInstance currentDoi = pe.getDomainObjectInstance(proc);
 
 		// copy service action variable from the DO's state
-		checkVariablesOfAnInvokeActivity(pe, current, currentDoi);
+		checkVariablesOfAnInvokeActivity(pe, current, proc, currentDoi);
 
 		if (current.getServiceType() != null) {
 			isServiceActivity = true;
@@ -96,72 +114,76 @@ public class InvokeActivityHandler extends AbstractHandler {
 		}
 	}
 
-	// private void checkVariablesOfAnInvokeServiceActivity(ProcessEngine pe,
-	// ProcessActivity current, DomainObjectInstance doi) {
-	//
-	// // the invoke activity updates its variables with the values of the
-	// // corresponding
-	// // variables in the domain object state (Some
-	// // previous executed activity has written these variables probably.)
-	// if (doi.getState() != null) {
-	// if (!doi.getState().getStateVariable().isEmpty()) {
-	// if (doi.hasSameVariablesOfCurrentActivity(current)) {
-	// copyVariablesFromAdomainObjectState(current, doi);
-	// } else {
-	// // find the domain object father of the fragment under
-	// // execution
-	// DomainObjectInstance fatherDoi = new DomainObjectInstance();
-	// DomainObjectDefinition fatherDod = pe
-	// .getDefinitionByFragment(current.getServiceType());
-	// List<DomainObjectInstance> listDoi = pe.getCorrelated(doi);
-	// for (DomainObjectInstance tempDoi : pe
-	// .getDomainObjectInstance(fatherDod)) {
-	// if (listDoi.contains(tempDoi)) {
-	// fatherDoi = tempDoi;
-	// }
-	// }
-	// if (fatherDoi != null) {
-	// copyVariablesFromAdomainObjectState(current, fatherDoi);
-	// }
-	//
-	// }
-	// }
-	// }
-	// }
-
 	private void checkVariablesOfAnInvokeActivity(ProcessEngine pe,
-			ProcessActivity current, DomainObjectInstance doi) {
+			ProcessActivity current, ProcessDiagram proc,
+			DomainObjectInstance doi) {
 
 		// the invoke activity updates its variables with the values of the
 		// corresponding
 		// variables in the domain object state that is executing it.
 		if (doi.getState() != null) {
 			if (!doi.getState().getStateVariable().isEmpty()) {
-				copyVariablesFromTheDomainObjectState(current, doi);
+				copyVariablesFromTheDomainObjectState(proc, current, doi);
 			}
 		}
 	}
 
-	private void copyVariablesFromTheDomainObjectState(ProcessActivity current,
-			DomainObjectInstance doi) {
+	private void copyVariablesFromTheDomainObjectState(ProcessDiagram proc,
+			ProcessActivity current, DomainObjectInstance doi) {
 		List<VariableType> var;
 		if (current.getServiceType() != null) {
 			var = current.getServiceActionVariables();
 		} else {
 			var = current.getActionVariables();
 		}
+		boolean actInAInnerScope = false;
+		AbstractActivity abstractAct = null;
+		ProcessActivity fatherAct = null;
+		if (proc.getFather() != null) {
+			fatherAct = proc.getFather().getCurrentActivity();
+		}
+		if (current.getServiceType() != null && fatherAct != null) {
+			if (fatherAct.isAbstract()) {
+				abstractAct = (AbstractActivity) fatherAct;
+				if (abstractAct.getAbstractType() != null) {
+					if (abstractAct.getAbstractType().equalsIgnoreCase(
+							"GeneratedAbstract")) {
+						// we are in a generated abstract activity scope (for
+						// variables)
+						actInAInnerScope = true;
+					}
+				}
+			}
+		}
 
-		for (VariableType actionVar : var) {
-			if (doi.hasVariableWithName(actionVar.getName())) {
-				Element eleNsImplObject = doi
-						.getStateVariableContentByName(actionVar.getName());
-
-				// To get the string content of the Element use the
-				// following:
-				// eleNsImplObject.getFirstChild().getNodeValue();
-				actionVar.setContent(eleNsImplObject);
-				// Element e = (Element) (actionVar.getContent());
-				// logger.debug(e.getFirstChild().getNodeValue());
+		if (actInAInnerScope) {
+			if (var != null && !var.isEmpty()) {
+				String varPrefix = abstractAct.getName();
+				for (VariableType actionVar : var) {
+					if (doi.hasVariableWithNameAndScope(actionVar.getName(),
+							varPrefix)) {
+						Element eleNsImplObject = doi
+								.getStateVariableContentByNameInScope(
+										actionVar.getName(), varPrefix);
+						actionVar.setContent(eleNsImplObject);
+					}
+				}
+			}
+		} else {
+			if (var != null && !var.isEmpty()) {
+				for (VariableType actionVar : var) {
+					if (doi.hasVariableWithName(actionVar.getName())) {
+						Element eleNsImplObject = doi
+								.getStateVariableContentByName(actionVar
+										.getName());
+						// To get the string content of the Element use the
+						// following:
+						// eleNsImplObject.getFirstChild().getNodeValue();
+						actionVar.setContent(eleNsImplObject);
+						// Element e = (Element) (actionVar.getContent());
+						// logger.debug(e.getFirstChild().getNodeValue());
+					}
+				}
 			}
 		}
 	}

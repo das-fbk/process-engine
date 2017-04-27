@@ -62,8 +62,14 @@ public class SwitchActivityHandler extends AbstractHandler {
 				int pid = pe.getPid();
 				branch.setPid(pid);
 				branch.setCurrentActivity(branch.getFirstActivity());
-				pe.addRunningBranch(pid, branch);
-
+				// pe.addRunningBranch(pid, branch);
+				/*****************
+				 * GESTIONE BRANCH DELLO SWITCH COME REFINEMENT ATTIVITA
+				 * ASTRATTA
+				 *****************************/
+				pe.registerProcess(branch, proc);
+				pe.addRunningRefinements(proc, branch);
+				/***************************************************************************/
 				branch.setFather(proc);
 				proc.setRunning(false);
 				branch.setRunning(true);
@@ -79,7 +85,11 @@ public class SwitchActivityHandler extends AbstractHandler {
 			int pid = pe.getPid();
 			branch.setPid(pid);
 			branch.setCurrentActivity(branch.getFirstActivity());
-			pe.addRunningBranch(pid, branch);
+			// pe.addRunningBranch(pid, branch);
+			/***************** UGUALE A SOPRA - TESTARE MEGLIO *****************************/
+			pe.registerProcess(branch, proc);
+			pe.addRunningRefinements(proc, branch);
+			/***************************************************************************/
 			branch.setFather(proc);
 			proc.setRunning(false);
 			branch.setRunning(true);

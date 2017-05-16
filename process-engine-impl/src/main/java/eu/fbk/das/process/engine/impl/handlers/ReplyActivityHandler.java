@@ -16,6 +16,7 @@ import eu.fbk.das.process.engine.api.domain.ProcessActivity;
 import eu.fbk.das.process.engine.api.domain.ProcessDiagram;
 import eu.fbk.das.process.engine.api.domain.ReplyActivity;
 import eu.fbk.das.process.engine.api.jaxb.VariableType;
+import eu.fbk.das.process.engine.impl.util.VariableUtils;
 
 /**
  * @author Martina
@@ -90,9 +91,11 @@ public class ReplyActivityHandler extends AbstractHandler {
 					// process reply and a fragment reply
 					if (current.getServiceType() != null) {
 						// the activity is a reply in a fragment
-						current.setServiceActionVariables(map.get(msg));
+						current.setServiceActionVariables(VariableUtils
+								.cloneList(map.get(msg)));
 					} else {
-						current.setActionVariables(map.get(msg));
+						current.setActionVariables(VariableUtils.cloneList(map
+								.get(msg)));
 					}
 					// write the variables in the domain object state
 					writeTheDomainObjectState(doi, proc, current);
@@ -185,9 +188,11 @@ public class ReplyActivityHandler extends AbstractHandler {
 				if (!doi.getState().getStateVariable().isEmpty()
 						&& doi.getState().getStateVariable() != null) {
 					if (current.getServiceType() != null) {
-						activityVariables = current.getServiceActionVariables();
+						activityVariables = VariableUtils.cloneList(current
+								.getServiceActionVariables());
 					} else {
-						activityVariables = current.getActionVariables();
+						activityVariables = VariableUtils.cloneList(current
+								.getActionVariables());
 					}
 					if (activityVariables != null
 							&& !activityVariables.isEmpty()) {

@@ -3,8 +3,6 @@ package eu.fbk.das.process.engine.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.w3c.dom.Element;
-
 import eu.fbk.das.composer.api.exceptions.InvalidServiceInitialStateException;
 import eu.fbk.das.composer.api.exceptions.InvalidServiceTransitionException;
 import eu.fbk.das.composer.api.exceptions.ServiceDuplicateActionException;
@@ -18,6 +16,7 @@ import eu.fbk.das.process.engine.api.domain.exceptions.InvalidFlowInitialStateEx
 import eu.fbk.das.process.engine.api.jaxb.DomainObject.State;
 import eu.fbk.das.process.engine.api.jaxb.VariableType;
 import eu.fbk.das.process.engine.impl.util.Parser;
+import eu.fbk.das.process.engine.impl.util.VariableUtils;
 
 /**
  * Utility class for conversion between classes use {@link Parser}
@@ -69,19 +68,14 @@ public final class Converter {
 		doi.setProcess(process);
 		doi.setRole(ed.isRole());
 		doi.setSingleton(ed.getDomainObject().isSingleton());
-		// before setting the state, variables are cleaned from previous use
 		State doiState = new State();
 		List<VariableType> stateVariable = new ArrayList<VariableType>();
 		if (ed.getState() != null) {
 			if (ed.getState().getStateVariable() != null
 					&& !ed.getState().getStateVariable().isEmpty()) {
-				for (VariableType var : ed.getState().getStateVariable()) {
-					if (((Element) var.getContent()).getFirstChild() != null) {
-						((Element) var.getContent()).getFirstChild()
-								.setNodeValue("");
-					}
-					stateVariable.add(var);
-				}
+				// build the domain object state from the model
+				stateVariable = VariableUtils.cloneList(ed.getState()
+						.getStateVariable());
 			}
 		}
 		doiState.getStateVariable().addAll(stateVariable);

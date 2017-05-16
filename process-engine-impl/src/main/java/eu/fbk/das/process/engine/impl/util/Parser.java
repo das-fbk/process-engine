@@ -105,7 +105,9 @@ public class Parser {
 				act.setReceive(true);
 				act.setEffect(processActivity.getEffect());
 				act.setPrecondition(processActivity.getPrecondition());
-				act.setActionVariables(processActivity.getActionVariable());
+				// act.setActionVariables(processActivity.getActionVariable());
+				act.setActionVariables(VariableUtils.cloneList(processActivity
+						.getActionVariable()));
 				result.add(act);
 			}
 			if (isInvokeType(processActivity)) {
@@ -114,7 +116,12 @@ public class Parser {
 				act.setSend(true);
 				act.setEffect(processActivity.getEffect());
 				act.setPrecondition(processActivity.getPrecondition());
-				act.setActionVariables(processActivity.getActionVariable());
+				// act.setActionVariables(processActivity.getActionVariable());
+				if (act.getName().equalsIgnoreCase("DVM_DataPatternResponse")) {
+					System.out.println();
+				}
+				act.setActionVariables(VariableUtils.cloneList(processActivity
+						.getActionVariable()));
 				result.add(act);
 			}
 			if (isSwitchType(processActivity)) {
@@ -141,7 +148,9 @@ public class Parser {
 				AbstractActivity absact = (AbstractActivity) act;
 				absact.setEffect(processActivity.getEffect());
 				absact.setPrecondition(processActivity.getPrecondition());
-				act.setActionVariables(processActivity.getActionVariable());
+				// act.setActionVariables(processActivity.getActionVariable());
+				act.setActionVariables(VariableUtils.cloneList(processActivity
+						.getActionVariable()));
 				result.add(act);
 			}
 			if (isWhileType(processActivity)) {
@@ -342,6 +351,7 @@ public class Parser {
 			throws InvalidFlowInitialStateException,
 			InvalidFlowActivityException, FlowDuplicateActivityException {
 
+		String name = ((SwitchType) object).getName();
 		List<IFActivity> IFs = new ArrayList<IFActivity>();
 		DefaultActivity def = new DefaultActivity();
 
@@ -443,8 +453,8 @@ public class Parser {
 		}
 
 		// }
-		SwitchActivity sw = new SwitchActivity(sourcest, sourcest + 1,
-				"SWITCH", IFs, def);
+		SwitchActivity sw = new SwitchActivity(sourcest, sourcest + 1, name,
+				IFs, def);
 		states.add(sourcest + 1);
 		return sw;
 	}
@@ -813,6 +823,7 @@ public class Parser {
 		}
 		return ServiceDiagramActionType.IN;
 	}
+
 	// public ServiceDiagram convertToObjectDiagrams(List<DomainProperty>
 	// property) {
 	//
@@ -820,4 +831,5 @@ public class Parser {
 	//
 	// return null;
 	// }
+
 }

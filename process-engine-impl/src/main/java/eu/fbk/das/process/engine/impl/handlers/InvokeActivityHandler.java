@@ -16,6 +16,7 @@ import eu.fbk.das.process.engine.api.domain.ProcessActivity;
 import eu.fbk.das.process.engine.api.domain.ProcessActivityType;
 import eu.fbk.das.process.engine.api.domain.ProcessDiagram;
 import eu.fbk.das.process.engine.api.jaxb.VariableType;
+import eu.fbk.das.process.engine.impl.util.VariableUtils;
 
 /**
  * Handle an Invoke Activity
@@ -33,7 +34,7 @@ public class InvokeActivityHandler extends AbstractHandler {
 	public void handle(ProcessEngine pe, ProcessDiagram proc,
 			ProcessActivity current) {
 
-		if (current.getName().equals("TA_GatherLegDetails")) {
+		if (current.getName().equals("DVM_DataPatternResponse")) {
 			System.out.println();
 		}
 
@@ -50,6 +51,8 @@ public class InvokeActivityHandler extends AbstractHandler {
 
 		// management of the variables in the activities of type Invoke
 		manageVariablesForInvokeActivity(pe, proc, current);
+		List<VariableType> prVariables = VariableUtils
+				.cloneList(currentActivityVariables);
 
 		ProcessRequest pr = new ProcessRequest();
 		pr.setPid(proc.getpid());
@@ -57,7 +60,7 @@ public class InvokeActivityHandler extends AbstractHandler {
 		pr.setName(current.getName());
 		pr.setType(ProcessActivityType.REPLY);
 		// passing variables from the Invoke to the corresponding Reply
-		pr.setVariables(currentActivityVariables);
+		pr.setVariables(prVariables);
 		pe.addRequest(pr);
 
 		/************************* HANDLERS IN INVOKE!!! *******************************/
@@ -187,4 +190,5 @@ public class InvokeActivityHandler extends AbstractHandler {
 			}
 		}
 	}
+
 }

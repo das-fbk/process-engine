@@ -988,10 +988,10 @@ public class ProcessEngineImpl implements ProcessEngine {
 					DomainObjectInstance in = createDoi(doi, dos);
 					cm.create(doi, in);
 					response.putAll(correlate(doi, in));
-					/*******
-					 * INIZIO ATTENZIONE: CODICE AGGIUNTO PER RAFFINARE PIU
-					 * VOLTE SEPARATAMENTE SULLA STESSA PROP. ESTERNA
-					 ********/
+					/****************************
+					 * INIT: CODE ADDED TO REFINE MORE TIMES SEPARATELY ON THE
+					 * SAME EXTERNAL PROPERTY
+					 ***************************/
 					List<ObjectDiagram> external = doi.getExternalKnowledge();
 					for (int i = 0; i < external.size(); i++) {
 						if (external
@@ -1000,12 +1000,13 @@ public class ProcessEngineImpl implements ProcessEngine {
 								.equals(in.getInternalKnowledge().get(0)
 										.getOid())) {
 							external.get(i).setCurrentState("INITIAL");
+							break;
 						}
 					}
-					/*******
-					 * FINE ATTENZIONE: CODICE AGGIUNTO PER RAFFINARE PIU VOLTE
-					 * SEPARATAMENTE SULLA STESSA PROP. ESTERNA
-					 ********/
+					/******************************
+					 * END: CODE ADDED TO REFINE MORE TIMES SEPARATELY ON THE
+					 * SAME EXTERNAL PROPERTY
+					 *******************************/
 				} else {
 					if (dos.getDomainObject().isSingleton()) {
 						List<String> correlations = getCorrelationsForType(doi,

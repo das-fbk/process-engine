@@ -38,6 +38,7 @@ import eu.fbk.das.process.engine.api.jaxb.Process;
 import eu.fbk.das.process.engine.api.jaxb.VariableType;
 import eu.fbk.das.process.engine.impl.util.FileUtil;
 import eu.fbk.das.process.engine.impl.util.Parser;
+import eu.fbk.das.process.engine.impl.util.VariableUtils;
 
 /**
  * Manage Domain Object definition loaded from file and instances
@@ -598,7 +599,9 @@ public class DomainObjectManager implements DomainObjectManagerInterface {
 						// newVar.setContent(v.getContent());
 						// extendedState.add(newVar);
 						// }
-						extendedState.addAll(a.getActionVariable());
+						extendedState.addAll(VariableUtils.cloneList(a
+								.getActionVariable()));
+						// extendedState.addAll(a.getActionVariable());
 					}
 				}
 			}

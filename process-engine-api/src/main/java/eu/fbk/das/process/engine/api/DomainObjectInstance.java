@@ -271,6 +271,15 @@ public class DomainObjectInstance {
 		return stateVarContent;
 	}
 
+	// public void setStateVariableContentByVarNameBis(String varName,
+	// Element varContent) {
+	// int index = this.getIndexOfVariableWithName(varName);
+	// if (index != -1) {
+	// this.getState().getStateVariable().get(index)
+	// .setContent(varContent);
+	// }
+	// }
+
 	public void setStateVariableContentByVarName(String varName,
 			Element varContent) {
 		int index = this.getIndexOfVariableWithName(varName);
@@ -279,31 +288,6 @@ public class DomainObjectInstance {
 					.setContent(varContent);
 		}
 	}
-
-	// public void extendInternalState(String scopeId,
-	// List<VariableType> extendedState) {
-	// if (extendedState != null) {
-	// if (this.getState() != null) {
-	// for (VariableType var : extendedState) {
-	// boolean found = false;
-	// for (VariableType stateVar : this.getState()
-	// .getStateVariable()) {
-	// if (stateVar.getName().equalsIgnoreCase(var.getName())) {
-	// found = true;
-	// break;
-	// }
-	// }
-	// if (!found) {
-	// this.getState().getStateVariable().add(var);
-	// }
-	// }
-	// } else {
-	// State s = new State();
-	// s.getStateVariable().addAll(extendedState);
-	// this.setState(s);
-	// }
-	// }
-	// }
 
 	public void extendInternalState(String scopeId,
 			List<VariableType> extendedState) {

@@ -25,7 +25,8 @@ public class DomainObjectDefinition {
 	private Process process;
 	private boolean isRole;
 
-	public static final DomainObjectDefinition NONE = new DomainObjectDefinition();
+	// public static final DomainObjectDefinition NONE = new
+	// DomainObjectDefinition();
 
 	public void setDomainObject(DomainObject e) {
 		this.domainObject = e;
@@ -80,5 +81,15 @@ public class DomainObjectDefinition {
 	public String toString() {
 		return "[name=" + getProcess().getName() + "]";
 	}
+
+	// private class State {
+	//
+	// List<VariableType> stateVariables;
+	//
+	// public State() {
+	// this.stateVariables = new ArrayList<VariableType>();
+	// }
+	//
+	// }
 
 }

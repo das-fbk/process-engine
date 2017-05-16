@@ -9,25 +9,25 @@ import eu.fbk.das.process.engine.api.domain.ProcessDiagram;
 
 public abstract class AbstractHandler implements Handler {
 
-    private static final Logger logger = LogManager
-	    .getLogger(AbstractHandler.class);
+	private static final Logger logger = LogManager
+			.getLogger(AbstractHandler.class);
 
-    public boolean handlePrecondition(ProcessEngine pe, ProcessDiagram proc,
-	    ProcessActivity current) {
-	if (!current.isSwitch() && !current.isPick()) {
-	    if (current.getPrecondition() != null) {
-		return pe.checkPrecondition(proc, current);
-	    }
+	public boolean handlePrecondition(ProcessEngine pe, ProcessDiagram proc,
+			ProcessActivity current) {
+		if (!current.isSwitch() && !current.isPick()) {
+			if (current.getPrecondition() != null) {
+				return pe.checkPrecondition(proc, current);
+			}
+		}
+		return true;
 	}
-	return true;
-    }
 
-    public void handleEffect(ProcessEngine pe, ProcessDiagram proc,
-	    ProcessActivity current) {
-	if (current.getEffect() != null
-		&& current.getEffect().getEvent() != null) {
-	    logger.debug("[" + proc.getpid() + "] applicazione effetti");
-	    pe.applyEffect(proc, current.getEffect());
+	public void handleEffect(ProcessEngine pe, ProcessDiagram proc,
+			ProcessActivity current) {
+		if (current.getEffect() != null
+				&& current.getEffect().getEvent() != null) {
+			logger.debug("[" + proc.getpid() + "] applicazione effetti");
+			pe.applyEffect(proc, current.getEffect());
+		}
 	}
-    }
 }

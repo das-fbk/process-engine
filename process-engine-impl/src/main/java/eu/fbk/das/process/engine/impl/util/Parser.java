@@ -543,6 +543,10 @@ public class Parser {
 			ReplyActivity act = new ReplyActivity(sourcest, sourcest + 1, name);
 			sourcest++;
 			act.setReceive(true);
+			act.setEffect(((ActivityType) object).getEffect());
+			act.setPrecondition(((ActivityType) object).getPrecondition());
+			act.setActionVariables(VariableUtils
+					.cloneList(((ActivityType) object).getActionVariable()));
 			states.add(sourcest);
 			result = act;
 		}
@@ -573,6 +577,10 @@ public class Parser {
 			InvokeActivty act = new InvokeActivty(sourcest, sourcest + 1, name);
 			sourcest++;
 			act.setSend(true);
+			act.setEffect(((ActivityType) object).getEffect());
+			act.setPrecondition(((ActivityType) object).getPrecondition());
+			act.setActionVariables(VariableUtils
+					.cloneList(((ActivityType) object).getActionVariable()));
 			states.add(sourcest);
 			result = act;
 

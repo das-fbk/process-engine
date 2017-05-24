@@ -19,6 +19,7 @@ import org.w3c.dom.Element;
 import com.google.common.collect.ArrayListMultimap;
 
 import eu.fbk.das.adaptation.api.AdaptationManagerInterface;
+//import eu.fbk.das.domainobject.executable.test.TestRefinementSingleton;
 //import eu.fbk.das.adaptation.api.AdaptationManagerInterface;
 import eu.fbk.das.process.engine.api.AbstractExecutableActivityInterface;
 import eu.fbk.das.process.engine.api.AdaptationProblem;
@@ -66,6 +67,8 @@ public class ProcessEngineImpl implements ProcessEngine {
 	private static final Logger logger = LogManager
 			.getLogger(ProcessEngineImpl.class);
 
+	public int journeySegmentsNumber = 0;
+
 	private Map<Integer, ProcessDiagram> processes = new HashMap<Integer, ProcessDiagram>();
 
 	private ArrayListMultimap<DomainObjectInstance, Map<String, List<VariableType>>> msgQueue = ArrayListMultimap
@@ -103,6 +106,8 @@ public class ProcessEngineImpl implements ProcessEngine {
 
 	private ScopeManager scopeManager;
 
+//	private TestRefinementSingleton testAdaptation;
+
 	public ProcessEngineImpl(DomainObjectManagerInterface em,
 			AdaptationManagerInterface am, String folder) {
 		this.dom = em;
@@ -121,6 +126,8 @@ public class ProcessEngineImpl implements ProcessEngine {
 		register(ProcessActivityType.WHILE, new WhileActivityHandler());
 		register(ProcessActivityType.SCOPE, new ScopeActivityHandler());
 		removeAndCreateCompositionsFolder();
+
+//		testAdaptation = TestRefinementSingleton.getInstance();
 	}
 
 	/**
@@ -1045,6 +1052,23 @@ public class ProcessEngineImpl implements ProcessEngine {
 
 							}
 						} else {
+							/****************************
+							 * INIT: CODE ADDED TO MAKE THE DATA VIEWER
+							 * SINGLETON FOR THE USER
+							 ***************************/
+							List<ObjectDiagram> external = doi
+									.getExternalKnowledge();
+							for (int i = 0; i < external.size(); i++) {
+								if (external.get(i).getOid()
+										.equals("DataViewer")) {
+									external.get(i).setCurrentState("INITIAL");
+									break;
+								}
+							}
+							/****************************
+							 * INIT: CODE ADDED TO MAKE THE DATA VIEWER
+							 * SINGLETON FOR THE USER
+							 ***************************/
 							// select singleton
 							cm.create(ins.get(0), doi);
 							response.putAll(correlate(doi, ins.get(0)));
@@ -1436,5 +1460,20 @@ public class ProcessEngineImpl implements ProcessEngine {
 	public Map<Integer, ProcessDiagram> getProcesses() {
 		return processes;
 	}
+
+//	@Override
+//	public File getAdaptationTest() {
+//		return testAdaptation.getAdaptationTestFile();
+//	}
+//
+//	public TestRefinementSingleton getTestAdaptation() {
+//		return testAdaptation;
+//	}
+//
+//	@Override
+//	public void setTestAdaptationLog(String userId, String activityName,
+//			long refinementTime) {
+//		this.testAdaptation.setToLog(userId, activityName, refinementTime);
+//	}
 
 }

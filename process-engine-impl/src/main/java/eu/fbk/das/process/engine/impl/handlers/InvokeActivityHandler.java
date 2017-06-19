@@ -34,7 +34,7 @@ public class InvokeActivityHandler extends AbstractHandler {
 	public void handle(ProcessEngine pe, ProcessDiagram proc,
 			ProcessActivity current) {
 
-		if (current.getName().equals("DVM_DataPatternResponse")) {
+		if (current.getName().equals("DVM_DataPatternRequest")) {
 			System.out.println();
 		}
 
@@ -63,7 +63,7 @@ public class InvokeActivityHandler extends AbstractHandler {
 		pr.setVariables(prVariables);
 		pe.addRequest(pr);
 
-		/************************* HANDLERS IN INVOKE!!! *******************************/
+		/************************* HANDLERS IN INVOKE!!! *************************/
 		// InvokeActivty invokeAct = (InvokeActivty) current;
 		// if (pe.getExecutableHandler(invokeAct.getName(), proc.getpid()) !=
 		// null) {

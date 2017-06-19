@@ -19,6 +19,7 @@ import org.w3c.dom.Element;
 import com.google.common.collect.ArrayListMultimap;
 
 import eu.fbk.das.adaptation.api.AdaptationManagerInterface;
+import eu.fbk.das.domainobject.executable.test.TestServicesSingleton;
 //import eu.fbk.das.domainobject.executable.test.TestRefinementSingleton;
 //import eu.fbk.das.adaptation.api.AdaptationManagerInterface;
 import eu.fbk.das.process.engine.api.AbstractExecutableActivityInterface;
@@ -106,7 +107,11 @@ public class ProcessEngineImpl implements ProcessEngine {
 
 	private ScopeManager scopeManager;
 
-//	private TestRefinementSingleton testAdaptation;
+	private TestServicesSingleton testServices = TestServicesSingleton
+			.getInstance();;
+
+	private Map<String, ArrayList<?>> r2rAlternativesMap = new HashMap<String, ArrayList<?>>();
+	private Map<String, ArrayList<?>> viaggiaAlternativesMap = new HashMap<String, ArrayList<?>>();
 
 	public ProcessEngineImpl(DomainObjectManagerInterface em,
 			AdaptationManagerInterface am, String folder) {
@@ -127,7 +132,7 @@ public class ProcessEngineImpl implements ProcessEngine {
 		register(ProcessActivityType.SCOPE, new ScopeActivityHandler());
 		removeAndCreateCompositionsFolder();
 
-//		testAdaptation = TestRefinementSingleton.getInstance();
+		testServices = TestServicesSingleton.getInstance();
 	}
 
 	/**
@@ -1053,7 +1058,7 @@ public class ProcessEngineImpl implements ProcessEngine {
 							}
 						} else {
 							/****************************
-							 * INIT: CODE ADDED TO MAKE THE DATA VIEWER
+							 * INIT: CODE ADDED TO MAKE THE "DATA VIEWER"
 							 * SINGLETON FOR THE USER
 							 ***************************/
 							List<ObjectDiagram> external = doi
@@ -1066,7 +1071,7 @@ public class ProcessEngineImpl implements ProcessEngine {
 								}
 							}
 							/****************************
-							 * INIT: CODE ADDED TO MAKE THE DATA VIEWER
+							 * INIT: CODE ADDED TO MAKE THE "DATA VIEWER"
 							 * SINGLETON FOR THE USER
 							 ***************************/
 							// select singleton
@@ -1461,19 +1466,75 @@ public class ProcessEngineImpl implements ProcessEngine {
 		return processes;
 	}
 
-//	@Override
-//	public File getAdaptationTest() {
-//		return testAdaptation.getAdaptationTestFile();
-//	}
-//
-//	public TestRefinementSingleton getTestAdaptation() {
-//		return testAdaptation;
-//	}
-//
-//	@Override
-//	public void setTestAdaptationLog(String userId, String activityName,
-//			long refinementTime) {
-//		this.testAdaptation.setToLog(userId, activityName, refinementTime);
-//	}
+	@Override
+	public File getServicesTest() {
+		return testServices.getServicesTestFile();
+	}
+
+	public TestServicesSingleton getTestServices() {
+		return testServices;
+	}
+
+	@Override
+	public void setTestServicesLog(String userId, String activityName,
+			long refinementTime, int numAlternatives, long avgSegments) {
+		this.testServices.setToLog(userId, activityName, refinementTime,
+				numAlternatives, avgSegments);
+	}
+
+	@Override
+	public void addR2rAlternatives(String user, ArrayList<?> r2rAlternatives) {
+		r2rAlternativesMap.put(user, r2rAlternatives);
+	}
+
+	@Override
+	public ArrayList<?> getR2rAlternativesForUser(String user) {
+		if (this.r2rAlternativesMap.containsKey(user)) {
+			return this.r2rAlternativesMap.get(user);
+		} else {
+			return null;
+		}
+	}
+
+	@Override
+	public void addViaggiaTrentoAlternatives(String user,
+			ArrayList<?> viaggiaAlternatives) {
+		viaggiaAlternativesMap.put(user, viaggiaAlternatives);
+	}
+
+	@Override
+	public ArrayList<?> getViaggiaTrentoForUser(String user) {
+		if (this.viaggiaAlternativesMap.containsKey(user)) {
+			return this.viaggiaAlternativesMap.get(user);
+		} else {
+			return null;
+		}
+	}
+
+	@Override
+	public DomainObjectInstance getReferringUser(DomainObjectInstance doi) {
+		DomainObjectInstance user = new DomainObjectInstance();
+		List<DomainObjectInstance> cr = new ArrayList<DomainObjectInstance>();
+		if (cm.hasCorrelation(doi)) {
+			cr = Arrays.asList(cm.get(doi).get(0));
+		}
+		for (DomainObjectInstance d : cr) {
+			if (d.getType().equalsIgnoreCase("user")) {
+				user = d;
+				return user;
+			} else {
+				return getReferringUser(d);
+			}
+		}
+		return user;
+	}
+
+	public Map<String, ArrayList<?>> getR2rAlternativesMap() {
+		return r2rAlternativesMap;
+	}
+
+	public Map<String, ArrayList<?>> getViaggiaAlternativesMap() {
+		return viaggiaAlternativesMap;
+	}
 
 }

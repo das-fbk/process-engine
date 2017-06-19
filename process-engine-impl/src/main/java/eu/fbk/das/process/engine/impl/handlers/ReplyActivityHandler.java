@@ -32,7 +32,7 @@ public class ReplyActivityHandler extends AbstractHandler {
 	public void handle(ProcessEngine pe, ProcessDiagram proc,
 			ProcessActivity current) {
 
-		if (current.getName().equals("TA_ProvideInstructions")) {
+		if (current.getName().equals("TA_EndLegHandling")) {
 			System.out.println();
 		}
 

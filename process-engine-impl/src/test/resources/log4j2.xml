@@ -3,10 +3,12 @@
 	<Appenders>
 		<Console name="ConsoleAppender" target="SYSTEM_OUT">
 			<PatternLayout pattern="%-5level - %msg%n" />
+<!-- <PatternLayout pattern="" /> -->
 		</Console>
 	</Appenders>
 	<Loggers>
 		<Root level="debug">
+<!-- <Root level="off"> -->
 			<AppenderRef ref="ConsoleAppender" />
 		</Root>
 	</Loggers>

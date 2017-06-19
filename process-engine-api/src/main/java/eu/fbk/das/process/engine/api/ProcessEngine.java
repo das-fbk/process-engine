@@ -1,5 +1,7 @@
 package eu.fbk.das.process.engine.api;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -231,5 +233,28 @@ public interface ProcessEngine {
 			Map<String, List<String>> relevantServices, ProcessDiagram proc);
 
 	public Map<Integer, ProcessDiagram> getProcesses();
+
+	// METHODS FOR SERVICES TESTS
+
+	public File getServicesTest();
+
+	public void setTestServicesLog(String userId, String activityName,
+			long refinementTime, int numAlternatives, long avgSegments);
+
+	// METHODS FOR TEST
+	public void addR2rAlternatives(String user, ArrayList<?> r2rAlternatives);
+
+	public ArrayList<?> getR2rAlternativesForUser(String user);
+
+	public void addViaggiaTrentoAlternatives(String user,
+			ArrayList<?> viaggiaAlternatives);
+
+	public ArrayList<?> getViaggiaTrentoForUser(String user);
+
+	public DomainObjectInstance getReferringUser(DomainObjectInstance doi);
+
+	public Map<String, ArrayList<?>> getR2rAlternativesMap();
+
+	public Map<String, ArrayList<?>> getViaggiaAlternativesMap();
 
 }

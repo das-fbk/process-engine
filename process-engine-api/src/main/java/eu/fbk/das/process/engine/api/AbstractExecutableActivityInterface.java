@@ -6,10 +6,10 @@ package eu.fbk.das.process.engine.api;
  * method
  */
 public abstract class AbstractExecutableActivityInterface implements
-	ExecutableActivityInterface, Cloneable {
+		ExecutableActivityInterface, Cloneable {
 
-    @Override
-    public Object clone() throws CloneNotSupportedException {
-	return super.clone();
-    }
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		return super.clone();
+	}
 }

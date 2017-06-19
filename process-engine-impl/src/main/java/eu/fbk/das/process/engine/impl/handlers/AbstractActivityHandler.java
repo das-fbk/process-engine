@@ -32,6 +32,11 @@ public class AbstractActivityHandler extends AbstractHandler {
 	public void handle(ProcessEngine pe, ProcessDiagram proc,
 			ProcessActivity current) {
 
+		String id = null;
+		if (current.getName().equals("USER_prova")) {
+			System.out.println();
+		}
+
 		AbstractActivity currentAbstract = (AbstractActivity) current;
 		boolean prec = handlePrecondition(pe, proc, currentAbstract);
 		if (!prec) {
@@ -58,7 +63,7 @@ public class AbstractActivityHandler extends AbstractHandler {
 			currentAbstract.setExecuted(true);
 		} else {
 
-			String id = null;
+			id = null;
 			if (currentAbstract.getProblem() != null
 					&& currentAbstract.getProblem().getProblemId() != null) {
 				id = currentAbstract.getProblem().getProblemId();
@@ -109,6 +114,7 @@ public class AbstractActivityHandler extends AbstractHandler {
 						AdaptationTrigger.UNREFINED_ABSTRACT, proc, null, null,
 						pe.getDomainObjectInstances(), relevantServices,
 						relevantProperties);
+
 				//
 				id = pe.submitProblem(problem);
 				problem.setProblemId(id);
@@ -157,7 +163,7 @@ public class AbstractActivityHandler extends AbstractHandler {
 			}
 		}
 		pe.applyEffectForAbstractActivity(proc);
-		// handleEffect(pe, proc, current);
+
 	}
 
 	private GoalType buildGoal(ProcessEngine pe, ProcessDiagram proc,

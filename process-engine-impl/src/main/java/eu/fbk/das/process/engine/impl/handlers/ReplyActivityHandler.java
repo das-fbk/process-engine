@@ -67,7 +67,7 @@ public class ReplyActivityHandler extends AbstractHandler {
 	 * @param current
 	 * @return true if there is at least a message for the reply activity
 	 * 
-	 *         With this method he reply activity waits for being awakened
+	 *         With this method the reply activity waits for being awakened
 	 *         through the reception of a specific message for it. When it wakes
 	 *         up, it also checks if the corresponding Invoke Activity send
 	 *         variables to it. If true, it updates its variables - this is a

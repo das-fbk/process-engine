@@ -672,7 +672,7 @@ public class Parser {
 		return null;
 	}
 
-	private ObjectDiagram convertToObjectDiagram(DomainProperty dp)
+	public ObjectDiagram convertToObjectDiagram(DomainProperty dp)
 			throws InvalidObjectInitialStateException,
 			InvalidObjectTransitionException,
 			InvalidObjectCurrentStateException {

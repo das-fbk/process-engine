@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:domainProperty id="BusJourney" xmlns:tns="http://das.fbk.eu/Process" 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xsi:schemaLocation="http://das.fbk.eu/Process ../../../schema/allow-ensembles/Process.xsd ">
+  
+  <tns:state isInitial="true">INITIAL</tns:state>
+  <tns:state>BUS_REQUESTED</tns:state>
+  <tns:state>BUS1</tns:state>
+  <tns:state>BUS2</tns:state>
+  <tns:state>BUS3</tns:state>
+  <tns:state>BUS4</tns:state>
+  <tns:state>BUS5</tns:state>
+  <tns:state>BUS6</tns:state>
+  <tns:state>BUS_RESPONSE_SENT</tns:state>
+  
+  <tns:event>processBusRequest</tns:event>
+  <tns:event>bus1</tns:event>
+  <tns:event>bus2</tns:event>
+  <tns:event>bus3</tns:event>
+  <tns:event>bus4</tns:event>
+  <tns:event>bus5</tns:event>
+  <tns:event>bus6</tns:event>
+  <tns:event>sendBusResponse</tns:event>
+  
+ 
+  <tns:transition isControllable="true">
+    <tns:from>INITIAL</tns:from>
+    <tns:to>BUS_REQUESTED</tns:to>
+    <tns:event>processBusRequest</tns:event>
+  </tns:transition>
+  
+  <tns:transition isControllable="true">
+    <tns:from>BUS_REQUESTED</tns:from>
+    <tns:to>BUS1</tns:to>
+    <tns:event>bus1</tns:event>
+  </tns:transition>
+  
+  <tns:transition isControllable="true">
+    <tns:from>BUS1</tns:from>
+    <tns:to>BUS2</tns:to>
+    <tns:event>bus2</tns:event>
+  </tns:transition>
+  
+  <tns:transition isControllable="true">
+    <tns:from>BUS2</tns:from>
+    <tns:to>BUS3</tns:to>
+    <tns:event>bus3</tns:event>
+  </tns:transition>
+  
+  <tns:transition isControllable="true">
+    <tns:from>BUS3</tns:from>
+    <tns:to>BUS4</tns:to>
+    <tns:event>bus4</tns:event>
+  </tns:transition>
+  
+  <tns:transition isControllable="true">
+    <tns:from>BUS4</tns:from>
+    <tns:to>BUS5</tns:to>
+    <tns:event>bus5</tns:event>
+  </tns:transition>
+  
+  <tns:transition isControllable="true">
+    <tns:from>BUS5</tns:from>
+    <tns:to>BUS6</tns:to>
+    <tns:event>bus6</tns:event>
+  </tns:transition>
+  
+  <tns:transition isControllable="true">
+    <tns:from>BUS6</tns:from>
+    <tns:to>BUS_RESPONSE_SENT</tns:to>
+    <tns:event>sendBusResponse</tns:event>
+  </tns:transition>
+  
+</tns:domainProperty>

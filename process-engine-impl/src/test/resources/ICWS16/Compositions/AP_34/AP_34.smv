@@ -1,0 +1,125 @@
+-------------------------------
+--   C O M P O S I T I O N   --
+-------------------------------
+MODULE dn_main
+
+---------------------
+--   I N P U T S   --
+---------------------
+IVAR input:
+{
+UNDEF, service69_FD_TakeFlexibusRequest, service69_RESET, service71_RESET, service71_FD_ExecuteRouteRequest
+};
+
+-----------------------
+--   O U T P U T S   --
+-----------------------
+IVAR output:
+{
+UNDEF, service69_FD_TakeFlexibusReply, service71_FD_AllPickupPointsCoveredNotice, service71_FD_RouteStartedNotice, service71_FD_ExecuteRouteReply
+};
+
+-------------------------
+--   S E R V I C E S   --
+-------------------------
+--	 service69
+VAR service69: {ST2, ST1, ST0};
+ASSIGN
+next(service69) :=
+case
+(service69 = ST1 & output = service69_FD_TakeFlexibusReply): ST2;
+(service69 = ST2 & input = service69_RESET): ST0;
+(service69 = ST1 & input = service69_RESET): ST0;
+(service69 = ST0 & input = service69_FD_TakeFlexibusRequest): ST1;
+1:service69;
+esac;
+TRANS ( input = service69_FD_TakeFlexibusRequest) -> (service69 = ST0)
+TRANS ( output = service69_FD_TakeFlexibusReply) -> (service69 = ST1)
+TRANS ( input = service69_RESET) -> (service69 = ST2 | service69 = ST1)
+
+--	 service71
+VAR service71: {ST2, ST1, ST4, ST3, ST0};
+ASSIGN
+next(service71) :=
+case
+(service71 = ST1 & output = service71_FD_RouteStartedNotice): ST2;
+(service71 = ST0 & input = service71_FD_ExecuteRouteRequest): ST1;
+(service71 = ST3 & input = service71_RESET): ST0;
+(service71 = ST4 & input = service71_RESET): ST0;
+(service71 = ST3 & output = service71_FD_ExecuteRouteReply): ST4;
+(service71 = ST1 & input = service71_RESET): ST0;
+(service71 = ST2 & output = service71_FD_AllPickupPointsCoveredNotice): ST3;
+(service71 = ST2 & input = service71_RESET): ST0;
+1:service71;
+esac;
+TRANS ( output = service71_FD_AllPickupPointsCoveredNotice) -> (service71 = ST2)
+TRANS ( input = service71_RESET) -> (service71 = ST2 | service71 = ST1 | service71 = ST4 | service71 = ST3)
+TRANS ( input = service71_FD_ExecuteRouteRequest) -> (service71 = ST0)
+TRANS ( output = service71_FD_RouteStartedNotice) -> (service71 = ST1)
+TRANS ( output = service71_FD_ExecuteRouteReply) -> (service71 = ST3)
+
+-----------------------
+--   O B J E C T S   --
+-----------------------
+--	 FlexibusDriverStatus
+VAR FlexibusDriverStatus: {ROUTE_STARTED, PASSENGERS_LOADED, AT_PICKUP_POINT, ROUTE_ENDED, INITIAL, ROUTE_CLOSED, FLEXIBUS_TAKEN, TAKING_PASSENGER};
+ASSIGN
+next(FlexibusDriverStatus) :=
+case
+(FlexibusDriverStatus = INITIAL & output = service69_FD_TakeFlexibusReply): FLEXIBUS_TAKEN;
+(FlexibusDriverStatus = ROUTE_STARTED & output = service71_FD_AllPickupPointsCoveredNotice): PASSENGERS_LOADED;
+(FlexibusDriverStatus = PASSENGERS_LOADED & output = service71_FD_ExecuteRouteReply): ROUTE_ENDED;
+(FlexibusDriverStatus = FLEXIBUS_TAKEN & output = service71_FD_RouteStartedNotice): ROUTE_STARTED;
+1:FlexibusDriverStatus;
+esac;
+-----------------------------------
+--   P R E C O N D I T I O N S   --
+-----------------------------------
+TRANS (input = service69_FD_TakeFlexibusRequest) -> ((((FlexibusDriverStatus = INITIAL))))
+TRANS (input = service71_FD_ExecuteRouteRequest) -> ((((FlexibusDriverStatus = FLEXIBUS_TAKEN))))
+-----------------------------
+--   I N V A R I A N T S   --
+-----------------------------
+--	 Synchronicity
+TRANS (1-(input = UNDEF)) + (1-(output = UNDEF)) = 1
+
+---------------------------------------
+--   S Y N C H R O N I Z A T I O N   --
+---------------------------------------
+DEFINE SYNC0 := ((FlexibusDriverStatus in {FLEXIBUS_TAKEN}));
+--	 Synchronicity enforcement
+TRANS (service69 in {ST1}) -> (next(service69) != service69)
+TRANS (service71 in {ST2, ST1, ST3}) -> (next(service71) != service71)
+-------------------------------
+--   C O N T R O L L E R S   --
+-------------------------------
+--	 Fault Controller
+VAR FAULT_CONTROLLER: { START, STOP };
+INIT FAULT_CONTROLLER = START
+
+ASSIGN
+next(FAULT_CONTROLLER) := 
+case
+(FAULT_CONTROLLER = START & FALSE): STOP;
+1: FAULT_CONTROLLER;
+esac;
+
+TRANS (output != UNDEF | input != UNDEF) -> (FAULT_CONTROLLER != STOP)
+
+-------------------------------------
+--   I N I T I A L I Z A T I O N   --
+-------------------------------------
+INIT ((FlexibusDriverStatus = INITIAL))
+INIT ((service69 = ST0) & (service71 = ST0))
+
+-----------------
+--   G O A L   --
+-----------------
+MODULE main
+VAR dn_main : dn_main;
+
+GOAL ONEOF(
+(dn_main.SYNC0), 1;
+(dn_main.FAULT_CONTROLLER = STOP), 0
+
+)

@@ -1,0 +1,12 @@
+(dn_main.service287 = ST0 & (dn_main.service288 = ST0 & (dn_main.BikeRoutePlan = INITIAL & (dn_main.BikeSharingTrip = INITIAL & (dn_main.HandleSmartMobilityCard = INITIAL & dn_main.FAULT_CONTROLLER = START)))))
+3
+(dn_main.service287 = ST3 & (dn_main.service288 = ST0 & (dn_main.BikeRoutePlan = INITIAL & (dn_main.BikeSharingTrip = USER_REGISTERED & (dn_main.HandleSmartMobilityCard = SERVICE_ADDED & dn_main.FAULT_CONTROLLER = START)))))
+digraph plan_fsm {
+ratio="1.3";
+margin="0.2";
+size="8.0,11.4";
+"0" -> "1" [style=dotted label="dn_main.input = service287_BS_RegistrationRequest &\n"]
+"1" -> "2" [style=dotted label="dn_main.input = service287_BS_UpdateSmartMobilityCard &\n"]
+"2" -> "3" [label="dn_main.output = service287_BS_RegistrationAck"]
+}
+

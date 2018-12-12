@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<tns:domainObject name="Robot" singleton="true" xmlns:tns="http://das.fbk.eu/DomainObject"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tns2="http://das.fbk.eu/DataType"
+	xsi:schemaLocation="http://das.fbk.eu/DomainObject ../schema/DomainObject.xsd ">
+	<tns:domainKnowledge>
+		<tns:internalDomainProperty name="domainProperties/RobotProgress" />
+		<tns:externalDomainProperty name="domainProperties/RobotStatus" />
+	</tns:domainKnowledge>
+
+	<tns:process name="processes/PROC_Robot" />
+
+</tns:domainObject>
+

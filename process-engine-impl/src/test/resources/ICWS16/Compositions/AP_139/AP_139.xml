@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<composition xmlns="http://das.fbk.eu/Composition" xmlns:ns2="http://das.fbk.eu/Annotation" xmlns:ns3="http://das.fbk.eu/Process" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://soa.fbk.eu/Composition null\Schemata\Composition.xsd">
+    <domainProperties>
+        <domainProperty type="ParkAndRideTrip" oid="ParkAndRideTrip"/>
+        <domainProperty type="CarRoutePlan" oid="CarRoutePlan"/>
+        <domainProperty type="HandlePayment" oid="HandlePayment"/>
+        <domainProperty type="ParkingManager" oid="ParkingManager"/>
+    </domainProperties>
+    <fragments>
+        <fragment type="PR_findParking" sid="service237">
+            <assignment oid="ParkAndRideTrip" o_name="ParkAndRideTrip"/>
+            <assignment oid="CarRoutePlan" o_name="CarRoutePlan"/>
+        </fragment>
+        <fragment type="PR_bookShuttle" sid="service238">
+            <assignment oid="ParkAndRideTrip" o_name="ParkAndRideTrip"/>
+        </fragment>
+        <fragment type="PR_checkInOnShuttle" sid="service239">
+            <assignment oid="ParkAndRideTrip" o_name="ParkAndRideTrip"/>
+        </fragment>
+        <fragment type="PR_userRegistration" sid="service240">
+            <assignment oid="ParkAndRideTrip" o_name="ParkAndRideTrip"/>
+            <assignment oid="ParkingManager" o_name="ParkingManager"/>
+        </fragment>
+        <fragment type="PR_parkAndPay" sid="service241">
+            <assignment oid="ParkAndRideTrip" o_name="ParkAndRideTrip"/>
+            <assignment oid="HandlePayment" o_name="HandlePayment"/>
+        </fragment>
+    </fragments>
+    <synchronization>
+        <point priority="0">
+            <domainProperty oid="ParkAndRideTrip">
+                <state>CAR_ROUTE_PLANNED</state>
+            </domainProperty>
+        </point>
+    </synchronization>
+    <runtime>
+        <domainProperties>
+            <domainProperty oid="ParkAndRideTrip">INITIAL</domainProperty>
+            <domainProperty oid="CarRoutePlan">INITIAL</domainProperty>
+            <domainProperty oid="HandlePayment">INITIAL</domainProperty>
+            <domainProperty oid="ParkingManager">INITIAL</domainProperty>
+        </domainProperties>
+        <fragments>
+            <fragment sid="service237">ST0</fragment>
+            <fragment sid="service238">ST0</fragment>
+            <fragment sid="service239">ST0</fragment>
+            <fragment sid="service240">ST0</fragment>
+            <fragment sid="service241">ST0</fragment>
+        </fragments>
+    </runtime>
+</composition>

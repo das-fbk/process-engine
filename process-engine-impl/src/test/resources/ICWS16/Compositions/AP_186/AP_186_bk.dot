@@ -1,0 +1,14 @@
+(dn_main.service397 = ST0 & (dn_main.service399 = ST0 & (dn_main.HandlePayment = INITIAL & (dn_main.HandleSmartMobilityCard = INITIAL & dn_main.FAULT_CONTROLLER = START))))
+5
+(dn_main.service397 = ST2 & (dn_main.service399 = ST3 & (dn_main.HandlePayment = PAYMENT_EXECUTED & (dn_main.HandleSmartMobilityCard = SERVICE_ADDED & dn_main.FAULT_CONTROLLER = START))))
+digraph plan_fsm {
+ratio="1.3";
+margin="0.2";
+size="8.0,11.4";
+"0" -> "1" [style=dotted label="dn_main.input = service399_SMC_MobilityCardRequest &\n"]
+"1" -> "2" [style=dotted label="dn_main.input = service399_SMC_SubscribeAndPay &\n"]
+"2" -> "3" [label="dn_main.output = service399_SMC_MobilityCardReply"]
+"3" -> "4" [style=dotted label="dn_main.input = service397_SMC_ActivateServiceRequest &\n"]
+"4" -> "5" [label="dn_main.output = service397_SMC_ActivateServiceReply"]
+}
+

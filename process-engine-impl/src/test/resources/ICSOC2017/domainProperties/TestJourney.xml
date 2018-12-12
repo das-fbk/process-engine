@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:domainProperty id="TestJourney" xmlns:tns="http://das.fbk.eu/Process" 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xsi:schemaLocation="http://das.fbk.eu/Process ../../../schema/allow-ensembles/Process.xsd ">
+  
+  <tns:state isInitial="true">INITIAL</tns:state>
+  <tns:state>TEST_REQUESTED</tns:state>
+  <tns:state>TEST1</tns:state>
+  <tns:state>TEST2</tns:state>
+  <tns:state>TEST3</tns:state>
+  <tns:state>TEST4</tns:state>
+  <tns:state>TEST5</tns:state>
+  <tns:state>TEST6</tns:state>
+<!--   <tns:state>TEST_RESPONSE_SENT</tns:state> -->
+  
+  <tns:event>processTestRequest</tns:event>
+  <tns:event>test1</tns:event>
+  <tns:event>test2</tns:event>
+  <tns:event>test3</tns:event>
+  <tns:event>test4</tns:event>
+  <tns:event>test5</tns:event>
+  <tns:event>test6</tns:event>
+<!--   <tns:event>sendTestResponse</tns:event> -->
+  
+ 
+  <tns:transition isControllable="true">
+    <tns:from>INITIAL</tns:from>
+    <tns:to>TEST_REQUESTED</tns:to>
+    <tns:event>processTestRequest</tns:event>
+  </tns:transition>
+  
+  <tns:transition isControllable="true">
+    <tns:from>TEST_REQUESTED</tns:from>
+    <tns:to>TEST1</tns:to>
+    <tns:event>test1</tns:event>
+  </tns:transition>
+  
+  <tns:transition isControllable="true">
+    <tns:from>TEST1</tns:from>
+    <tns:to>TEST2</tns:to>
+    <tns:event>test2</tns:event>
+  </tns:transition>
+  
+  <tns:transition isControllable="true">
+    <tns:from>TEST2</tns:from>
+    <tns:to>TEST3</tns:to>
+    <tns:event>test3</tns:event>
+  </tns:transition>
+  
+  <tns:transition isControllable="true">
+    <tns:from>TEST3</tns:from>
+    <tns:to>TEST4</tns:to>
+    <tns:event>test4</tns:event>
+  </tns:transition>
+  
+  <tns:transition isControllable="true">
+    <tns:from>TEST4</tns:from>
+    <tns:to>TEST5</tns:to>
+    <tns:event>test5</tns:event>
+  </tns:transition>
+  
+  <tns:transition isControllable="true">
+    <tns:from>TEST5</tns:from>
+    <tns:to>TEST6</tns:to>
+    <tns:event>test6</tns:event>
+  </tns:transition>
+  
+<!--   <tns:transition isControllable="true"> -->
+<!--     <tns:from>TEST6</tns:from> -->
+<!--     <tns:to>TEST_RESPONSE_SENT</tns:to> -->
+<!--     <tns:event>sendTestResponse</tns:event> -->
+<!--   </tns:transition> -->
+  
+</tns:domainProperty>

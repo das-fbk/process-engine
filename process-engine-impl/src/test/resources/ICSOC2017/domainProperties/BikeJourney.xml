@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:domainProperty id="BikeJourney" xmlns:tns="http://das.fbk.eu/Process" 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xsi:schemaLocation="http://das.fbk.eu/Process ../../../schema/allow-ensembles/Process.xsd ">
+  
+  <tns:state isInitial="true">INITIAL</tns:state>
+  <tns:state>BIKE0</tns:state>
+  <tns:state>BIKE1</tns:state>
+  <tns:state>BIKE2</tns:state>
+  <tns:state>BIKE3</tns:state>
+  <tns:state>BIKE4</tns:state>
+  <tns:state>BIKE5</tns:state>
+  <tns:state>BIKE6</tns:state>
+  <tns:state>BIKE7</tns:state>
+  <tns:state>BIKE8</tns:state>
+  <tns:state>BIKE9</tns:state>
+  <tns:state>BIKE10</tns:state>
+  <tns:state>BIKE11</tns:state>
+  
+  <tns:event>bike0</tns:event>
+  <tns:event>bike1</tns:event>
+  <tns:event>bike2</tns:event>
+  <tns:event>bike3</tns:event>
+  <tns:event>bike4</tns:event>
+  <tns:event>bike5</tns:event>
+  <tns:event>bike6</tns:event>
+  <tns:event>bike7</tns:event>
+  <tns:event>bike8</tns:event>
+  <tns:event>bike9</tns:event>
+  <tns:event>bike10</tns:event>
+  <tns:event>bike11</tns:event>
+  
+ 
+  <tns:transition isControllable="true">
+    <tns:from>INITIAL</tns:from>
+    <tns:to>BIKE0</tns:to>
+    <tns:event>bike0</tns:event>
+  </tns:transition>
+  
+  <tns:transition isControllable="true">
+    <tns:from>BIKE0</tns:from>
+    <tns:to>BIKE1</tns:to>
+    <tns:event>bike1</tns:event>
+  </tns:transition>
+  
+  <tns:transition isControllable="true">
+    <tns:from>BIKE1</tns:from>
+    <tns:to>BIKE2</tns:to>
+    <tns:event>bike2</tns:event>
+  </tns:transition>
+  
+  <tns:transition isControllable="true">
+    <tns:from>BIKE2</tns:from>
+    <tns:to>BIKE3</tns:to>
+    <tns:event>bike3</tns:event>
+  </tns:transition>
+  
+  <tns:transition isControllable="true">
+    <tns:from>BIKE3</tns:from>
+    <tns:to>BIKE4</tns:to>
+    <tns:event>bike4</tns:event>
+  </tns:transition>
+  
+  <tns:transition isControllable="true">
+    <tns:from>BIKE4</tns:from>
+    <tns:to>BIKE5</tns:to>
+    <tns:event>bike5</tns:event>
+  </tns:transition>
+  
+  <tns:transition isControllable="true">
+    <tns:from>BIKE5</tns:from>
+    <tns:to>BIKE6</tns:to>
+    <tns:event>bike6</tns:event>
+  </tns:transition>
+  
+  <tns:transition isControllable="true">
+    <tns:from>BIKE6</tns:from>
+    <tns:to>BIKE7</tns:to>
+    <tns:event>bike7</tns:event>
+  </tns:transition>
+  
+  <tns:transition isControllable="true">
+    <tns:from>BIKE7</tns:from>
+    <tns:to>BIKE8</tns:to>
+    <tns:event>bike8</tns:event>
+  </tns:transition>
+  
+  <tns:transition isControllable="true">
+    <tns:from>BIKE8</tns:from>
+    <tns:to>BIKE9</tns:to>
+    <tns:event>bike9</tns:event>
+  </tns:transition>
+  
+  <tns:transition isControllable="true">
+    <tns:from>BIKE9</tns:from>
+    <tns:to>BIKE10</tns:to>
+    <tns:event>bike10</tns:event>
+  </tns:transition>
+  
+  <tns:transition isControllable="true">
+    <tns:from>BIKE10</tns:from>
+    <tns:to>BIKE11</tns:to>
+    <tns:event>bike11</tns:event>
+  </tns:transition>
+  
+</tns:domainProperty>

@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:fragment id="BM_plan" xmlns:tns="http://das.fbk.eu/Fragment"
+	xmlns:tns1="http://das.fbk.eu/Annotation" xmlns:tns2="http://das.fbk.eu/DataType"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://das.fbk.eu/Fragment Fragment.xsd ">
+
+	<tns:state isInitial="true" name="ST0" />
+	<tns:state name="ST1" />
+	<tns:state name="ST2" />
+	<tns:state name="ST3" />
+	<tns:state name="ST4" />
+	<tns:state name="ST5" />
+	<tns:state name="ST6" />
+	<tns:state name="ST7" />
+	<tns:state name="ST8" />
+
+	<tns:action name="BM_BusRequest" actionType="input">
+		<tns:precondition>
+			<tns1:point>
+				<tns1:domainProperty dp_name="BusJourney">
+					<tns1:state>INITIAL</tns1:state>
+				</tns1:domainProperty>
+			</tns1:point>
+		</tns:precondition>
+		<tns:effect>
+			<tns1:event dpName="BusJourney" eventName="processBusRequest"></tns1:event>
+		</tns:effect>
+	</tns:action>
+	
+	<tns:action name="BM_Bus1" actionType="concrete">
+		<tns:effect>
+			<tns1:event dpName="BusJourney" eventName="bus1"></tns1:event>
+		</tns:effect>
+	</tns:action>
+	
+	<tns:action name="BM_Bus2" actionType="concrete">
+		<tns:effect>
+			<tns1:event dpName="BusJourney" eventName="bus2"></tns1:event>
+		</tns:effect>
+	</tns:action>
+	
+	<tns:action name="BM_Bus3" actionType="concrete">
+		<tns:effect>
+			<tns1:event dpName="BusJourney" eventName="bus3"></tns1:event>
+		</tns:effect>
+	</tns:action>
+	
+	<tns:action name="BM_Bus4" actionType="concrete">
+		<tns:effect>
+			<tns1:event dpName="BusJourney" eventName="bus4"></tns1:event>
+		</tns:effect>
+	</tns:action>
+	
+	<tns:action name="BM_Bus5" actionType="concrete">
+		<tns:effect>
+			<tns1:event dpName="BusJourney" eventName="bus5"></tns1:event>
+		</tns:effect>
+	</tns:action>
+	
+	<tns:action name="BM_Bus6" actionType="concrete">
+		<tns:effect>
+			<tns1:event dpName="BusJourney" eventName="bus6"></tns1:event>
+		</tns:effect>
+	</tns:action>
+
+	<tns:action name="BM_BusResponse" actionType="output">
+		<tns:effect>
+			<tns1:event dpName="BusJourney" eventName="sendBusResponse"></tns1:event>
+		</tns:effect>
+	</tns:action>
+
+	<tns:transition>
+		<tns:initialState>ST0</tns:initialState>
+		<tns:finalState>ST1</tns:finalState>
+		<tns:action name="BM_BusRequest" actionType="input" />
+	</tns:transition>
+	
+	<tns:transition>
+		<tns:initialState>ST1</tns:initialState>
+		<tns:finalState>ST2</tns:finalState>
+		<tns:action name="BM_Bus1" actionType="concrete" />
+	</tns:transition>
+	
+	<tns:transition>
+		<tns:initialState>ST2</tns:initialState>
+		<tns:finalState>ST3</tns:finalState>
+		<tns:action name="BM_Bus2" actionType="concrete" />
+	</tns:transition>
+	
+	<tns:transition>
+		<tns:initialState>ST3</tns:initialState>
+		<tns:finalState>ST4</tns:finalState>
+		<tns:action name="BM_Bus3" actionType="concrete" />
+	</tns:transition>
+	
+	<tns:transition>
+		<tns:initialState>ST4</tns:initialState>
+		<tns:finalState>ST5</tns:finalState>
+		<tns:action name="BM_Bus4" actionType="concrete" />
+	</tns:transition>
+	
+	<tns:transition>
+		<tns:initialState>ST5</tns:initialState>
+		<tns:finalState>ST6</tns:finalState>
+		<tns:action name="BM_Bus5" actionType="concrete" />
+	</tns:transition>
+	
+	<tns:transition>
+		<tns:initialState>ST6</tns:initialState>
+		<tns:finalState>ST7</tns:finalState>
+		<tns:action name="BM_Bus6" actionType="concrete" />
+	</tns:transition>
+
+	<tns:transition>
+		<tns:initialState>ST7</tns:initialState>
+		<tns:finalState>ST8</tns:finalState>
+		<tns:action name="BM_BusResponse" actionType="output" />
+	</tns:transition>
+
+</tns:fragment>
+

@@ -1,0 +1,105 @@
+-------------------------------
+--   C O M P O S I T I O N   --
+-------------------------------
+MODULE dn_main
+
+---------------------
+--   I N P U T S   --
+---------------------
+IVAR input:
+{
+UNDEF, service188_TO_HOAAorganizeTrip, service188_TO_ChosenTrip, service188_RESET
+};
+
+-----------------------
+--   O U T P U T S   --
+-----------------------
+IVAR output:
+{
+UNDEF, service188_TO_DefineGoal, service188_TO_ChosenTripEnd
+};
+
+-------------------------
+--   S E R V I C E S   --
+-------------------------
+--	 service188
+VAR service188: {ST2, ST1, ST4, ST3, ST0};
+ASSIGN
+next(service188) :=
+case
+(service188 = ST0 & input = service188_TO_ChosenTrip): ST1;
+(service188 = ST2 & input = service188_RESET): ST0;
+(service188 = ST4 & input = service188_RESET): ST0;
+(service188 = ST3 & input = service188_RESET): ST0;
+(service188 = ST1 & output = service188_TO_DefineGoal): ST2;
+(service188 = ST3 & output = service188_TO_ChosenTripEnd): ST4;
+(service188 = ST1 & input = service188_RESET): ST0;
+(service188 = ST2 & input = service188_TO_HOAAorganizeTrip): ST3;
+1:service188;
+esac;
+TRANS ( input = service188_TO_HOAAorganizeTrip) -> (service188 = ST2)
+TRANS ( input = service188_TO_ChosenTrip) -> (service188 = ST0)
+TRANS ( input = service188_RESET) -> (service188 = ST2 | service188 = ST1 | service188 = ST4 | service188 = ST3)
+TRANS ( output = service188_TO_DefineGoal) -> (service188 = ST1)
+TRANS ( output = service188_TO_ChosenTripEnd) -> (service188 = ST3)
+
+-----------------------
+--   O B J E C T S   --
+-----------------------
+--	 SetupTrip
+VAR SetupTrip: {ORGANIZED, INITIAL};
+ASSIGN
+next(SetupTrip) :=
+case
+(SetupTrip = INITIAL & output = service188_TO_ChosenTripEnd): ORGANIZED;
+1:SetupTrip;
+esac;
+-----------------------------------
+--   P R E C O N D I T I O N S   --
+-----------------------------------
+TRANS (input = service188_TO_ChosenTrip) -> ((((SetupTrip = INITIAL))))
+-----------------------------
+--   I N V A R I A N T S   --
+-----------------------------
+--	 Synchronicity
+TRANS (1-(input = UNDEF)) + (1-(output = UNDEF)) = 1
+
+---------------------------------------
+--   S Y N C H R O N I Z A T I O N   --
+---------------------------------------
+DEFINE SYNC0 := ((SetupTrip in {ORGANIZED}));
+--	 Synchronicity enforcement
+TRANS (service188 in {ST1, ST3}) -> (next(service188) != service188)
+-------------------------------
+--   C O N T R O L L E R S   --
+-------------------------------
+--	 Fault Controller
+VAR FAULT_CONTROLLER: { START, STOP };
+INIT FAULT_CONTROLLER = START
+
+ASSIGN
+next(FAULT_CONTROLLER) := 
+case
+(FAULT_CONTROLLER = START & FALSE): STOP;
+1: FAULT_CONTROLLER;
+esac;
+
+TRANS (output != UNDEF | input != UNDEF) -> (FAULT_CONTROLLER != STOP)
+
+-------------------------------------
+--   I N I T I A L I Z A T I O N   --
+-------------------------------------
+INIT ((SetupTrip = INITIAL))
+INIT ((service188 = ST0))
+
+-----------------
+--   G O A L   --
+-----------------
+MODULE main
+VAR dn_main : dn_main;
+
+GOAL ONEOF(
+(dn_main.SYNC0), 1;
+(dn_main.FAULT_CONTROLLER = STOP), 0
+
+)

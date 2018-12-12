@@ -1,0 +1,113 @@
+-------------------------------
+--   C O M P O S I T I O N   --
+-------------------------------
+MODULE dn_main
+
+---------------------
+--   I N P U T S   --
+---------------------
+IVAR input:
+{
+UNDEF, service4_AssistantRequest, service4_RESET, service4_StartInteraction
+};
+
+-----------------------
+--   O U T P U T S   --
+-----------------------
+IVAR output:
+{
+UNDEF, service4_InsertDestination, service4_StartChatbot, service4_AssistantResponse, service4_InsertSource, service4_ShowResults
+};
+
+-------------------------
+--   S E R V I C E S   --
+-------------------------
+--	 service4
+VAR service4: {ST2, ST1, ST4, ST3, ST6, ST5, ST7, ST0};
+ASSIGN
+next(service4) :=
+case
+(service4 = ST4 & input = service4_AssistantRequest): ST5;
+(service4 = ST2 & output = service4_InsertSource): ST3;
+(service4 = ST3 & output = service4_InsertDestination): ST4;
+(service4 = ST2 & input = service4_RESET): ST0;
+(service4 = ST7 & input = service4_RESET): ST0;
+(service4 = ST5 & output = service4_AssistantResponse): ST6;
+(service4 = ST1 & output = service4_StartChatbot): ST2;
+(service4 = ST6 & input = service4_RESET): ST0;
+(service4 = ST6 & output = service4_ShowResults): ST7;
+(service4 = ST3 & input = service4_RESET): ST0;
+(service4 = ST1 & input = service4_RESET): ST0;
+(service4 = ST5 & input = service4_RESET): ST0;
+(service4 = ST4 & input = service4_RESET): ST0;
+(service4 = ST0 & input = service4_StartInteraction): ST1;
+1:service4;
+esac;
+TRANS ( input = service4_AssistantRequest) -> (service4 = ST4)
+TRANS ( output = service4_InsertDestination) -> (service4 = ST3)
+TRANS ( output = service4_StartChatbot) -> (service4 = ST1)
+TRANS ( output = service4_AssistantResponse) -> (service4 = ST5)
+TRANS ( input = service4_RESET) -> (service4 = ST2 | service4 = ST1 | service4 = ST4 | service4 = ST3 | service4 = ST6 | service4 = ST5 | service4 = ST7)
+TRANS ( input = service4_StartInteraction) -> (service4 = ST0)
+TRANS ( output = service4_InsertSource) -> (service4 = ST2)
+TRANS ( output = service4_ShowResults) -> (service4 = ST6)
+
+-----------------------
+--   O B J E C T S   --
+-----------------------
+--	 TravelAssistant
+VAR TravelAssistant: {INITIAL, FINAL};
+ASSIGN
+next(TravelAssistant) :=
+case
+(TravelAssistant = INITIAL & output = service4_ShowResults): FINAL;
+1:TravelAssistant;
+esac;
+-----------------------------------
+--   P R E C O N D I T I O N S   --
+-----------------------------------
+-----------------------------
+--   I N V A R I A N T S   --
+-----------------------------
+--	 Synchronicity
+TRANS (1-(input = UNDEF)) + (1-(output = UNDEF)) = 1
+
+---------------------------------------
+--   S Y N C H R O N I Z A T I O N   --
+---------------------------------------
+DEFINE SYNC0 := ((TravelAssistant in {FINAL}));
+--	 Synchronicity enforcement
+TRANS (service4 in {ST2, ST1, ST3, ST6, ST5}) -> (next(service4) != service4)
+-------------------------------
+--   C O N T R O L L E R S   --
+-------------------------------
+--	 Fault Controller
+VAR FAULT_CONTROLLER: { START, STOP };
+INIT FAULT_CONTROLLER = START
+
+ASSIGN
+next(FAULT_CONTROLLER) := 
+case
+(FAULT_CONTROLLER = START & FALSE): STOP;
+1: FAULT_CONTROLLER;
+esac;
+
+TRANS (output != UNDEF | input != UNDEF) -> (FAULT_CONTROLLER != STOP)
+
+-------------------------------------
+--   I N I T I A L I Z A T I O N   --
+-------------------------------------
+INIT ((TravelAssistant = INITIAL))
+INIT ((service4 = ST0))
+
+-----------------
+--   G O A L   --
+-----------------
+MODULE main
+VAR dn_main : dn_main;
+
+GOAL ONEOF(
+(dn_main.SYNC0), 1;
+(dn_main.FAULT_CONTROLLER = STOP), 0
+
+)

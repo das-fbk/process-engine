@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:domainProperty id="CableJourney" xmlns:tns="http://das.fbk.eu/Process" 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xsi:schemaLocation="http://das.fbk.eu/Process ../../../schema/allow-ensembles/Process.xsd ">
+  
+  <tns:state isInitial="true">INITIAL</tns:state>
+  <tns:state>CABLE1</tns:state>
+  <tns:state>CABLE2</tns:state>
+  <tns:state>CABLE3</tns:state>
+  <tns:state>CABLE4</tns:state>
+  <tns:state>CABLE5</tns:state>
+  <tns:state>CABLE6</tns:state>
+  
+  
+  <tns:event>cable1</tns:event>
+  <tns:event>cable2</tns:event>
+  <tns:event>cable3</tns:event>
+  <tns:event>cable4</tns:event>
+  <tns:event>cable5</tns:event>
+  <tns:event>cable6</tns:event>
+  
+  
+ 
+  <tns:transition isControllable="true">
+    <tns:from>INITIAL</tns:from>
+    <tns:to>CABLE1</tns:to>
+    <tns:event>cable1</tns:event>
+  </tns:transition>
+  
+  <tns:transition isControllable="true">
+    <tns:from>CABLE1</tns:from>
+    <tns:to>CABLE2</tns:to>
+    <tns:event>cable2</tns:event>
+  </tns:transition>
+  
+  <tns:transition isControllable="true">
+    <tns:from>CABLE2</tns:from>
+    <tns:to>CABLE3</tns:to>
+    <tns:event>cable3</tns:event>
+  </tns:transition>
+  
+  <tns:transition isControllable="true">
+    <tns:from>CABLE3</tns:from>
+    <tns:to>CABLE4</tns:to>
+    <tns:event>cable4</tns:event>
+  </tns:transition>
+  
+  <tns:transition isControllable="true">
+    <tns:from>CABLE4</tns:from>
+    <tns:to>CABLE5</tns:to>
+    <tns:event>cable5</tns:event>
+  </tns:transition>
+  
+  <tns:transition isControllable="true">
+    <tns:from>CABLE5</tns:from>
+    <tns:to>CABLE6</tns:to>
+    <tns:event>cable6</tns:event>
+  </tns:transition>
+  
+</tns:domainProperty>

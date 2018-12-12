@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:domainProperty id="RobotStatus" xmlns:tns="http://das.fbk.eu/Process" 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xsi:schemaLocation="http://das.fbk.eu/Process ../../../schema/allow-ensembles/Process.xsd ">
+  
+  <tns:state isInitial="true">INITIAL</tns:state>
+  <tns:state>MOVED</tns:state>
+  <tns:state>DOOR_REACHED</tns:state>
+  <tns:state>DOOR_NOT_REACHED</tns:state>
+  <tns:state>DOOR_OPENED</tns:state>
+  <tns:state>DOOR_CROSSED</tns:state>
+  
+  
+  <tns:event>doStep</tns:event>
+  <tns:event>reachDoor</tns:event>
+   <tns:event>restart</tns:event>
+   <tns:event>notreachDoor</tns:event>
+  <tns:event>openDoor</tns:event>
+  <tns:event>crossDoor</tns:event>
+ 
+ 
+  <tns:transition isControllable="true">
+    <tns:from>INITIAL</tns:from>
+    <tns:to>MOVED</tns:to>
+    <tns:event>doStep</tns:event>
+  </tns:transition>
+  
+   <tns:transition isControllable="true">
+    <tns:from>MOVED</tns:from>
+    <tns:to>DOOR_NOT_REACHED</tns:to>
+    <tns:event>notreachDoor</tns:event>
+  </tns:transition>
+  
+  <tns:transition isControllable="true">
+    <tns:from>MOVED</tns:from>
+    <tns:to>DOOR_REACHED</tns:to>
+    <tns:event>reachDoor</tns:event>
+  </tns:transition>
+  
+   <tns:transition isControllable="true">
+    <tns:from>DOOR_NOT_REACHED</tns:from>
+    <tns:to>INITIAL</tns:to>
+    <tns:event>restart</tns:event>
+  </tns:transition>
+  
+  <tns:transition isControllable="true">
+    <tns:from>DOOR_REACHED</tns:from>
+    <tns:to>DOOR_OPENED</tns:to>
+    <tns:event>openDoor</tns:event>
+  </tns:transition>
+  
+  <tns:transition isControllable="true">
+    <tns:from>DOOR_OPENED</tns:from>
+    <tns:to>DOOR_CROSSED</tns:to>
+    <tns:event>crossDoor</tns:event>
+  </tns:transition>
+  
+ 
+
+</tns:domainProperty>

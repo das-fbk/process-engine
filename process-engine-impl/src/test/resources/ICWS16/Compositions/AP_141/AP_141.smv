@@ -1,0 +1,301 @@
+-------------------------------
+--   C O M P O S I T I O N   --
+-------------------------------
+MODULE dn_main
+
+---------------------
+--   I N P U T S   --
+---------------------
+IVAR input:
+{
+UNDEF, service249_PR_FindPArkRequest, service249_PR_PlanCarRoute, service249_RESET, service250_BS_RegistrationRequest, service250_BS_UpdateSmartMobilityCard, service250_RESET, service251_PR_BookShuttleRequest, service251_RESET, service252_PR_RegistrationRequest, service252_RESET, service252_PR_bookPark, service253_PR_PayForParking, service253_RESET, service253_PR_ParkingRequest, service254_BS_PlanBikeRoute, service254_BS_ExecuteRouteRequest, service254_RESET, service255_PR_ShuttleCheckInRequest, service255_RESET
+};
+
+-----------------------
+--   O U T P U T S   --
+-----------------------
+IVAR output:
+{
+UNDEF, service249_PR_concrete2, service249_PR_concrete3, service249_PR_FindPArkAck, service249_PR_concrete1, service250_BS_RegistrationAck, service251_PR_concrete_3, service251_PR_BookShuttleAck, service251_PR_concrete_1, service251_PR_concrete_2, service252_PR_concrete_3, service252_PR_concrete_4, service252_PR_concrete_1, service252_PR_concrete_2, service252_PR_RegistrationAck, service253_PR_ParkingAck, service254_BS_ExecuteRouteAck, service255_PR_ShuttleCheckInAck
+};
+
+-------------------------
+--   S E R V I C E S   --
+-------------------------
+--	 service249
+VAR service249: {ST2, ST1, ST4, ST3, ST6, ST5, ST0};
+ASSIGN
+next(service249) :=
+case
+(service249 = ST4 & input = service249_RESET): ST0;
+(service249 = ST3 & input = service249_RESET): ST0;
+(service249 = ST1 & output = service249_PR_concrete1): ST2;
+(service249 = ST1 & input = service249_RESET): ST0;
+(service249 = ST3 & output = service249_PR_concrete3): ST4;
+(service249 = ST5 & output = service249_PR_FindPArkAck): ST6;
+(service249 = ST6 & input = service249_RESET): ST0;
+(service249 = ST5 & input = service249_RESET): ST0;
+(service249 = ST0 & input = service249_PR_FindPArkRequest): ST1;
+(service249 = ST2 & input = service249_RESET): ST0;
+(service249 = ST2 & output = service249_PR_concrete2): ST3;
+(service249 = ST4 & input = service249_PR_PlanCarRoute): ST5;
+1:service249;
+esac;
+TRANS ( output = service249_PR_concrete2) -> (service249 = ST2)
+TRANS ( output = service249_PR_concrete3) -> (service249 = ST3)
+TRANS ( output = service249_PR_FindPArkAck) -> (service249 = ST5)
+TRANS ( input = service249_PR_FindPArkRequest) -> (service249 = ST0)
+TRANS ( input = service249_PR_PlanCarRoute) -> (service249 = ST4)
+TRANS ( input = service249_RESET) -> (service249 = ST2 | service249 = ST1 | service249 = ST4 | service249 = ST3 | service249 = ST6 | service249 = ST5)
+TRANS ( output = service249_PR_concrete1) -> (service249 = ST1)
+
+--	 service250
+VAR service250: {ST2, ST1, ST3, ST0};
+ASSIGN
+next(service250) :=
+case
+(service250 = ST1 & input = service250_RESET): ST0;
+(service250 = ST0 & input = service250_BS_RegistrationRequest): ST1;
+(service250 = ST1 & input = service250_BS_UpdateSmartMobilityCard): ST2;
+(service250 = ST2 & output = service250_BS_RegistrationAck): ST3;
+(service250 = ST3 & input = service250_RESET): ST0;
+(service250 = ST2 & input = service250_RESET): ST0;
+1:service250;
+esac;
+TRANS ( input = service250_BS_RegistrationRequest) -> (service250 = ST0)
+TRANS ( output = service250_BS_RegistrationAck) -> (service250 = ST2)
+TRANS ( input = service250_BS_UpdateSmartMobilityCard) -> (service250 = ST1)
+TRANS ( input = service250_RESET) -> (service250 = ST2 | service250 = ST1 | service250 = ST3)
+
+--	 service251
+VAR service251: {ST2, ST1, ST4, ST3, ST5, ST0};
+ASSIGN
+next(service251) :=
+case
+(service251 = ST1 & output = service251_PR_concrete_1): ST2;
+(service251 = ST5 & input = service251_RESET): ST0;
+(service251 = ST0 & input = service251_PR_BookShuttleRequest): ST1;
+(service251 = ST4 & output = service251_PR_BookShuttleAck): ST5;
+(service251 = ST3 & output = service251_PR_concrete_3): ST4;
+(service251 = ST1 & input = service251_RESET): ST0;
+(service251 = ST2 & output = service251_PR_concrete_2): ST3;
+(service251 = ST3 & input = service251_RESET): ST0;
+(service251 = ST2 & input = service251_RESET): ST0;
+(service251 = ST4 & input = service251_RESET): ST0;
+1:service251;
+esac;
+TRANS ( input = service251_PR_BookShuttleRequest) -> (service251 = ST0)
+TRANS ( output = service251_PR_concrete_3) -> (service251 = ST3)
+TRANS ( output = service251_PR_BookShuttleAck) -> (service251 = ST4)
+TRANS ( output = service251_PR_concrete_1) -> (service251 = ST1)
+TRANS ( output = service251_PR_concrete_2) -> (service251 = ST2)
+TRANS ( input = service251_RESET) -> (service251 = ST2 | service251 = ST1 | service251 = ST4 | service251 = ST3 | service251 = ST5)
+
+--	 service252
+VAR service252: {ST2, ST1, ST4, ST3, ST6, ST5, ST7, ST0};
+ASSIGN
+next(service252) :=
+case
+(service252 = ST4 & output = service252_PR_concrete_4): ST5;
+(service252 = ST4 & input = service252_RESET): ST0;
+(service252 = ST1 & output = service252_PR_concrete_1): ST2;
+(service252 = ST6 & input = service252_PR_bookPark): ST7;
+(service252 = ST5 & input = service252_RESET): ST0;
+(service252 = ST6 & input = service252_RESET): ST0;
+(service252 = ST3 & output = service252_PR_concrete_3): ST4;
+(service252 = ST3 & input = service252_RESET): ST0;
+(service252 = ST1 & input = service252_RESET): ST0;
+(service252 = ST5 & output = service252_PR_RegistrationAck): ST6;
+(service252 = ST0 & input = service252_PR_RegistrationRequest): ST1;
+(service252 = ST7 & input = service252_RESET): ST0;
+(service252 = ST2 & output = service252_PR_concrete_2): ST3;
+(service252 = ST2 & input = service252_RESET): ST0;
+1:service252;
+esac;
+TRANS ( output = service252_PR_concrete_3) -> (service252 = ST3)
+TRANS ( output = service252_PR_concrete_4) -> (service252 = ST4)
+TRANS ( output = service252_PR_concrete_1) -> (service252 = ST1)
+TRANS ( output = service252_PR_concrete_2) -> (service252 = ST2)
+TRANS ( input = service252_PR_RegistrationRequest) -> (service252 = ST0)
+TRANS ( input = service252_RESET) -> (service252 = ST2 | service252 = ST1 | service252 = ST4 | service252 = ST3 | service252 = ST6 | service252 = ST5 | service252 = ST7)
+TRANS ( input = service252_PR_bookPark) -> (service252 = ST6)
+TRANS ( output = service252_PR_RegistrationAck) -> (service252 = ST5)
+
+--	 service253
+VAR service253: {ST2, ST1, ST3, ST0};
+ASSIGN
+next(service253) :=
+case
+(service253 = ST1 & input = service253_PR_PayForParking): ST2;
+(service253 = ST2 & input = service253_RESET): ST0;
+(service253 = ST2 & output = service253_PR_ParkingAck): ST3;
+(service253 = ST1 & input = service253_RESET): ST0;
+(service253 = ST3 & input = service253_RESET): ST0;
+(service253 = ST0 & input = service253_PR_ParkingRequest): ST1;
+1:service253;
+esac;
+TRANS ( input = service253_PR_PayForParking) -> (service253 = ST1)
+TRANS ( output = service253_PR_ParkingAck) -> (service253 = ST2)
+TRANS ( input = service253_RESET) -> (service253 = ST2 | service253 = ST1 | service253 = ST3)
+TRANS ( input = service253_PR_ParkingRequest) -> (service253 = ST0)
+
+--	 service254
+VAR service254: {ST2, ST1, ST3, ST0};
+ASSIGN
+next(service254) :=
+case
+(service254 = ST1 & input = service254_BS_PlanBikeRoute): ST2;
+(service254 = ST3 & input = service254_RESET): ST0;
+(service254 = ST0 & input = service254_BS_ExecuteRouteRequest): ST1;
+(service254 = ST2 & input = service254_RESET): ST0;
+(service254 = ST2 & output = service254_BS_ExecuteRouteAck): ST3;
+(service254 = ST1 & input = service254_RESET): ST0;
+1:service254;
+esac;
+TRANS ( input = service254_BS_PlanBikeRoute) -> (service254 = ST1)
+TRANS ( input = service254_BS_ExecuteRouteRequest) -> (service254 = ST0)
+TRANS ( input = service254_RESET) -> (service254 = ST2 | service254 = ST1 | service254 = ST3)
+TRANS ( output = service254_BS_ExecuteRouteAck) -> (service254 = ST2)
+
+--	 service255
+VAR service255: {ST2, ST1, ST0};
+ASSIGN
+next(service255) :=
+case
+(service255 = ST1 & input = service255_RESET): ST0;
+(service255 = ST1 & output = service255_PR_ShuttleCheckInAck): ST2;
+(service255 = ST0 & input = service255_PR_ShuttleCheckInRequest): ST1;
+(service255 = ST2 & input = service255_RESET): ST0;
+1:service255;
+esac;
+TRANS ( input = service255_PR_ShuttleCheckInRequest) -> (service255 = ST0)
+TRANS ( input = service255_RESET) -> (service255 = ST2 | service255 = ST1)
+TRANS ( output = service255_PR_ShuttleCheckInAck) -> (service255 = ST1)
+
+-----------------------
+--   O B J E C T S   --
+-----------------------
+--	 BikeRoutePlan
+VAR BikeRoutePlan: {ROUTE_PLANNED, INITIAL};
+ASSIGN
+next(BikeRoutePlan) :=
+case
+(input = service254_BS_PlanBikeRoute):{(ROUTE_PLANNED)};
+1:BikeRoutePlan;
+esac;
+--	 ParkAndRideTrip
+VAR ParkAndRideTrip: {CAR_ROUTE_PLANNED, CHECK_IN_EXECUTED, PARK_REACHED, INITIAL, USER_REGISTERED, SHUTTLE_BOOKED};
+ASSIGN
+next(ParkAndRideTrip) :=
+case
+(ParkAndRideTrip = INITIAL & input = service252_PR_bookPark): USER_REGISTERED;
+(ParkAndRideTrip = PARK_REACHED & output = service251_PR_BookShuttleAck): SHUTTLE_BOOKED;
+(ParkAndRideTrip = USER_REGISTERED & output = service249_PR_FindPArkAck): CAR_ROUTE_PLANNED;
+(ParkAndRideTrip = SHUTTLE_BOOKED & output = service255_PR_ShuttleCheckInAck): CHECK_IN_EXECUTED;
+(ParkAndRideTrip = CAR_ROUTE_PLANNED & output = service253_PR_ParkingAck): PARK_REACHED;
+1:ParkAndRideTrip;
+esac;
+--	 CarRoutePlan
+VAR CarRoutePlan: {CAR_ROUTE_PLANNED, INITIAL};
+ASSIGN
+next(CarRoutePlan) :=
+case
+(input = service249_PR_PlanCarRoute):{(CAR_ROUTE_PLANNED)};
+1:CarRoutePlan;
+esac;
+--	 HandlePayment
+VAR HandlePayment: {PAYMENT_EXECUTED, INITIAL};
+ASSIGN
+next(HandlePayment) :=
+case
+(input = service253_PR_PayForParking):{(PAYMENT_EXECUTED)};
+1:HandlePayment;
+esac;
+--	 BikeSharingTrip
+VAR BikeSharingTrip: {RACK_REACHED, INITIAL, BIKE_ROUTE_PLANNED, USER_REGISTERED};
+ASSIGN
+next(BikeSharingTrip) :=
+case
+(BikeSharingTrip = BIKE_ROUTE_PLANNED & output = service254_BS_ExecuteRouteAck): RACK_REACHED;
+(BikeSharingTrip = INITIAL & output = service250_BS_RegistrationAck): USER_REGISTERED;
+(BikeSharingTrip = USER_REGISTERED & input = service254_BS_PlanBikeRoute): BIKE_ROUTE_PLANNED;
+1:BikeSharingTrip;
+esac;
+--	 ParkingManager
+VAR ParkingManager: {PARK_BOOKED, INITIAL};
+ASSIGN
+next(ParkingManager) :=
+case
+(input = service252_PR_bookPark):{(PARK_BOOKED)};
+1:ParkingManager;
+esac;
+--	 HandleSmartMobilityCard
+VAR HandleSmartMobilityCard: {INITIAL, SUBSCRIPTION, CARD_RELEASED, SERVICE_ADDED};
+ASSIGN
+next(HandleSmartMobilityCard) :=
+case
+(HandleSmartMobilityCard = SERVICE_ADDED & input = service250_BS_UpdateSmartMobilityCard): CARD_RELEASED;
+(input = service250_BS_UpdateSmartMobilityCard):{(SERVICE_ADDED)};
+1:HandleSmartMobilityCard;
+esac;
+-----------------------------------
+--   P R E C O N D I T I O N S   --
+-----------------------------------
+TRANS (input = service249_PR_FindPArkRequest) -> ((((ParkAndRideTrip = USER_REGISTERED))))
+TRANS (input = service250_BS_RegistrationRequest) -> ((((BikeSharingTrip = INITIAL))))
+TRANS (input = service251_PR_BookShuttleRequest) -> ((((ParkAndRideTrip = PARK_REACHED))))
+TRANS (input = service252_PR_RegistrationRequest) -> ((((ParkAndRideTrip = INITIAL))))
+TRANS (input = service253_PR_ParkingRequest) -> ((((ParkAndRideTrip = CAR_ROUTE_PLANNED))))
+TRANS (input = service254_BS_ExecuteRouteRequest) -> ((((BikeSharingTrip = USER_REGISTERED))))
+TRANS (input = service255_PR_ShuttleCheckInRequest) -> ((((ParkAndRideTrip = SHUTTLE_BOOKED))))
+-----------------------------
+--   I N V A R I A N T S   --
+-----------------------------
+--	 Synchronicity
+TRANS (1-(input = UNDEF)) + (1-(output = UNDEF)) = 1
+
+---------------------------------------
+--   S Y N C H R O N I Z A T I O N   --
+---------------------------------------
+DEFINE SYNC0 := ((ParkAndRideTrip in {CAR_ROUTE_PLANNED}) & (BikeSharingTrip in {USER_REGISTERED}));
+--	 Synchronicity enforcement
+TRANS (service249 in {ST2, ST1, ST3, ST5}) -> (next(service249) != service249)
+TRANS (service250 in {ST2}) -> (next(service250) != service250)
+TRANS (service251 in {ST2, ST1, ST4, ST3}) -> (next(service251) != service251)
+TRANS (service252 in {ST2, ST1, ST4, ST3, ST5}) -> (next(service252) != service252)
+TRANS (service253 in {ST2}) -> (next(service253) != service253)
+TRANS (service254 in {ST2}) -> (next(service254) != service254)
+TRANS (service255 in {ST1}) -> (next(service255) != service255)
+-------------------------------
+--   C O N T R O L L E R S   --
+-------------------------------
+--	 Fault Controller
+VAR FAULT_CONTROLLER: { START, STOP };
+INIT FAULT_CONTROLLER = START
+
+ASSIGN
+next(FAULT_CONTROLLER) := 
+case
+(FAULT_CONTROLLER = START & FALSE): STOP;
+1: FAULT_CONTROLLER;
+esac;
+
+TRANS (output != UNDEF | input != UNDEF) -> (FAULT_CONTROLLER != STOP)
+
+-------------------------------------
+--   I N I T I A L I Z A T I O N   --
+-------------------------------------
+INIT ((BikeRoutePlan = INITIAL) & (ParkAndRideTrip = INITIAL) & (CarRoutePlan = INITIAL) & (HandlePayment = INITIAL) & (BikeSharingTrip = INITIAL) & (ParkingManager = INITIAL) & (HandleSmartMobilityCard = INITIAL))
+INIT ((service249 = ST0) & (service250 = ST0) & (service251 = ST0) & (service252 = ST0) & (service253 = ST0) & (service254 = ST0) & (service255 = ST0))
+
+-----------------
+--   G O A L   --
+-----------------
+MODULE main
+VAR dn_main : dn_main;
+
+GOAL ONEOF(
+(dn_main.SYNC0), 1;
+(dn_main.FAULT_CONTROLLER = STOP), 0
+
+)

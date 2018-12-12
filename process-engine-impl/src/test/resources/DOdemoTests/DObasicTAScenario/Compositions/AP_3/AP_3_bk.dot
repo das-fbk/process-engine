@@ -1,0 +1,16 @@
+(dn_main.service4 = ST0 & (dn_main.TravelAssistant = INITIAL & dn_main.FAULT_CONTROLLER = START))
+7
+(dn_main.service4 = ST7 & (dn_main.TravelAssistant = FINAL & dn_main.FAULT_CONTROLLER = START))
+digraph plan_fsm {
+ratio="1.3";
+margin="0.2";
+size="8.0,11.4";
+"0" -> "1" [style=dotted label="dn_main.input = service4_StartInteraction &\n"]
+"1" -> "2" [label="dn_main.output = service4_StartChatbot"]
+"2" -> "3" [label="dn_main.output = service4_InsertSource"]
+"3" -> "4" [label="dn_main.output = service4_InsertDestination"]
+"4" -> "5" [style=dotted label="dn_main.input = service4_AssistantRequest &\n"]
+"5" -> "6" [label="dn_main.output = service4_AssistantResponse"]
+"6" -> "7" [label="dn_main.output = service4_ShowResults"]
+}
+

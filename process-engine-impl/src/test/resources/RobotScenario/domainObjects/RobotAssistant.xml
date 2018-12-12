@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:domainObject name="RobotAssistant" xmlns:tns="http://das.fbk.eu/DomainObject"
+	xmlns:tns2="http://das.fbk.eu/DataType" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://das.fbk.eu/DomainObject ../schema/DomainObject.xsd ">
+
+	<tns:domainKnowledge>
+		<tns:internalDomainProperty name="domainProperties/RobotStatus" />
+	</tns:domainKnowledge>
+	
+
+	
+
+	<tns:process name="processes/PROC_RobotAssistant" />
+
+	<tns:fragment name="fragments/RA_AssistRobotMove" />
+
+</tns:domainObject>

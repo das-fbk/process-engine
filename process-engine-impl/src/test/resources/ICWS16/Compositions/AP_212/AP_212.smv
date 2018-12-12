@@ -1,0 +1,99 @@
+-------------------------------
+--   C O M P O S I T I O N   --
+-------------------------------
+MODULE dn_main
+
+---------------------
+--   I N P U T S   --
+---------------------
+IVAR input:
+{
+UNDEF, service425_CRP_PlanRequest, service425_RESET
+};
+
+-----------------------
+--   O U T P U T S   --
+-----------------------
+IVAR output:
+{
+UNDEF, service425_CRP_PlanResponse
+};
+
+-------------------------
+--   S E R V I C E S   --
+-------------------------
+--	 service425
+VAR service425: {ST2, ST1, ST0};
+ASSIGN
+next(service425) :=
+case
+(service425 = ST1 & output = service425_CRP_PlanResponse): ST2;
+(service425 = ST2 & input = service425_RESET): ST0;
+(service425 = ST0 & input = service425_CRP_PlanRequest): ST1;
+(service425 = ST1 & input = service425_RESET): ST0;
+1:service425;
+esac;
+TRANS ( output = service425_CRP_PlanResponse) -> (service425 = ST1)
+TRANS ( input = service425_CRP_PlanRequest) -> (service425 = ST0)
+TRANS ( input = service425_RESET) -> (service425 = ST2 | service425 = ST1)
+
+-----------------------
+--   O B J E C T S   --
+-----------------------
+--	 CarRoutePlan
+VAR CarRoutePlan: {CAR_ROUTE_PLANNED, INITIAL};
+ASSIGN
+next(CarRoutePlan) :=
+case
+(CarRoutePlan = INITIAL & output = service425_CRP_PlanResponse): CAR_ROUTE_PLANNED;
+1:CarRoutePlan;
+esac;
+-----------------------------------
+--   P R E C O N D I T I O N S   --
+-----------------------------------
+TRANS (input = service425_CRP_PlanRequest) -> ((((CarRoutePlan = INITIAL))))
+-----------------------------
+--   I N V A R I A N T S   --
+-----------------------------
+--	 Synchronicity
+TRANS (1-(input = UNDEF)) + (1-(output = UNDEF)) = 1
+
+---------------------------------------
+--   S Y N C H R O N I Z A T I O N   --
+---------------------------------------
+DEFINE SYNC0 := ((CarRoutePlan in {CAR_ROUTE_PLANNED}));
+--	 Synchronicity enforcement
+TRANS (service425 in {ST1}) -> (next(service425) != service425)
+-------------------------------
+--   C O N T R O L L E R S   --
+-------------------------------
+--	 Fault Controller
+VAR FAULT_CONTROLLER: { START, STOP };
+INIT FAULT_CONTROLLER = START
+
+ASSIGN
+next(FAULT_CONTROLLER) := 
+case
+(FAULT_CONTROLLER = START & FALSE): STOP;
+1: FAULT_CONTROLLER;
+esac;
+
+TRANS (output != UNDEF | input != UNDEF) -> (FAULT_CONTROLLER != STOP)
+
+-------------------------------------
+--   I N I T I A L I Z A T I O N   --
+-------------------------------------
+INIT ((CarRoutePlan = INITIAL))
+INIT ((service425 = ST0))
+
+-----------------
+--   G O A L   --
+-----------------
+MODULE main
+VAR dn_main : dn_main;
+
+GOAL ONEOF(
+(dn_main.SYNC0), 1;
+(dn_main.FAULT_CONTROLLER = STOP), 0
+
+)

@@ -1,0 +1,277 @@
+-------------------------------
+--   C O M P O S I T I O N   --
+-------------------------------
+MODULE dn_main
+
+---------------------
+--   I N P U T S   --
+---------------------
+IVAR input:
+{
+UNDEF, service207_FC_UserLoginRequest, service207_RESET, service209_BS_RegistrationRequest, service209_BS_UpdateSmartMobilityCard, service209_RESET, service211_RESET, service211_FC_UserRegistrationRequest, service213_RESET, service213_FC_RouteAssignmentRequest, service213_FC_TakeFlexibus, service214_FC_DriverLoginRequest, service214_RESET, service217_BS_PlanBikeRoute, service217_BS_ExecuteRouteRequest, service217_RESET, service218_FC_ConfirmAndPay, service218_FC_FlexibusBookingRequest, service218_FC_PaymentReceipt, service218_FC_SetPassengerDetails, service218_RESET
+};
+
+-----------------------
+--   O U T P U T S   --
+-----------------------
+IVAR output:
+{
+UNDEF, service207_FC_UserLoginAck, service209_BS_RegistrationAck, service211_FC_UserRegistrationAck, service213_FC_RouteAssignmentReply, service214_FC_DriverLoginAck, service217_BS_ExecuteRouteAck, service218_FC_TripDetails, service218_FC_BookingResult
+};
+
+-------------------------
+--   S E R V I C E S   --
+-------------------------
+--	 service207
+VAR service207: {ST2, ST1, ST0};
+ASSIGN
+next(service207) :=
+case
+(service207 = ST0 & input = service207_FC_UserLoginRequest): ST1;
+(service207 = ST1 & input = service207_RESET): ST0;
+(service207 = ST2 & input = service207_RESET): ST0;
+(service207 = ST1 & output = service207_FC_UserLoginAck): ST2;
+1:service207;
+esac;
+TRANS ( input = service207_FC_UserLoginRequest) -> (service207 = ST0)
+TRANS ( input = service207_RESET) -> (service207 = ST2 | service207 = ST1)
+TRANS ( output = service207_FC_UserLoginAck) -> (service207 = ST1)
+
+--	 service209
+VAR service209: {ST2, ST1, ST3, ST0};
+ASSIGN
+next(service209) :=
+case
+(service209 = ST2 & input = service209_RESET): ST0;
+(service209 = ST3 & input = service209_RESET): ST0;
+(service209 = ST1 & input = service209_RESET): ST0;
+(service209 = ST2 & output = service209_BS_RegistrationAck): ST3;
+(service209 = ST1 & input = service209_BS_UpdateSmartMobilityCard): ST2;
+(service209 = ST0 & input = service209_BS_RegistrationRequest): ST1;
+1:service209;
+esac;
+TRANS ( input = service209_BS_RegistrationRequest) -> (service209 = ST0)
+TRANS ( output = service209_BS_RegistrationAck) -> (service209 = ST2)
+TRANS ( input = service209_BS_UpdateSmartMobilityCard) -> (service209 = ST1)
+TRANS ( input = service209_RESET) -> (service209 = ST2 | service209 = ST1 | service209 = ST3)
+
+--	 service211
+VAR service211: {ST2, ST1, ST0};
+ASSIGN
+next(service211) :=
+case
+(service211 = ST1 & input = service211_RESET): ST0;
+(service211 = ST1 & output = service211_FC_UserRegistrationAck): ST2;
+(service211 = ST2 & input = service211_RESET): ST0;
+(service211 = ST0 & input = service211_FC_UserRegistrationRequest): ST1;
+1:service211;
+esac;
+TRANS ( output = service211_FC_UserRegistrationAck) -> (service211 = ST1)
+TRANS ( input = service211_RESET) -> (service211 = ST2 | service211 = ST1)
+TRANS ( input = service211_FC_UserRegistrationRequest) -> (service211 = ST0)
+
+--	 service213
+VAR service213: {ST2, ST1, ST3, ST0};
+ASSIGN
+next(service213) :=
+case
+(service213 = ST0 & input = service213_FC_RouteAssignmentRequest): ST1;
+(service213 = ST2 & input = service213_RESET): ST0;
+(service213 = ST1 & output = service213_FC_RouteAssignmentReply): ST2;
+(service213 = ST3 & input = service213_RESET): ST0;
+(service213 = ST2 & input = service213_FC_TakeFlexibus): ST3;
+(service213 = ST1 & input = service213_RESET): ST0;
+1:service213;
+esac;
+TRANS ( input = service213_RESET) -> (service213 = ST2 | service213 = ST1 | service213 = ST3)
+TRANS ( output = service213_FC_RouteAssignmentReply) -> (service213 = ST1)
+TRANS ( input = service213_FC_RouteAssignmentRequest) -> (service213 = ST0)
+TRANS ( input = service213_FC_TakeFlexibus) -> (service213 = ST2)
+
+--	 service214
+VAR service214: {ST2, ST1, ST0};
+ASSIGN
+next(service214) :=
+case
+(service214 = ST1 & input = service214_RESET): ST0;
+(service214 = ST1 & output = service214_FC_DriverLoginAck): ST2;
+(service214 = ST2 & input = service214_RESET): ST0;
+(service214 = ST0 & input = service214_FC_DriverLoginRequest): ST1;
+1:service214;
+esac;
+TRANS ( output = service214_FC_DriverLoginAck) -> (service214 = ST1)
+TRANS ( input = service214_FC_DriverLoginRequest) -> (service214 = ST0)
+TRANS ( input = service214_RESET) -> (service214 = ST2 | service214 = ST1)
+
+--	 service217
+VAR service217: {ST2, ST1, ST3, ST0};
+ASSIGN
+next(service217) :=
+case
+(service217 = ST0 & input = service217_BS_ExecuteRouteRequest): ST1;
+(service217 = ST2 & output = service217_BS_ExecuteRouteAck): ST3;
+(service217 = ST3 & input = service217_RESET): ST0;
+(service217 = ST1 & input = service217_BS_PlanBikeRoute): ST2;
+(service217 = ST2 & input = service217_RESET): ST0;
+(service217 = ST1 & input = service217_RESET): ST0;
+1:service217;
+esac;
+TRANS ( input = service217_BS_PlanBikeRoute) -> (service217 = ST1)
+TRANS ( input = service217_BS_ExecuteRouteRequest) -> (service217 = ST0)
+TRANS ( input = service217_RESET) -> (service217 = ST2 | service217 = ST1 | service217 = ST3)
+TRANS ( output = service217_BS_ExecuteRouteAck) -> (service217 = ST2)
+
+--	 service218
+VAR service218: {ST2, ST1, ST4, ST3, ST6, ST5, ST0};
+ASSIGN
+next(service218) :=
+case
+(service218 = ST0 & input = service218_FC_FlexibusBookingRequest): ST1;
+(service218 = ST4 & input = service218_RESET): ST0;
+(service218 = ST1 & output = service218_FC_TripDetails): ST2;
+(service218 = ST2 & input = service218_FC_ConfirmAndPay): ST3;
+(service218 = ST3 & input = service218_FC_PaymentReceipt): ST4;
+(service218 = ST6 & input = service218_RESET): ST0;
+(service218 = ST4 & output = service218_FC_BookingResult): ST5;
+(service218 = ST1 & input = service218_RESET): ST0;
+(service218 = ST5 & input = service218_RESET): ST0;
+(service218 = ST5 & input = service218_FC_SetPassengerDetails): ST6;
+(service218 = ST2 & input = service218_RESET): ST0;
+(service218 = ST3 & input = service218_RESET): ST0;
+1:service218;
+esac;
+TRANS ( input = service218_FC_ConfirmAndPay) -> (service218 = ST2)
+TRANS ( input = service218_FC_FlexibusBookingRequest) -> (service218 = ST0)
+TRANS ( input = service218_FC_PaymentReceipt) -> (service218 = ST3)
+TRANS ( input = service218_FC_SetPassengerDetails) -> (service218 = ST5)
+TRANS ( output = service218_FC_TripDetails) -> (service218 = ST1)
+TRANS ( output = service218_FC_BookingResult) -> (service218 = ST4)
+TRANS ( input = service218_RESET) -> (service218 = ST2 | service218 = ST1 | service218 = ST4 | service218 = ST3 | service218 = ST6 | service218 = ST5)
+
+-----------------------
+--   O B J E C T S   --
+-----------------------
+--	 BikeRoutePlan
+VAR BikeRoutePlan: {ROUTE_PLANNED, INITIAL};
+ASSIGN
+next(BikeRoutePlan) :=
+case
+(input = service217_BS_PlanBikeRoute):{(ROUTE_PLANNED)};
+1:BikeRoutePlan;
+esac;
+--	 HandlePayment
+VAR HandlePayment: {PAYMENT_EXECUTED, INITIAL};
+ASSIGN
+next(HandlePayment) :=
+case
+(input = service218_FC_ConfirmAndPay):{(PAYMENT_EXECUTED)};
+1:HandlePayment;
+esac;
+--	 FlexibusDriverStatus
+VAR FlexibusDriverStatus: {ROUTE_STARTED, PASSENGERS_LOADED, AT_PICKUP_POINT, ROUTE_ENDED, INITIAL, ROUTE_CLOSED, FLEXIBUS_TAKEN, TAKING_PASSENGER};
+ASSIGN
+next(FlexibusDriverStatus) :=
+case
+(input = service213_FC_TakeFlexibus):{(FLEXIBUS_TAKEN)};
+1:FlexibusDriverStatus;
+esac;
+--	 FlexibusTrip
+VAR FlexibusTrip: {USER_LOGGED_IN, DRIVER_LOGGED_IN, TRIP_BOOKED, ROUTE_COMPLETED, INITIAL, USER_REGISTERED, ROUTE_ASSIGNED};
+ASSIGN
+next(FlexibusTrip) :=
+case
+(FlexibusTrip = DRIVER_LOGGED_IN & input = service213_FC_TakeFlexibus): ROUTE_ASSIGNED;
+(FlexibusTrip = INITIAL & output = service211_FC_UserRegistrationAck): USER_REGISTERED;
+(FlexibusTrip = USER_REGISTERED & output = service207_FC_UserLoginAck): USER_LOGGED_IN;
+(FlexibusTrip = USER_LOGGED_IN & input = service218_FC_SetPassengerDetails): TRIP_BOOKED;
+(FlexibusTrip = INITIAL & output = service214_FC_DriverLoginAck): DRIVER_LOGGED_IN;
+1:FlexibusTrip;
+esac;
+--	 BikeSharingTrip
+VAR BikeSharingTrip: {RACK_REACHED, INITIAL, BIKE_ROUTE_PLANNED, USER_REGISTERED};
+ASSIGN
+next(BikeSharingTrip) :=
+case
+(BikeSharingTrip = USER_REGISTERED & input = service217_BS_PlanBikeRoute): BIKE_ROUTE_PLANNED;
+(BikeSharingTrip = BIKE_ROUTE_PLANNED & output = service217_BS_ExecuteRouteAck): RACK_REACHED;
+(BikeSharingTrip = INITIAL & output = service209_BS_RegistrationAck): USER_REGISTERED;
+1:BikeSharingTrip;
+esac;
+--	 RoutePassengerStatus
+VAR RoutePassengerStatus: {PASSENGER_DETAILS_DEFINED, DESTINATION_REACHED, INITIAL, PICKUP_POINT_REACHED, PASSENGER_CHECKED_IN, FLEXIBUS_ARRIVED};
+ASSIGN
+next(RoutePassengerStatus) :=
+case
+(input = service218_FC_SetPassengerDetails):{(PASSENGER_DETAILS_DEFINED)};
+1:RoutePassengerStatus;
+esac;
+--	 HandleSmartMobilityCard
+VAR HandleSmartMobilityCard: {INITIAL, SUBSCRIPTION, CARD_RELEASED, SERVICE_ADDED};
+ASSIGN
+next(HandleSmartMobilityCard) :=
+case
+(HandleSmartMobilityCard = SERVICE_ADDED & input = service209_BS_UpdateSmartMobilityCard): CARD_RELEASED;
+(input = service209_BS_UpdateSmartMobilityCard):{(SERVICE_ADDED)};
+1:HandleSmartMobilityCard;
+esac;
+-----------------------------------
+--   P R E C O N D I T I O N S   --
+-----------------------------------
+TRANS (input = service207_FC_UserLoginRequest) -> ((((FlexibusTrip = USER_REGISTERED))))
+TRANS (input = service209_BS_RegistrationRequest) -> ((((BikeSharingTrip = INITIAL))))
+TRANS (input = service211_FC_UserRegistrationRequest) -> ((((FlexibusTrip = INITIAL))))
+TRANS (input = service213_FC_RouteAssignmentRequest) -> ((((FlexibusTrip = DRIVER_LOGGED_IN))))
+TRANS (input = service214_FC_DriverLoginRequest) -> ((((FlexibusTrip = INITIAL))))
+TRANS (input = service217_BS_ExecuteRouteRequest) -> ((((BikeSharingTrip = USER_REGISTERED))))
+TRANS (input = service218_FC_FlexibusBookingRequest) -> ((((FlexibusTrip = USER_LOGGED_IN))))
+-----------------------------
+--   I N V A R I A N T S   --
+-----------------------------
+--	 Synchronicity
+TRANS (1-(input = UNDEF)) + (1-(output = UNDEF)) = 1
+
+---------------------------------------
+--   S Y N C H R O N I Z A T I O N   --
+---------------------------------------
+DEFINE SYNC0 := ((FlexibusTrip in {TRIP_BOOKED}) & (BikeSharingTrip in {USER_REGISTERED}));
+--	 Synchronicity enforcement
+TRANS (service207 in {ST1}) -> (next(service207) != service207)
+TRANS (service209 in {ST2}) -> (next(service209) != service209)
+TRANS (service211 in {ST1}) -> (next(service211) != service211)
+TRANS (service213 in {ST1}) -> (next(service213) != service213)
+TRANS (service214 in {ST1}) -> (next(service214) != service214)
+TRANS (service217 in {ST2}) -> (next(service217) != service217)
+TRANS (service218 in {ST1, ST4}) -> (next(service218) != service218)
+-------------------------------
+--   C O N T R O L L E R S   --
+-------------------------------
+--	 Fault Controller
+VAR FAULT_CONTROLLER: { START, STOP };
+INIT FAULT_CONTROLLER = START
+
+ASSIGN
+next(FAULT_CONTROLLER) := 
+case
+(FAULT_CONTROLLER = START & FALSE): STOP;
+1: FAULT_CONTROLLER;
+esac;
+
+TRANS (output != UNDEF | input != UNDEF) -> (FAULT_CONTROLLER != STOP)
+
+-------------------------------------
+--   I N I T I A L I Z A T I O N   --
+-------------------------------------
+INIT ((BikeRoutePlan = INITIAL) & (HandlePayment = INITIAL) & (FlexibusDriverStatus = INITIAL) & (FlexibusTrip = INITIAL) & (BikeSharingTrip = INITIAL) & (RoutePassengerStatus = INITIAL) & (HandleSmartMobilityCard = INITIAL))
+INIT ((service207 = ST0) & (service209 = ST0) & (service211 = ST0) & (service213 = ST0) & (service214 = ST0) & (service217 = ST0) & (service218 = ST0))
+
+-----------------
+--   G O A L   --
+-----------------
+MODULE main
+VAR dn_main : dn_main;
+
+GOAL ONEOF(
+(dn_main.SYNC0), 1;
+(dn_main.FAULT_CONTROLLER = STOP), 0
+
+)

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<composition xmlns="http://das.fbk.eu/Composition" xmlns:ns2="http://das.fbk.eu/Annotation" xmlns:ns3="http://das.fbk.eu/Process" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://soa.fbk.eu/Composition null\Schemata\Composition.xsd">
+    <domainProperties>
+        <domainProperty type="HandlePayment" oid="HandlePayment"/>
+        <domainProperty type="PayPalPayment" oid="PayPalPayment"/>
+    </domainProperties>
+    <fragments>
+        <fragment type="PM_ticketPayment" sid="service430">
+            <assignment oid="HandlePayment" o_name="HandlePayment"/>
+            <assignment oid="PayPalPayment" o_name="PayPalPayment"/>
+        </fragment>
+    </fragments>
+    <synchronization>
+        <point priority="0">
+            <domainProperty oid="HandlePayment">
+                <state>PAYMENT_EXECUTED</state>
+            </domainProperty>
+        </point>
+    </synchronization>
+    <runtime>
+        <domainProperties>
+            <domainProperty oid="HandlePayment">INITIAL</domainProperty>
+            <domainProperty oid="PayPalPayment">INITIAL</domainProperty>
+        </domainProperties>
+        <fragments>
+            <fragment sid="service430">ST0</fragment>
+        </fragments>
+    </runtime>
+</composition>

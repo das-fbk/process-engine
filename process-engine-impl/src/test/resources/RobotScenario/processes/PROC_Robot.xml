@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:process name="PROC_Robot" xmlns:tns="http://das.fbk.eu/Process"
+	xmlns:tns1="http://das.fbk.eu/Annotation" xmlns:tns2="http://das.fbk.eu/DataType"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://das.fbk.eu/Process ../../../schema/allow-ensembles/Process.xsd ">
+
+<!--  	<tns:while name="Robot_ReachDoor">
+		<tns:contextCondition>
+			<tns1:point>
+				<tns1:domainProperty dp_name="RobotProgress">
+					<tns1:state>INITIAL</tns1:state>
+				</tns1:domainProperty>
+			</tns1:point>
+		</tns:contextCondition>-->
+	
+	
+	<tns:abstract name="Robot_move">
+		<tns:goal>
+			<tns1:point>
+				<tns1:domainProperty dp_name="RobotStatus">
+					<tns1:state>
+						MOVED
+					</tns1:state>
+				</tns1:domainProperty>
+			</tns1:point>
+		</tns:goal>
+	</tns:abstract>
+	<!--  <tns:abstract name="Robot_reachDoor">
+		<tns:goal>
+			<tns1:point>
+				<tns1:domainProperty dp_name="RobotStatus">
+					<tns1:state>
+						DOOR_REACHED
+					</tns1:state>
+				</tns1:domainProperty>
+			</tns1:point>
+		</tns:goal>
+	</tns:abstract>-->
+	<!--</tns:while>-->
+</tns:process>

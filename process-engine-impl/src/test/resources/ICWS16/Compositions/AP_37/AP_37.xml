@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<composition xmlns="http://das.fbk.eu/Composition" xmlns:ns2="http://das.fbk.eu/Annotation" xmlns:ns3="http://das.fbk.eu/Process" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://soa.fbk.eu/Composition null\Schemata\Composition.xsd">
+    <domainProperties>
+        <domainProperty type="MultiModalPlanner" oid="MultiModalPlanner"/>
+    </domainProperties>
+    <fragments>
+        <fragment type="MMP_plan" sid="service75">
+            <assignment oid="MultiModalPlanner" o_name="MultiModalPlanner"/>
+        </fragment>
+    </fragments>
+    <synchronization>
+        <point priority="0">
+            <domainProperty oid="MultiModalPlanner">
+                <state>PLANNING_COMPLETED</state>
+            </domainProperty>
+        </point>
+    </synchronization>
+    <runtime>
+        <domainProperties>
+            <domainProperty oid="MultiModalPlanner">INITIAL</domainProperty>
+        </domainProperties>
+        <fragments>
+            <fragment sid="service75">ST0</fragment>
+        </fragments>
+    </runtime>
+</composition>

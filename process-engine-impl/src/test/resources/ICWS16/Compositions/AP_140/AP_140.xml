@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<composition xmlns="http://das.fbk.eu/Composition" xmlns:ns2="http://das.fbk.eu/Annotation" xmlns:ns3="http://das.fbk.eu/Process" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://soa.fbk.eu/Composition null\Schemata\Composition.xsd">
+    <domainProperties>
+        <domainProperty type="BikeRoutePlan" oid="BikeRoutePlan"/>
+        <domainProperty type="ParkAndRideTrip" oid="ParkAndRideTrip"/>
+        <domainProperty type="CarRoutePlan" oid="CarRoutePlan"/>
+        <domainProperty type="HandlePayment" oid="HandlePayment"/>
+        <domainProperty type="BikeSharingTrip" oid="BikeSharingTrip"/>
+        <domainProperty type="ParkingManager" oid="ParkingManager"/>
+        <domainProperty type="HandleSmartMobilityCard" oid="HandleSmartMobilityCard"/>
+    </domainProperties>
+    <fragments>
+        <fragment type="PR_findParking" sid="service242">
+            <assignment oid="ParkAndRideTrip" o_name="ParkAndRideTrip"/>
+            <assignment oid="CarRoutePlan" o_name="CarRoutePlan"/>
+        </fragment>
+        <fragment type="BS_userRegistration" sid="service243">
+            <assignment oid="BikeSharingTrip" o_name="BikeSharingTrip"/>
+            <assignment oid="HandleSmartMobilityCard" o_name="HandleSmartMobilityCard"/>
+        </fragment>
+        <fragment type="PR_bookShuttle" sid="service244">
+            <assignment oid="ParkAndRideTrip" o_name="ParkAndRideTrip"/>
+        </fragment>
+        <fragment type="PR_userRegistration" sid="service245">
+            <assignment oid="ParkAndRideTrip" o_name="ParkAndRideTrip"/>
+            <assignment oid="ParkingManager" o_name="ParkingManager"/>
+        </fragment>
+        <fragment type="PR_parkAndPay" sid="service246">
+            <assignment oid="ParkAndRideTrip" o_name="ParkAndRideTrip"/>
+            <assignment oid="HandlePayment" o_name="HandlePayment"/>
+        </fragment>
+        <fragment type="BS_executeBikeRoute" sid="service247">
+            <assignment oid="BikeRoutePlan" o_name="BikeRoutePlan"/>
+            <assignment oid="BikeSharingTrip" o_name="BikeSharingTrip"/>
+        </fragment>
+        <fragment type="PR_checkInOnShuttle" sid="service248">
+            <assignment oid="ParkAndRideTrip" o_name="ParkAndRideTrip"/>
+        </fragment>
+    </fragments>
+    <synchronization>
+        <point priority="0">
+            <domainProperty oid="ParkAndRideTrip">
+                <state>CAR_ROUTE_PLANNED</state>
+            </domainProperty>
+            <domainProperty oid="BikeSharingTrip">
+                <state>USER_REGISTERED</state>
+            </domainProperty>
+        </point>
+    </synchronization>
+    <runtime>
+        <domainProperties>
+            <domainProperty oid="BikeRoutePlan">INITIAL</domainProperty>
+            <domainProperty oid="ParkAndRideTrip">INITIAL</domainProperty>
+            <domainProperty oid="CarRoutePlan">INITIAL</domainProperty>
+            <domainProperty oid="HandlePayment">INITIAL</domainProperty>
+            <domainProperty oid="BikeSharingTrip">INITIAL</domainProperty>
+            <domainProperty oid="ParkingManager">INITIAL</domainProperty>
+            <domainProperty oid="HandleSmartMobilityCard">INITIAL</domainProperty>
+        </domainProperties>
+        <fragments>
+            <fragment sid="service242">ST0</fragment>
+            <fragment sid="service243">ST0</fragment>
+            <fragment sid="service244">ST0</fragment>
+            <fragment sid="service245">ST0</fragment>
+            <fragment sid="service246">ST0</fragment>
+            <fragment sid="service247">ST0</fragment>
+            <fragment sid="service248">ST0</fragment>
+        </fragments>
+    </runtime>
+</composition>

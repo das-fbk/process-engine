@@ -1,0 +1,11 @@
+digraph plan_fsm {
+ratio="1.3";
+margin="0.2";
+size="8.0,11.4";
+"0" -> "1" [style=dotted label="dn_main.input = service386_SMC_MobilityCardRequest &\n"]
+"1" -> "2" [style=dotted label="dn_main.input = service386_SMC_SubscribeAndPay &\n"]
+"2" -> "3" [label="dn_main.output = service386_SMC_MobilityCardReply"]
+"3" -> "4" [style=dotted label="dn_main.input = service385_SMC_ActivateServiceRequest &\n"]
+"4" -> "5" [label="dn_main.output = service385_SMC_ActivateServiceReply"]
+}
+

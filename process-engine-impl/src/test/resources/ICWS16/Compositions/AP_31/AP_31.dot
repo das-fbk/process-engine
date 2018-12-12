@@ -1,0 +1,10 @@
+digraph plan_fsm {
+ratio="1.3";
+margin="0.2";
+size="8.0,11.4";
+"0" -> "1" [style=dotted label="dn_main.input = service68_UMS_TripRequest &\n"]
+"1" -> "2" [label="dn_main.output = service68_UMS_concrete1"]
+"2" -> "3" [label="dn_main.output = service68_UMS_concrete2"]
+"3" -> "4" [label="dn_main.output = service68_UMS_TripAlternatives"]
+}
+

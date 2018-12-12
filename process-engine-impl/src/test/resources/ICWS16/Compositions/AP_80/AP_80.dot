@@ -1,0 +1,14 @@
+digraph plan_fsm {
+ratio="1.3";
+margin="0.2";
+size="8.0,11.4";
+"0" -> "1" [style=dotted label="dn_main.input = service135_UMS_TripManagementRequest &\n"]
+"1" -> "2" [label="dn_main.output = service135_UMS_concrete1"]
+"2" -> "3" [label="dn_main.output = service135_UMS_concrete2"]
+"3" -> "4" [label="dn_main.output = service135_UMS_concrete3"]
+"4" -> "5" [label="dn_main.output = service135_UMS_concrete4"]
+"5" -> "6" [label="dn_main.output = service135_UMS_concrete5"]
+"6" -> "7" [style=dotted label="dn_main.input = service135_UMS_ManagementTrip &\n"]
+"7" -> "8" [label="dn_main.output = service135_UMS_TripManagementReply"]
+}
+

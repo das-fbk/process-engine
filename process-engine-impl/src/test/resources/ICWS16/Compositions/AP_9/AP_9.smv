@@ -1,0 +1,153 @@
+-------------------------------
+--   C O M P O S I T I O N   --
+-------------------------------
+MODULE dn_main
+
+---------------------
+--   I N P U T S   --
+---------------------
+IVAR input:
+{
+UNDEF, service22_UMS_ManagementTrip, service22_UMS_TripManagementRequest, service22_RESET, service23_UMS_TripRequest, service23_RESET
+};
+
+-----------------------
+--   O U T P U T S   --
+-----------------------
+IVAR output:
+{
+UNDEF, service22_UMS_concrete4, service22_UMS_concrete3, service22_UMS_concrete2, service22_UMS_concrete1, service22_UMS_TripManagementReply, service22_UMS_concrete5, service23_UMS_TripAlternatives, service23_UMS_concrete2, service23_UMS_concrete1
+};
+
+-------------------------
+--   S E R V I C E S   --
+-------------------------
+--	 service22
+VAR service22: {ST2, ST1, ST4, ST3, ST6, ST5, ST8, ST7, ST0};
+ASSIGN
+next(service22) :=
+case
+(service22 = ST8 & input = service22_RESET): ST0;
+(service22 = ST2 & input = service22_RESET): ST0;
+(service22 = ST1 & output = service22_UMS_concrete1): ST2;
+(service22 = ST4 & output = service22_UMS_concrete4): ST5;
+(service22 = ST1 & input = service22_RESET): ST0;
+(service22 = ST3 & input = service22_RESET): ST0;
+(service22 = ST0 & input = service22_UMS_TripManagementRequest): ST1;
+(service22 = ST5 & input = service22_RESET): ST0;
+(service22 = ST7 & output = service22_UMS_TripManagementReply): ST8;
+(service22 = ST5 & output = service22_UMS_concrete5): ST6;
+(service22 = ST6 & input = service22_RESET): ST0;
+(service22 = ST3 & output = service22_UMS_concrete3): ST4;
+(service22 = ST4 & input = service22_RESET): ST0;
+(service22 = ST2 & output = service22_UMS_concrete2): ST3;
+(service22 = ST6 & input = service22_UMS_ManagementTrip): ST7;
+(service22 = ST7 & input = service22_RESET): ST0;
+1:service22;
+esac;
+TRANS ( input = service22_UMS_ManagementTrip) -> (service22 = ST6)
+TRANS ( output = service22_UMS_concrete4) -> (service22 = ST4)
+TRANS ( input = service22_UMS_TripManagementRequest) -> (service22 = ST0)
+TRANS ( output = service22_UMS_concrete3) -> (service22 = ST3)
+TRANS ( output = service22_UMS_concrete2) -> (service22 = ST2)
+TRANS ( input = service22_RESET) -> (service22 = ST2 | service22 = ST1 | service22 = ST4 | service22 = ST3 | service22 = ST6 | service22 = ST5 | service22 = ST8 | service22 = ST7)
+TRANS ( output = service22_UMS_concrete1) -> (service22 = ST1)
+TRANS ( output = service22_UMS_TripManagementReply) -> (service22 = ST7)
+TRANS ( output = service22_UMS_concrete5) -> (service22 = ST5)
+
+--	 service23
+VAR service23: {ST2, ST1, ST4, ST3, ST0};
+ASSIGN
+next(service23) :=
+case
+(service23 = ST4 & input = service23_RESET): ST0;
+(service23 = ST3 & input = service23_RESET): ST0;
+(service23 = ST2 & output = service23_UMS_concrete2): ST3;
+(service23 = ST1 & input = service23_RESET): ST0;
+(service23 = ST1 & output = service23_UMS_concrete1): ST2;
+(service23 = ST3 & output = service23_UMS_TripAlternatives): ST4;
+(service23 = ST0 & input = service23_UMS_TripRequest): ST1;
+(service23 = ST2 & input = service23_RESET): ST0;
+1:service23;
+esac;
+TRANS ( input = service23_UMS_TripRequest) -> (service23 = ST0)
+TRANS ( output = service23_UMS_TripAlternatives) -> (service23 = ST3)
+TRANS ( output = service23_UMS_concrete2) -> (service23 = ST2)
+TRANS ( input = service23_RESET) -> (service23 = ST2 | service23 = ST1 | service23 = ST4 | service23 = ST3)
+TRANS ( output = service23_UMS_concrete1) -> (service23 = ST1)
+
+-----------------------
+--   O B J E C T S   --
+-----------------------
+--	 SetupTrip
+VAR SetupTrip: {ORGANIZED, INITIAL};
+ASSIGN
+next(SetupTrip) :=
+case
+(input = service22_UMS_ManagementTrip):{(ORGANIZED)};
+1:SetupTrip;
+esac;
+--	 ProvideTrip
+VAR ProvideTrip: {TRIP_REQUEST_ACCOMPLISHED, TRIP_MANAGEMENT_ACCOMPLISHED, TRIP_MANAGE_REQUEST_LOADED, TRIP_REQUEST_LOADED, INITIAL};
+ASSIGN
+next(ProvideTrip) :=
+case
+(ProvideTrip = INITIAL & input = service23_UMS_TripRequest): TRIP_REQUEST_LOADED;
+(ProvideTrip = TRIP_REQUEST_LOADED & output = service23_UMS_TripAlternatives): TRIP_REQUEST_ACCOMPLISHED;
+(ProvideTrip = TRIP_REQUEST_ACCOMPLISHED & input = service22_UMS_TripManagementRequest): TRIP_MANAGE_REQUEST_LOADED;
+(ProvideTrip = TRIP_MANAGE_REQUEST_LOADED & output = service22_UMS_TripManagementReply): TRIP_MANAGEMENT_ACCOMPLISHED;
+1:ProvideTrip;
+esac;
+-----------------------------------
+--   P R E C O N D I T I O N S   --
+-----------------------------------
+TRANS (input = service22_UMS_TripManagementRequest) -> ((((ProvideTrip = TRIP_REQUEST_ACCOMPLISHED))))
+TRANS (output = service22_UMS_TripManagementReply) -> ((((ProvideTrip = TRIP_MANAGE_REQUEST_LOADED))))
+TRANS (input = service23_UMS_TripRequest) -> ((((ProvideTrip = INITIAL))))
+TRANS (output = service23_UMS_TripAlternatives) -> ((((ProvideTrip = TRIP_REQUEST_LOADED))))
+-----------------------------
+--   I N V A R I A N T S   --
+-----------------------------
+--	 Synchronicity
+TRANS (1-(input = UNDEF)) + (1-(output = UNDEF)) = 1
+
+---------------------------------------
+--   S Y N C H R O N I Z A T I O N   --
+---------------------------------------
+DEFINE SYNC0 := ((ProvideTrip in {TRIP_REQUEST_ACCOMPLISHED}));
+--	 Synchronicity enforcement
+TRANS (service22 in {ST2, ST1, ST4, ST3, ST5, ST7}) -> (next(service22) != service22)
+TRANS (service23 in {ST2, ST1, ST3}) -> (next(service23) != service23)
+-------------------------------
+--   C O N T R O L L E R S   --
+-------------------------------
+--	 Fault Controller
+VAR FAULT_CONTROLLER: { START, STOP };
+INIT FAULT_CONTROLLER = START
+
+ASSIGN
+next(FAULT_CONTROLLER) := 
+case
+(FAULT_CONTROLLER = START & FALSE): STOP;
+1: FAULT_CONTROLLER;
+esac;
+
+TRANS (output != UNDEF | input != UNDEF) -> (FAULT_CONTROLLER != STOP)
+
+-------------------------------------
+--   I N I T I A L I Z A T I O N   --
+-------------------------------------
+INIT ((SetupTrip = INITIAL) & (ProvideTrip = INITIAL))
+INIT ((service22 = ST0) & (service23 = ST0))
+
+-----------------
+--   G O A L   --
+-----------------
+MODULE main
+VAR dn_main : dn_main;
+
+GOAL ONEOF(
+(dn_main.SYNC0), 1;
+(dn_main.FAULT_CONTROLLER = STOP), 0
+
+)

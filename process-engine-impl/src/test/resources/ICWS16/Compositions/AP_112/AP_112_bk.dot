@@ -1,0 +1,13 @@
+(dn_main.service187 = ST0 & (dn_main.SetupTrip = INITIAL & dn_main.FAULT_CONTROLLER = START))
+4
+(dn_main.service187 = ST4 & (dn_main.SetupTrip = ORGANIZED & dn_main.FAULT_CONTROLLER = START))
+digraph plan_fsm {
+ratio="1.3";
+margin="0.2";
+size="8.0,11.4";
+"0" -> "1" [style=dotted label="dn_main.input = service187_TO_ChosenTrip &\n"]
+"1" -> "2" [label="dn_main.output = service187_TO_DefineGoal"]
+"2" -> "3" [style=dotted label="dn_main.input = service187_TO_HOAAorganizeTrip &\n"]
+"3" -> "4" [label="dn_main.output = service187_TO_ChosenTripEnd"]
+}
+

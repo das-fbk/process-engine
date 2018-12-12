@@ -1,0 +1,108 @@
+-------------------------------
+--   C O M P O S I T I O N   --
+-------------------------------
+MODULE dn_main
+
+---------------------
+--   I N P U T S   --
+---------------------
+IVAR input:
+{
+UNDEF, service437_RESET, service437_PP_PaymentRequest
+};
+
+-----------------------
+--   O U T P U T S   --
+-----------------------
+IVAR output:
+{
+UNDEF, service437_PP_concrete1, service437_PP_concrete3, service437_PP_concrete2, service437_PP_PaymentReply
+};
+
+-------------------------
+--   S E R V I C E S   --
+-------------------------
+--	 service437
+VAR service437: {ST2, ST1, ST4, ST3, ST5, ST0};
+ASSIGN
+next(service437) :=
+case
+(service437 = ST3 & input = service437_RESET): ST0;
+(service437 = ST1 & output = service437_PP_concrete1): ST2;
+(service437 = ST2 & input = service437_RESET): ST0;
+(service437 = ST1 & input = service437_RESET): ST0;
+(service437 = ST5 & input = service437_RESET): ST0;
+(service437 = ST0 & input = service437_PP_PaymentRequest): ST1;
+(service437 = ST2 & output = service437_PP_concrete2): ST3;
+(service437 = ST4 & input = service437_RESET): ST0;
+(service437 = ST4 & output = service437_PP_PaymentReply): ST5;
+(service437 = ST3 & output = service437_PP_concrete3): ST4;
+1:service437;
+esac;
+TRANS ( output = service437_PP_concrete1) -> (service437 = ST1)
+TRANS ( output = service437_PP_concrete3) -> (service437 = ST3)
+TRANS ( output = service437_PP_concrete2) -> (service437 = ST2)
+TRANS ( input = service437_RESET) -> (service437 = ST2 | service437 = ST1 | service437 = ST4 | service437 = ST3 | service437 = ST5)
+TRANS ( input = service437_PP_PaymentRequest) -> (service437 = ST0)
+TRANS ( output = service437_PP_PaymentReply) -> (service437 = ST4)
+
+-----------------------
+--   O B J E C T S   --
+-----------------------
+--	 PayPalPayment
+VAR PayPalPayment: {INITIAL, PP_PAYMENT_EXECUTED};
+ASSIGN
+next(PayPalPayment) :=
+case
+(PayPalPayment = INITIAL & output = service437_PP_PaymentReply): PP_PAYMENT_EXECUTED;
+1:PayPalPayment;
+esac;
+-----------------------------------
+--   P R E C O N D I T I O N S   --
+-----------------------------------
+TRANS (input = service437_PP_PaymentRequest) -> ((((PayPalPayment = INITIAL))))
+-----------------------------
+--   I N V A R I A N T S   --
+-----------------------------
+--	 Synchronicity
+TRANS (1-(input = UNDEF)) + (1-(output = UNDEF)) = 1
+
+---------------------------------------
+--   S Y N C H R O N I Z A T I O N   --
+---------------------------------------
+DEFINE SYNC0 := ((PayPalPayment in {PP_PAYMENT_EXECUTED}));
+--	 Synchronicity enforcement
+TRANS (service437 in {ST2, ST1, ST4, ST3}) -> (next(service437) != service437)
+-------------------------------
+--   C O N T R O L L E R S   --
+-------------------------------
+--	 Fault Controller
+VAR FAULT_CONTROLLER: { START, STOP };
+INIT FAULT_CONTROLLER = START
+
+ASSIGN
+next(FAULT_CONTROLLER) := 
+case
+(FAULT_CONTROLLER = START & FALSE): STOP;
+1: FAULT_CONTROLLER;
+esac;
+
+TRANS (output != UNDEF | input != UNDEF) -> (FAULT_CONTROLLER != STOP)
+
+-------------------------------------
+--   I N I T I A L I Z A T I O N   --
+-------------------------------------
+INIT ((PayPalPayment = INITIAL))
+INIT ((service437 = ST0))
+
+-----------------
+--   G O A L   --
+-----------------
+MODULE main
+VAR dn_main : dn_main;
+
+GOAL ONEOF(
+(dn_main.SYNC0), 1;
+(dn_main.FAULT_CONTROLLER = STOP), 0
+
+)

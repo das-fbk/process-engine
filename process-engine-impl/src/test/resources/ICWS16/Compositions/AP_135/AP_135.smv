@@ -1,0 +1,141 @@
+-------------------------------
+--   C O M P O S I T I O N   --
+-------------------------------
+MODULE dn_main
+
+---------------------
+--   I N P U T S   --
+---------------------
+IVAR input:
+{
+UNDEF, service223_BS_RegistrationRequest, service223_BS_UpdateSmartMobilityCard, service223_RESET, service224_BS_PlanBikeRoute, service224_BS_ExecuteRouteRequest, service224_RESET
+};
+
+-----------------------
+--   O U T P U T S   --
+-----------------------
+IVAR output:
+{
+UNDEF, service223_BS_RegistrationAck, service224_BS_ExecuteRouteAck
+};
+
+-------------------------
+--   S E R V I C E S   --
+-------------------------
+--	 service223
+VAR service223: {ST2, ST1, ST3, ST0};
+ASSIGN
+next(service223) :=
+case
+(service223 = ST0 & input = service223_BS_RegistrationRequest): ST1;
+(service223 = ST1 & input = service223_BS_UpdateSmartMobilityCard): ST2;
+(service223 = ST1 & input = service223_RESET): ST0;
+(service223 = ST3 & input = service223_RESET): ST0;
+(service223 = ST2 & input = service223_RESET): ST0;
+(service223 = ST2 & output = service223_BS_RegistrationAck): ST3;
+1:service223;
+esac;
+TRANS ( input = service223_BS_RegistrationRequest) -> (service223 = ST0)
+TRANS ( output = service223_BS_RegistrationAck) -> (service223 = ST2)
+TRANS ( input = service223_BS_UpdateSmartMobilityCard) -> (service223 = ST1)
+TRANS ( input = service223_RESET) -> (service223 = ST2 | service223 = ST1 | service223 = ST3)
+
+--	 service224
+VAR service224: {ST2, ST1, ST3, ST0};
+ASSIGN
+next(service224) :=
+case
+(service224 = ST1 & input = service224_RESET): ST0;
+(service224 = ST0 & input = service224_BS_ExecuteRouteRequest): ST1;
+(service224 = ST1 & input = service224_BS_PlanBikeRoute): ST2;
+(service224 = ST2 & input = service224_RESET): ST0;
+(service224 = ST2 & output = service224_BS_ExecuteRouteAck): ST3;
+(service224 = ST3 & input = service224_RESET): ST0;
+1:service224;
+esac;
+TRANS ( input = service224_BS_PlanBikeRoute) -> (service224 = ST1)
+TRANS ( input = service224_BS_ExecuteRouteRequest) -> (service224 = ST0)
+TRANS ( input = service224_RESET) -> (service224 = ST2 | service224 = ST1 | service224 = ST3)
+TRANS ( output = service224_BS_ExecuteRouteAck) -> (service224 = ST2)
+
+-----------------------
+--   O B J E C T S   --
+-----------------------
+--	 BikeRoutePlan
+VAR BikeRoutePlan: {ROUTE_PLANNED, INITIAL};
+ASSIGN
+next(BikeRoutePlan) :=
+case
+(input = service224_BS_PlanBikeRoute):{(ROUTE_PLANNED)};
+1:BikeRoutePlan;
+esac;
+--	 BikeSharingTrip
+VAR BikeSharingTrip: {RACK_REACHED, INITIAL, BIKE_ROUTE_PLANNED, USER_REGISTERED};
+ASSIGN
+next(BikeSharingTrip) :=
+case
+(BikeSharingTrip = INITIAL & output = service223_BS_RegistrationAck): USER_REGISTERED;
+(BikeSharingTrip = BIKE_ROUTE_PLANNED & output = service224_BS_ExecuteRouteAck): RACK_REACHED;
+(BikeSharingTrip = USER_REGISTERED & input = service224_BS_PlanBikeRoute): BIKE_ROUTE_PLANNED;
+1:BikeSharingTrip;
+esac;
+--	 HandleSmartMobilityCard
+VAR HandleSmartMobilityCard: {INITIAL, SUBSCRIPTION, CARD_RELEASED, SERVICE_ADDED};
+ASSIGN
+next(HandleSmartMobilityCard) :=
+case
+(HandleSmartMobilityCard = SERVICE_ADDED & input = service223_BS_UpdateSmartMobilityCard): CARD_RELEASED;
+(input = service223_BS_UpdateSmartMobilityCard):{(SERVICE_ADDED)};
+1:HandleSmartMobilityCard;
+esac;
+-----------------------------------
+--   P R E C O N D I T I O N S   --
+-----------------------------------
+TRANS (input = service223_BS_RegistrationRequest) -> ((((BikeSharingTrip = INITIAL))))
+TRANS (input = service224_BS_ExecuteRouteRequest) -> ((((BikeSharingTrip = USER_REGISTERED))))
+-----------------------------
+--   I N V A R I A N T S   --
+-----------------------------
+--	 Synchronicity
+TRANS (1-(input = UNDEF)) + (1-(output = UNDEF)) = 1
+
+---------------------------------------
+--   S Y N C H R O N I Z A T I O N   --
+---------------------------------------
+DEFINE SYNC0 := ((BikeSharingTrip in {USER_REGISTERED}));
+--	 Synchronicity enforcement
+TRANS (service223 in {ST2}) -> (next(service223) != service223)
+TRANS (service224 in {ST2}) -> (next(service224) != service224)
+-------------------------------
+--   C O N T R O L L E R S   --
+-------------------------------
+--	 Fault Controller
+VAR FAULT_CONTROLLER: { START, STOP };
+INIT FAULT_CONTROLLER = START
+
+ASSIGN
+next(FAULT_CONTROLLER) := 
+case
+(FAULT_CONTROLLER = START & FALSE): STOP;
+1: FAULT_CONTROLLER;
+esac;
+
+TRANS (output != UNDEF | input != UNDEF) -> (FAULT_CONTROLLER != STOP)
+
+-------------------------------------
+--   I N I T I A L I Z A T I O N   --
+-------------------------------------
+INIT ((BikeRoutePlan = INITIAL) & (BikeSharingTrip = INITIAL) & (HandleSmartMobilityCard = INITIAL))
+INIT ((service223 = ST0) & (service224 = ST0))
+
+-----------------
+--   G O A L   --
+-----------------
+MODULE main
+VAR dn_main : dn_main;
+
+GOAL ONEOF(
+(dn_main.SYNC0), 1;
+(dn_main.FAULT_CONTROLLER = STOP), 0
+
+)

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<composition xmlns="http://das.fbk.eu/Composition" xmlns:ns2="http://das.fbk.eu/Annotation" xmlns:ns3="http://das.fbk.eu/Process" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://soa.fbk.eu/Composition null\Schemata\Composition.xsd">
+    <domainProperties>
+        <domainProperty type="HandleRoute" oid="HandleRoute"/>
+    </domainProperties>
+    <fragments>
+        <fragment type="RM_assignPickupPoint" sid="service106">
+            <assignment oid="HandleRoute" o_name="HandleRoute"/>
+        </fragment>
+        <fragment type="RM_createRoute" sid="service108">
+            <assignment oid="HandleRoute" o_name="HandleRoute"/>
+        </fragment>
+        <fragment type="RM_passengerCheckIn" sid="service110">
+            <assignment oid="HandleRoute" o_name="HandleRoute"/>
+        </fragment>
+        <fragment type="RM_startRoute" sid="service111">
+            <assignment oid="HandleRoute" o_name="HandleRoute"/>
+        </fragment>
+        <fragment type="RM_endRoute" sid="service112">
+            <assignment oid="HandleRoute" o_name="HandleRoute"/>
+        </fragment>
+    </fragments>
+    <synchronization>
+        <point priority="0">
+            <domainProperty oid="HandleRoute">
+                <state>ROUTE_STARTED</state>
+            </domainProperty>
+        </point>
+    </synchronization>
+    <runtime>
+        <domainProperties>
+            <domainProperty oid="HandleRoute">INITIAL</domainProperty>
+        </domainProperties>
+        <fragments>
+            <fragment sid="service106">ST0</fragment>
+            <fragment sid="service108">ST0</fragment>
+            <fragment sid="service110">ST0</fragment>
+            <fragment sid="service111">ST0</fragment>
+            <fragment sid="service112">ST0</fragment>
+        </fragments>
+    </runtime>
+</composition>

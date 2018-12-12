@@ -1,0 +1,99 @@
+-------------------------------
+--   C O M P O S I T I O N   --
+-------------------------------
+MODULE dn_main
+
+---------------------
+--   I N P U T S   --
+---------------------
+IVAR input:
+{
+UNDEF, service393_PKM_ParkBookRequest, service393_RESET
+};
+
+-----------------------
+--   O U T P U T S   --
+-----------------------
+IVAR output:
+{
+UNDEF, service393_PKM_ParkBookResponse
+};
+
+-------------------------
+--   S E R V I C E S   --
+-------------------------
+--	 service393
+VAR service393: {ST2, ST1, ST0};
+ASSIGN
+next(service393) :=
+case
+(service393 = ST1 & output = service393_PKM_ParkBookResponse): ST2;
+(service393 = ST2 & input = service393_RESET): ST0;
+(service393 = ST1 & input = service393_RESET): ST0;
+(service393 = ST0 & input = service393_PKM_ParkBookRequest): ST1;
+1:service393;
+esac;
+TRANS ( output = service393_PKM_ParkBookResponse) -> (service393 = ST1)
+TRANS ( input = service393_PKM_ParkBookRequest) -> (service393 = ST0)
+TRANS ( input = service393_RESET) -> (service393 = ST2 | service393 = ST1)
+
+-----------------------
+--   O B J E C T S   --
+-----------------------
+--	 ParkingManager
+VAR ParkingManager: {PARK_BOOKED, INITIAL};
+ASSIGN
+next(ParkingManager) :=
+case
+(ParkingManager = INITIAL & output = service393_PKM_ParkBookResponse): PARK_BOOKED;
+1:ParkingManager;
+esac;
+-----------------------------------
+--   P R E C O N D I T I O N S   --
+-----------------------------------
+TRANS (input = service393_PKM_ParkBookRequest) -> ((((ParkingManager = INITIAL))))
+-----------------------------
+--   I N V A R I A N T S   --
+-----------------------------
+--	 Synchronicity
+TRANS (1-(input = UNDEF)) + (1-(output = UNDEF)) = 1
+
+---------------------------------------
+--   S Y N C H R O N I Z A T I O N   --
+---------------------------------------
+DEFINE SYNC0 := ((ParkingManager in {PARK_BOOKED}));
+--	 Synchronicity enforcement
+TRANS (service393 in {ST1}) -> (next(service393) != service393)
+-------------------------------
+--   C O N T R O L L E R S   --
+-------------------------------
+--	 Fault Controller
+VAR FAULT_CONTROLLER: { START, STOP };
+INIT FAULT_CONTROLLER = START
+
+ASSIGN
+next(FAULT_CONTROLLER) := 
+case
+(FAULT_CONTROLLER = START & FALSE): STOP;
+1: FAULT_CONTROLLER;
+esac;
+
+TRANS (output != UNDEF | input != UNDEF) -> (FAULT_CONTROLLER != STOP)
+
+-------------------------------------
+--   I N I T I A L I Z A T I O N   --
+-------------------------------------
+INIT ((ParkingManager = INITIAL))
+INIT ((service393 = ST0))
+
+-----------------
+--   G O A L   --
+-----------------
+MODULE main
+VAR dn_main : dn_main;
+
+GOAL ONEOF(
+(dn_main.SYNC0), 1;
+(dn_main.FAULT_CONTROLLER = STOP), 0
+
+)

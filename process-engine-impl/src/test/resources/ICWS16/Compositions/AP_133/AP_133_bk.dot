@@ -1,0 +1,22 @@
+(dn_main.service208 = ST0 & (dn_main.service210 = ST0 & (dn_main.service212 = ST0 & (dn_main.service215 = ST0 & (dn_main.service216 = ST0 & (dn_main.service219 = ST0 & (dn_main.service220 = ST0 & (dn_main.BikeRoutePlan = INITIAL & (dn_main.HandlePayment = INITIAL & (dn_main.FlexibusDriverStatus = INITIAL & (dn_main.FlexibusTrip = INITIAL & (dn_main.BikeSharingTrip = INITIAL & (dn_main.RoutePassengerStatus = INITIAL & (dn_main.HandleSmartMobilityCard = INITIAL & dn_main.FAULT_CONTROLLER = START))))))))))))))
+13
+(dn_main.service208 = ST2 & (dn_main.service210 = ST3 & (dn_main.service212 = ST2 & (dn_main.service215 = ST0 & (dn_main.service216 = ST0 & (dn_main.service219 = ST0 & (dn_main.service220 = ST6 & (dn_main.BikeRoutePlan = INITIAL & (dn_main.HandlePayment = PAYMENT_EXECUTED & (dn_main.FlexibusDriverStatus = INITIAL & (dn_main.FlexibusTrip = TRIP_BOOKED & (dn_main.BikeSharingTrip = USER_REGISTERED & (dn_main.RoutePassengerStatus = PASSENGER_DETAILS_DEFINED & (dn_main.HandleSmartMobilityCard = SERVICE_ADDED & dn_main.FAULT_CONTROLLER = START))))))))))))))
+digraph plan_fsm {
+ratio="1.3";
+margin="0.2";
+size="8.0,11.4";
+"0" -> "1" [style=dotted label="dn_main.input = service210_BS_RegistrationRequest &\n"]
+"1" -> "2" [style=dotted label="dn_main.input = service210_BS_UpdateSmartMobilityCard &\n"]
+"2" -> "3" [label="dn_main.output = service210_BS_RegistrationAck"]
+"3" -> "4" [style=dotted label="dn_main.input = service212_FC_UserRegistrationRequest &\n"]
+"4" -> "5" [label="dn_main.output = service212_FC_UserRegistrationAck"]
+"5" -> "6" [style=dotted label="dn_main.input = service208_FC_UserLoginRequest &\n"]
+"6" -> "7" [label="dn_main.output = service208_FC_UserLoginAck"]
+"7" -> "8" [style=dotted label="dn_main.input = service220_FC_FlexibusBookingRequest &\n"]
+"8" -> "9" [label="dn_main.output = service220_FC_TripDetails"]
+"9" -> "10" [style=dotted label="dn_main.input = service220_FC_ConfirmAndPay &\n"]
+"10" -> "11" [style=dotted label="dn_main.input = service220_FC_PaymentReceipt &\n"]
+"11" -> "12" [label="dn_main.output = service220_FC_BookingResult"]
+"12" -> "13" [style=dotted label="dn_main.input = service220_FC_SetPassengerDetails &\n"]
+}
+

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<composition xmlns="http://das.fbk.eu/Composition" xmlns:ns2="http://das.fbk.eu/Annotation" xmlns:ns3="http://das.fbk.eu/Process" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://soa.fbk.eu/Composition null\Schemata\Composition.xsd">
+    <domainProperties>
+        <domainProperty type="HandlePayment" oid="HandlePayment"/>
+        <domainProperty type="HandleSmartMobilityCard" oid="HandleSmartMobilityCard"/>
+    </domainProperties>
+    <fragments>
+        <fragment type="SMC_activateNewService" sid="service385">
+            <assignment oid="HandleSmartMobilityCard" o_name="HandleSmartMobilityCard"/>
+        </fragment>
+        <fragment type="SMC_releaseCard" sid="service386">
+            <assignment oid="HandlePayment" o_name="HandlePayment"/>
+            <assignment oid="HandleSmartMobilityCard" o_name="HandleSmartMobilityCard"/>
+        </fragment>
+    </fragments>
+    <synchronization>
+        <point priority="0">
+            <domainProperty oid="HandleSmartMobilityCard">
+                <state>SERVICE_ADDED</state>
+            </domainProperty>
+        </point>
+    </synchronization>
+    <runtime>
+        <domainProperties>
+            <domainProperty oid="HandlePayment">INITIAL</domainProperty>
+            <domainProperty oid="HandleSmartMobilityCard">INITIAL</domainProperty>
+        </domainProperties>
+        <fragments>
+            <fragment sid="service385">ST0</fragment>
+            <fragment sid="service386">ST0</fragment>
+        </fragments>
+    </runtime>
+</composition>

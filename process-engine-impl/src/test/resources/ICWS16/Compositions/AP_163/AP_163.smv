@@ -1,0 +1,130 @@
+-------------------------------
+--   C O M P O S I T I O N   --
+-------------------------------
+MODULE dn_main
+
+---------------------
+--   I N P U T S   --
+---------------------
+IVAR input:
+{
+UNDEF, service366_SMC_ActivateServiceRequest, service366_RESET, service367_SMC_SubscribeAndPay, service367_RESET, service367_SMC_MobilityCardRequest
+};
+
+-----------------------
+--   O U T P U T S   --
+-----------------------
+IVAR output:
+{
+UNDEF, service366_SMC_ActivateServiceReply, service367_SMC_MobilityCardReply
+};
+
+-------------------------
+--   S E R V I C E S   --
+-------------------------
+--	 service366
+VAR service366: {ST2, ST1, ST0};
+ASSIGN
+next(service366) :=
+case
+(service366 = ST1 & input = service366_RESET): ST0;
+(service366 = ST0 & input = service366_SMC_ActivateServiceRequest): ST1;
+(service366 = ST1 & output = service366_SMC_ActivateServiceReply): ST2;
+(service366 = ST2 & input = service366_RESET): ST0;
+1:service366;
+esac;
+TRANS ( input = service366_SMC_ActivateServiceRequest) -> (service366 = ST0)
+TRANS ( input = service366_RESET) -> (service366 = ST2 | service366 = ST1)
+TRANS ( output = service366_SMC_ActivateServiceReply) -> (service366 = ST1)
+
+--	 service367
+VAR service367: {ST2, ST1, ST3, ST0};
+ASSIGN
+next(service367) :=
+case
+(service367 = ST1 & input = service367_SMC_SubscribeAndPay): ST2;
+(service367 = ST2 & input = service367_RESET): ST0;
+(service367 = ST1 & input = service367_RESET): ST0;
+(service367 = ST2 & output = service367_SMC_MobilityCardReply): ST3;
+(service367 = ST3 & input = service367_RESET): ST0;
+(service367 = ST0 & input = service367_SMC_MobilityCardRequest): ST1;
+1:service367;
+esac;
+TRANS ( input = service367_SMC_SubscribeAndPay) -> (service367 = ST1)
+TRANS ( output = service367_SMC_MobilityCardReply) -> (service367 = ST2)
+TRANS ( input = service367_RESET) -> (service367 = ST2 | service367 = ST1 | service367 = ST3)
+TRANS ( input = service367_SMC_MobilityCardRequest) -> (service367 = ST0)
+
+-----------------------
+--   O B J E C T S   --
+-----------------------
+--	 HandlePayment
+VAR HandlePayment: {PAYMENT_EXECUTED, INITIAL};
+ASSIGN
+next(HandlePayment) :=
+case
+(input = service367_SMC_SubscribeAndPay):{(PAYMENT_EXECUTED)};
+1:HandlePayment;
+esac;
+--	 HandleSmartMobilityCard
+VAR HandleSmartMobilityCard: {INITIAL, SUBSCRIPTION, CARD_RELEASED, SERVICE_ADDED};
+ASSIGN
+next(HandleSmartMobilityCard) :=
+case
+(HandleSmartMobilityCard = CARD_RELEASED & output = service366_SMC_ActivateServiceReply): SERVICE_ADDED;
+(HandleSmartMobilityCard = SUBSCRIPTION & output = service367_SMC_MobilityCardReply): CARD_RELEASED;
+(HandleSmartMobilityCard = INITIAL & input = service367_SMC_SubscribeAndPay): SUBSCRIPTION;
+1:HandleSmartMobilityCard;
+esac;
+-----------------------------------
+--   P R E C O N D I T I O N S   --
+-----------------------------------
+TRANS (input = service366_SMC_ActivateServiceRequest) -> ((((HandleSmartMobilityCard = CARD_RELEASED))))
+TRANS (input = service367_SMC_MobilityCardRequest) -> ((((HandleSmartMobilityCard = INITIAL))))
+TRANS (output = service367_SMC_MobilityCardReply) -> ((((HandleSmartMobilityCard = SUBSCRIPTION))))
+-----------------------------
+--   I N V A R I A N T S   --
+-----------------------------
+--	 Synchronicity
+TRANS (1-(input = UNDEF)) + (1-(output = UNDEF)) = 1
+
+---------------------------------------
+--   S Y N C H R O N I Z A T I O N   --
+---------------------------------------
+DEFINE SYNC0 := ((HandleSmartMobilityCard in {SERVICE_ADDED}));
+--	 Synchronicity enforcement
+TRANS (service366 in {ST1}) -> (next(service366) != service366)
+TRANS (service367 in {ST2}) -> (next(service367) != service367)
+-------------------------------
+--   C O N T R O L L E R S   --
+-------------------------------
+--	 Fault Controller
+VAR FAULT_CONTROLLER: { START, STOP };
+INIT FAULT_CONTROLLER = START
+
+ASSIGN
+next(FAULT_CONTROLLER) := 
+case
+(FAULT_CONTROLLER = START & FALSE): STOP;
+1: FAULT_CONTROLLER;
+esac;
+
+TRANS (output != UNDEF | input != UNDEF) -> (FAULT_CONTROLLER != STOP)
+
+-------------------------------------
+--   I N I T I A L I Z A T I O N   --
+-------------------------------------
+INIT ((HandlePayment = INITIAL) & (HandleSmartMobilityCard = INITIAL))
+INIT ((service366 = ST0) & (service367 = ST0))
+
+-----------------
+--   G O A L   --
+-----------------
+MODULE main
+VAR dn_main : dn_main;
+
+GOAL ONEOF(
+(dn_main.SYNC0), 1;
+(dn_main.FAULT_CONTROLLER = STOP), 0
+
+)

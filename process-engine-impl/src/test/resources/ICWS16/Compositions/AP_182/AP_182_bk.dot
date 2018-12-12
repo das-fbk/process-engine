@@ -1,0 +1,11 @@
+(dn_main.service393 = ST0 & (dn_main.ParkingManager = INITIAL & dn_main.FAULT_CONTROLLER = START))
+2
+(dn_main.service393 = ST2 & (dn_main.ParkingManager = PARK_BOOKED & dn_main.FAULT_CONTROLLER = START))
+digraph plan_fsm {
+ratio="1.3";
+margin="0.2";
+size="8.0,11.4";
+"0" -> "1" [style=dotted label="dn_main.input = service393_PKM_ParkBookRequest &\n"]
+"1" -> "2" [label="dn_main.output = service393_PKM_ParkBookResponse"]
+}
+

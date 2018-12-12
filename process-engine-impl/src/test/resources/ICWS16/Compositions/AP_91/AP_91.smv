@@ -1,0 +1,153 @@
+-------------------------------
+--   C O M P O S I T I O N   --
+-------------------------------
+MODULE dn_main
+
+---------------------
+--   I N P U T S   --
+---------------------
+IVAR input:
+{
+UNDEF, service156_UMS_ManagementTrip, service156_UMS_TripManagementRequest, service156_RESET, service158_UMS_TripRequest, service158_RESET
+};
+
+-----------------------
+--   O U T P U T S   --
+-----------------------
+IVAR output:
+{
+UNDEF, service156_UMS_concrete4, service156_UMS_concrete3, service156_UMS_concrete2, service156_UMS_concrete1, service156_UMS_TripManagementReply, service156_UMS_concrete5, service158_UMS_TripAlternatives, service158_UMS_concrete2, service158_UMS_concrete1
+};
+
+-------------------------
+--   S E R V I C E S   --
+-------------------------
+--	 service156
+VAR service156: {ST2, ST1, ST4, ST3, ST6, ST5, ST8, ST7, ST0};
+ASSIGN
+next(service156) :=
+case
+(service156 = ST3 & output = service156_UMS_concrete3): ST4;
+(service156 = ST6 & input = service156_RESET): ST0;
+(service156 = ST1 & output = service156_UMS_concrete1): ST2;
+(service156 = ST7 & input = service156_RESET): ST0;
+(service156 = ST1 & input = service156_RESET): ST0;
+(service156 = ST2 & output = service156_UMS_concrete2): ST3;
+(service156 = ST2 & input = service156_RESET): ST0;
+(service156 = ST4 & output = service156_UMS_concrete4): ST5;
+(service156 = ST6 & input = service156_UMS_ManagementTrip): ST7;
+(service156 = ST5 & output = service156_UMS_concrete5): ST6;
+(service156 = ST5 & input = service156_RESET): ST0;
+(service156 = ST8 & input = service156_RESET): ST0;
+(service156 = ST3 & input = service156_RESET): ST0;
+(service156 = ST0 & input = service156_UMS_TripManagementRequest): ST1;
+(service156 = ST7 & output = service156_UMS_TripManagementReply): ST8;
+(service156 = ST4 & input = service156_RESET): ST0;
+1:service156;
+esac;
+TRANS ( input = service156_UMS_ManagementTrip) -> (service156 = ST6)
+TRANS ( output = service156_UMS_concrete4) -> (service156 = ST4)
+TRANS ( input = service156_UMS_TripManagementRequest) -> (service156 = ST0)
+TRANS ( output = service156_UMS_concrete3) -> (service156 = ST3)
+TRANS ( output = service156_UMS_concrete2) -> (service156 = ST2)
+TRANS ( input = service156_RESET) -> (service156 = ST2 | service156 = ST1 | service156 = ST4 | service156 = ST3 | service156 = ST6 | service156 = ST5 | service156 = ST8 | service156 = ST7)
+TRANS ( output = service156_UMS_concrete1) -> (service156 = ST1)
+TRANS ( output = service156_UMS_TripManagementReply) -> (service156 = ST7)
+TRANS ( output = service156_UMS_concrete5) -> (service156 = ST5)
+
+--	 service158
+VAR service158: {ST2, ST1, ST4, ST3, ST0};
+ASSIGN
+next(service158) :=
+case
+(service158 = ST1 & input = service158_RESET): ST0;
+(service158 = ST1 & output = service158_UMS_concrete1): ST2;
+(service158 = ST0 & input = service158_UMS_TripRequest): ST1;
+(service158 = ST2 & output = service158_UMS_concrete2): ST3;
+(service158 = ST2 & input = service158_RESET): ST0;
+(service158 = ST3 & output = service158_UMS_TripAlternatives): ST4;
+(service158 = ST4 & input = service158_RESET): ST0;
+(service158 = ST3 & input = service158_RESET): ST0;
+1:service158;
+esac;
+TRANS ( input = service158_UMS_TripRequest) -> (service158 = ST0)
+TRANS ( output = service158_UMS_TripAlternatives) -> (service158 = ST3)
+TRANS ( output = service158_UMS_concrete2) -> (service158 = ST2)
+TRANS ( input = service158_RESET) -> (service158 = ST2 | service158 = ST1 | service158 = ST4 | service158 = ST3)
+TRANS ( output = service158_UMS_concrete1) -> (service158 = ST1)
+
+-----------------------
+--   O B J E C T S   --
+-----------------------
+--	 SetupTrip
+VAR SetupTrip: {ORGANIZED, INITIAL};
+ASSIGN
+next(SetupTrip) :=
+case
+(input = service156_UMS_ManagementTrip):{(ORGANIZED)};
+1:SetupTrip;
+esac;
+--	 ProvideTrip
+VAR ProvideTrip: {TRIP_REQUEST_ACCOMPLISHED, TRIP_MANAGEMENT_ACCOMPLISHED, TRIP_MANAGE_REQUEST_LOADED, TRIP_REQUEST_LOADED, INITIAL};
+ASSIGN
+next(ProvideTrip) :=
+case
+(ProvideTrip = TRIP_REQUEST_LOADED & output = service158_UMS_TripAlternatives): TRIP_REQUEST_ACCOMPLISHED;
+(ProvideTrip = INITIAL & input = service158_UMS_TripRequest): TRIP_REQUEST_LOADED;
+(ProvideTrip = TRIP_MANAGE_REQUEST_LOADED & output = service156_UMS_TripManagementReply): TRIP_MANAGEMENT_ACCOMPLISHED;
+(ProvideTrip = TRIP_REQUEST_ACCOMPLISHED & input = service156_UMS_TripManagementRequest): TRIP_MANAGE_REQUEST_LOADED;
+1:ProvideTrip;
+esac;
+-----------------------------------
+--   P R E C O N D I T I O N S   --
+-----------------------------------
+TRANS (input = service156_UMS_TripManagementRequest) -> ((((ProvideTrip = TRIP_REQUEST_ACCOMPLISHED))))
+TRANS (output = service156_UMS_TripManagementReply) -> ((((ProvideTrip = TRIP_MANAGE_REQUEST_LOADED))))
+TRANS (input = service158_UMS_TripRequest) -> ((((ProvideTrip = INITIAL))))
+TRANS (output = service158_UMS_TripAlternatives) -> ((((ProvideTrip = TRIP_REQUEST_LOADED))))
+-----------------------------
+--   I N V A R I A N T S   --
+-----------------------------
+--	 Synchronicity
+TRANS (1-(input = UNDEF)) + (1-(output = UNDEF)) = 1
+
+---------------------------------------
+--   S Y N C H R O N I Z A T I O N   --
+---------------------------------------
+DEFINE SYNC0 := ((ProvideTrip in {TRIP_MANAGEMENT_ACCOMPLISHED}));
+--	 Synchronicity enforcement
+TRANS (service156 in {ST2, ST1, ST4, ST3, ST5, ST7}) -> (next(service156) != service156)
+TRANS (service158 in {ST2, ST1, ST3}) -> (next(service158) != service158)
+-------------------------------
+--   C O N T R O L L E R S   --
+-------------------------------
+--	 Fault Controller
+VAR FAULT_CONTROLLER: { START, STOP };
+INIT FAULT_CONTROLLER = START
+
+ASSIGN
+next(FAULT_CONTROLLER) := 
+case
+(FAULT_CONTROLLER = START & FALSE): STOP;
+1: FAULT_CONTROLLER;
+esac;
+
+TRANS (output != UNDEF | input != UNDEF) -> (FAULT_CONTROLLER != STOP)
+
+-------------------------------------
+--   I N I T I A L I Z A T I O N   --
+-------------------------------------
+INIT ((SetupTrip = INITIAL) & (ProvideTrip = TRIP_REQUEST_ACCOMPLISHED))
+INIT ((service156 = ST0) & (service158 = ST0))
+
+-----------------
+--   G O A L   --
+-----------------
+MODULE main
+VAR dn_main : dn_main;
+
+GOAL ONEOF(
+(dn_main.SYNC0), 1;
+(dn_main.FAULT_CONTROLLER = STOP), 0
+
+)

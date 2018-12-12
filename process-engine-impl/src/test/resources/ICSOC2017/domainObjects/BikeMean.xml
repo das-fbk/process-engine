@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:domainObject name="BikeMean" xmlns:tns="http://das.fbk.eu/DomainObject"
+	xmlns:tns2="http://das.fbk.eu/DataType" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://das.fbk.eu/DomainObject ../schema/DomainObject.xsd ">
+
+	<tns:domainKnowledge>
+		<tns:internalDomainProperty name="domainProperties/BikeJourney" />
+	</tns:domainKnowledge>
+
+	<tns:process name="processes/PROC_BikeMean" />
+
+	<tns:fragment name="fragments/BIM_plan" />
+	<tns:fragment name="fragments/BIM_book" />
+	<tns:fragment name="fragments/BIM_take" />
+
+</tns:domainObject>

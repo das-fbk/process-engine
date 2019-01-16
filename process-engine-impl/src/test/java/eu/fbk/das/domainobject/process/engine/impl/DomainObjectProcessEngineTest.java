@@ -58,7 +58,7 @@ public class DomainObjectProcessEngineTest {
 	private DomainObjectManager manager;
 	private List<String> dirs;
 	// C:\Users\Martina\git\process-engine\process-engine-impl\src\test\resources\DOdemoTests\DOdataModelTest\Storyboard1.xml
-	private final String BASE_DIR = "C:/Users/Martina/git/process-engine/process-engine-impl/src/test/resources/";
+	private final String BASE_DIR = "/Users/martina/git/process-engine/process-engine-impl/src/test/resources/";
 	private AdaptationManager adaptationManager;
 	private ProcessEngine processEngine;
 	private List<DomainObjectInstanceWithVariable> laterExecutionDoiList = new ArrayList<DomainObjectInstanceWithVariable>();
@@ -418,7 +418,7 @@ public class DomainObjectProcessEngineTest {
 		// new TAProvideSelectedDestinationExecutable(
 		// processEngine, null));
 
-		execute(processEngine, 100000);
+		execute(processEngine, 1000000);
 		processEngine.getServicesTest();
 		assertTrue(processEngine.size() >= 1);
 
